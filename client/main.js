@@ -1,25 +1,21 @@
-$(function() {
+$(function () {
+    const socket = io();
 
-  var randomColor ="#"+((1<<24)*Math.random()|0).toString(16);
+    const $sha = $("#sha");
+    const $users = $("#users");
+    $sha.click(() => {
+        socket.emit('sha');
+    })
 
-  document.documentElement.style.setProperty('color', randomColor);
+    socket.emit('addUser');
+    socket.on('addUser', (data) => {
+        console.log('addUser', data);
+        console.log('addUser', data.users.map((user)=>renderUser(user)).join(''));
 
-  const socket = io();
+        $users.html(data.users.map((user)=>renderUser(user)).join(''));
+    });
 
-  const $sha=$("#sha");
-
-
-  $sha.click(()=>{
-    socket.emit('sha');
-  })
-
-  socket.emit('init');
-
-  socket.on('init', (data) => {
-    console.log(data.message)
-  });
-
-  socket.on('new message', (data) => {
-    console.log(data.message)
-  });
+    socket.on('new message', (data) => {
+        console.log(data.message)
+    });
 });

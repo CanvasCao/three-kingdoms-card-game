@@ -5,35 +5,42 @@ const path = require('path');
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 const port = process.env.PORT || 3000;
-
+const {User} = require('../shared/User.js')
 
 server.listen(port, () => {
-  console.log('Server listening at port %d', port);
+    console.log('Server listening at port %d', port);
 });
 
 // Routing
 app.use(express.static(path.join(__dirname, '../client')));
 
 // Source
-let cards=['杀','杀','杀','杀','杀','杀'];
-let numUsers = ['user1'];
-let blood=4;
+
+let users = [];
+const gameStatus = {
+    users,
+}
+
 
 io.on('connection', (socket) => {
+    let addedUser = false;
 
-  socket.on('init', (data) => {
-    io.emit("init", {
-      message: `你是${numUsers[0]} 你有${blood}点血`,
+    socket.on('addUser', (data) => {
+        if (addedUser) return;
+        addedUser = true;
+        const name = `U${users.length + 1}`
+        const newUser=new User(name);
+        newUser.blood=4;
+        newUser.cards=['杀','闪','🍑'];
+        users.push(newUser);
+        io.emit("addUser", gameStatus);
     });
-  });
 
-
-  // when the client emits 'new message', this listens and executes
-  socket.on('sha', (data) => {
-    blood--;
-    io.emit('new message', {
-      message: `你是${numUsers[0]} 你有${blood}点血`,
+    socket.on('sha', (data) => {
+        blood--;
+        io.emit('new message', {
+            message: 'sha',
+        });
     });
-  });
 
 });
