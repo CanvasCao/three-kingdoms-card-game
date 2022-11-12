@@ -20,10 +20,12 @@ server.listen(port, () => {
 app.use(express.static(path.join(__dirname, '../client')));
 
 // Source
-
 let cards = [];
 let actions = [];// {type:'sha',cards:['1','2'],target:['1'],origin:"2"}
 let users = [];
+let logs = [];
+let whoseTurn;
+let whichStage;
 const gameStatus = {
     users,
 }
@@ -32,14 +34,27 @@ const gameStatus = {
 io.on('connection', (socket) => {
     let addedUser = false;
 
-    socket.on('addUser', (data) => {
+    socket.on('init', (data) => {
         if (addedUser) return;
-        addedUser = true;
+
+        // hardcode 只有两个角色
         const name = `U${users.length + 1}`
         const newUser = new User(name);
         newUser.blood = 4;
         newUser.cards = ['杀', '闪', '🍑'];
         users.push(newUser);
+
+        const newUser2 = new User(name);
+        newUser2.blood = 4;
+        newUser2.cards = ['杀', '闪', '🍑'];
+        users.push(newUser);
+
+        addedUser = true;
+
+        io.emit("init", gameStatus);
+    });
+
+    socket.on('refreshStatus', (data) => {
         io.emit("refreshStatus", gameStatus);
     });
 
