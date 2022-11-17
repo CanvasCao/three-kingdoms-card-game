@@ -1,3 +1,5 @@
+const {v4: uuidv4} = require('uuid');
+
 function shuffle(array) {
     let currentIndex = array.length, randomIndex;
 
@@ -16,7 +18,7 @@ function shuffle(array) {
     return array;
 }
 
-const cardList = [
+let cardList = [
     {'huase': '♣️', number: 1, name: "诸葛连弩", chineseName: '诸葛连弩'},
     {'huase': '♦️', number: 1, name: "诸葛连弩", chineseName: '诸葛连弩'},
     {'huase': '♠️️', number: 1, name: "闪电", chineseName: '闪电'},
@@ -27,12 +29,17 @@ const cardList = [
     {'huase': '♠️️', number: 2, name: "八卦阵", chineseName: '闪电'},
     {'huase': '♥️', number: 2, name: "闪", chineseName: '闪'},
 ]
-const testCardList = [
-    {'huase': '♠️️', number: 9, name: "sha", chineseName: '杀'},
+
+let testCardList = [
+    {'huase': '♠️️', number: 1, name: "sha", chineseName: '杀'},
     {'huase': '♦️', number: 2, name: "shan", chineseName: '闪'},
 ]
 
+const getInitCards = () => {
+    return shuffle(testCardList.map(c => {
+        c.cardId = uuidv4();
+        return c
+    }))
+}
 
-const initCards = shuffle(testCardList)
-
-exports.initCards = initCards;
+exports.getInitCards = getInitCards;
