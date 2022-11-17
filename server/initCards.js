@@ -1,17 +1,5 @@
-const cardList = [
-    {'huase': '♣️', number: 1, name: "诸葛连弩", chineseName: '诸葛连弩'},
-    {'huase': '♦️', number: 1, name: "诸葛连弩", chineseName: '诸葛连弩'},
-    {'huase': '♠️️', number: 1, name: "闪电", chineseName: '闪电'},
-    {'huase': '♥️', number: 1, name: "桃园结义", chineseName: '桃园结义'},
-
-    {'huase': '♣️', number: 2, name: "八卦阵", chineseName: '诸葛连弩'},
-    {'huase': '♦️', number: 2, name: "闪", chineseName: '闪'},
-    {'huase': '♠️️', number: 2, name: "八卦阵", chineseName: '闪电'},
-    {'huase': '♥️', number: 2, name: "闪", chineseName: '闪'},
-]
-
 function shuffle(array) {
-    let currentIndex = array.length,  randomIndex;
+    let currentIndex = array.length, randomIndex;
 
     // While there remain elements to shuffle.
     while (currentIndex != 0) {
@@ -28,6 +16,23 @@ function shuffle(array) {
     return array;
 }
 
-const initCards=shuffle(cardList)
+const cardList = [
+    {'huase': '♣️', number: 1, name: "诸葛连弩", chineseName: '诸葛连弩'},
+    {'huase': '♦️', number: 1, name: "诸葛连弩", chineseName: '诸葛连弩'},
+    {'huase': '♠️️', number: 1, name: "闪电", chineseName: '闪电'},
+    {'huase': '♥️', number: 1, name: "桃园结义", chineseName: '桃园结义'},
+
+    {'huase': '♣️', number: 2, name: "八卦阵", chineseName: '诸葛连弩'},
+    {'huase': '♦️', number: 2, name: "闪", chineseName: '闪'},
+    {'huase': '♠️️', number: 2, name: "八卦阵", chineseName: '闪电'},
+    {'huase': '♥️', number: 2, name: "闪", chineseName: '闪'},
+]
+const testCardList = [
+    {'huase': '♠️️', number: 9, name: "sha", chineseName: '杀'},
+    {'huase': '♦️', number: 2, name: "shan", chineseName: '闪'},
+]
+
+
+const initCards = shuffle(testCardList)
 
 exports.initCards = initCards;

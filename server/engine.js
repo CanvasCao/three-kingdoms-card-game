@@ -4,52 +4,66 @@
 
 const {initCards} = require("./initCards");
 let users = [];
-
-let userIndex = 0;
+let currentUserIndex = 0;
+let stages = ["start", "judge", "draw", "play", "throw", "end"];
 let stageIndex = 0;
 
-let stages = [
-    {"name": "draw", "timeout": 0, "userId": '22c3d181-5d60-4283-a4ce-6f2b14d772bc'},
-    {"name": "end", "timeout": 2000, "userId": '22c3d181-5d60-4283-a4ce-6f2b14d772bc'},
-    {"name": "draw", "timeout": 0, "userId": 'user2'},
-    {"name": "end", "timeout": 2000, "userId": 'user2'},
-];
-
 const gameStatus = {
-    users
+    users,
+    stage: {},
 }
 
+const getStageEmitAction = () => {
+    if (gameStatus.stage.stageName == 'draw') {
+        return {
+            actionName: 'drawCards',
+            actionData: {
+                cards: [initCards[0], initCards[1]],
+                userId: gameStatus.stage.userId
+            }
+        }
+    }
+    return {}
+}
 
-let timoutTimer = null;
 const startEngine = (io) => {
-    const stage = stages[stageIndex];
-    timoutTimer = setTimeout(() => {
-        // hardcode stage
-        stageIndex++;
-        if (stageIndex == 4) {
-            stageIndex = 0
-        }
+    gameStatus.stage = {userId: users[currentUserIndex].userId, stageName: stages[stageIndex]}
+    io.emit("goNextStage", gameStatus);
 
-
-        io.emit(
-            "message",
-            JSON.stringify(stage)
-        );
-
-        if (stage.name == "draw") {
-            io.emit(
-                "drawCards",
-                {
-                    cards: [initCards[0],initCards[1]],
-                    userId: stage.userId
-                }
-            );
-        }
-
-        startEngine(io);
-    }, stage.timeout)
+    if (canAutoGoNextStage()) {
+        goNextStage(io)
+    }
 }
 
+const goNextStage = (io) => {
+    stageIndex++
+    if (stageIndex >= stages.length) {
+        stageIndex = 0
 
-exports.startEngine = startEngine
-exports.gameStatus = gameStatus
+        currentUserIndex++
+        if (currentUserIndex >= users.length) {
+            currentUserIndex = 0
+        }
+    }
+
+    gameStatus.stage = {userId: users[currentUserIndex].userId, stageName: stages[stageIndex]}
+    io.emit("goNextStage", gameStatus);
+
+    // 目前只有发牌
+    const stageEmitAction = getStageEmitAction()
+    io.emit(stageEmitAction.actionName, stageEmitAction.actionData);
+
+    if (canAutoGoNextStage()) {
+        goNextStage(io)
+    }
+}
+
+const canAutoGoNextStage = () => {
+    return ["start", "judge", "draw", "end"].includes(gameStatus.stage.stageName)
+}
+
+module.exports = {
+    gameStatus,
+    startEngine,
+    goNextStage
+}

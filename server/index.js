@@ -1,5 +1,5 @@
 // Setup basic express server
-const {gameStatus, startEngine} = require("./engine");
+const {gameStatus, startEngine, goNextStage} = require("./engine");
 const express = require('express');
 const app = express();
 const path = require('path');
@@ -27,6 +27,7 @@ io.on('connection', (socket) => {
     socket.on('init', (data) => {
         // data { userId: '22c3d181-5d60-4283-a4ce-6f2b14d772bc' }
 
+        // TODO reconnect之后只刷新了users
         if (gameStatus.users.length >= 2) {
             io.emit("init", gameStatus);
             return;
@@ -40,7 +41,7 @@ io.on('connection', (socket) => {
 
         // hardcode 只有两个角色
         const newUser = new User();
-        newUser.blood = 4;
+        newUser.maxBlood = 4;
         newUser.name = "关羽";
         newUser.cardId = "SHU002";
         newUser.userId = data.userId;
@@ -49,9 +50,9 @@ io.on('connection', (socket) => {
         gameStatus.users.push(newUser);
 
         const newUser2 = new User();
-        newUser2.blood = 4;
-        newUser2.name = "关羽";
-        newUser2.cardId = "SHU002";
+        newUser2.maxBlood = 4;
+        newUser2.name = "刘备";
+        newUser2.cardId = "SHU001";
         newUser2.userId = "user2";
         newUser2.cards = [];
         newUser2.index = 1;
@@ -59,13 +60,14 @@ io.on('connection', (socket) => {
 
         addedUser = true;
 
-        //startEngine
+        // startEngine
         startEngine(io);
         io.emit("init", gameStatus);
     });
 
-    socket.on('refreshStatus', (data) => {
-        io.emit("refreshStatus", gameStatus);
+    socket.on('goNextStage', (data) => {
+        goNextStage(io);
     });
+
 
 });
