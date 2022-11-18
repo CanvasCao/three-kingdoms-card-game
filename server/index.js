@@ -1,5 +1,6 @@
 // Setup basic express server
-const {gameStatus, startEngine, goNextStage} = require("./engine");
+const {GameEngine} = require("./model/GameEngine");
+const emitMap = require("./data/emitMap.json");
 const express = require('express');
 const app = express();
 const path = require('path');
@@ -20,21 +21,20 @@ server.listen(port, () => {
 // Routing
 app.use(express.static(path.join(__dirname, '../client')));
 
+const gameEngine = new GameEngine(io);
 
 io.on('connection', (socket) => {
     let addedUser = false;
 
-    socket.on('init', (data) => {
+    socket.on(emitMap.INIT, (data) => {
         // data { userId: '22c3d181-5d60-4283-a4ce-6f2b14d772bc' }
-
-        // TODO reconnect之后只刷新了users
-        if (gameStatus.users.length >= 2) {
-            io.emit("init", gameStatus);
+        if (Object.keys(gameEngine.gameStatus.users).length >= 2) {
+            io.emit(emitMap.INIT, gameEngine.gameStatus);
             return;
         }
 
         if (addedUser) {
-            io.emit("init", gameStatus);
+            io.emit(emitMap.INIT, gameEngine.gameStatus);
             return;
         }
 
@@ -47,27 +47,24 @@ io.on('connection', (socket) => {
         newUser.userId = data.userId;
         newUser.cards = [];
         newUser.index = 0;
-        gameStatus.users.push(newUser);
+        gameEngine.gameStatus.users[newUser.userId] = newUser;
 
         const newUser2 = new User();
-        newUser2.maxBlood = 4;
+        newUser2.maxBlood = 5;
         newUser2.name = "刘备";
         newUser2.cardId = "SHU001";
         newUser2.userId = "user2";
         newUser2.cards = [];
         newUser2.index = 1;
-        gameStatus.users.push(newUser2);
+        gameEngine.gameStatus.users[newUser2.userId] = newUser2;
 
         addedUser = true;
 
         // startEngine
-        startEngine(io);
-        io.emit("init", gameStatus);
+        gameEngine.startEngine();
     });
 
-    socket.on('goNextStage', (data) => {
-        goNextStage(io);
+    socket.on(emitMap.GO_NEXT_STAGE, (data) => {
+        gameEngine.goNextStage();
     });
-
-
 });
