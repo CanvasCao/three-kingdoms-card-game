@@ -7,9 +7,11 @@ const path = require('path');
 const server = require('http').createServer(app);
 const io = require('socket.io')(server, {
     cors: {
-        origin: "http://localhost:9000",
-        methods: ["GET", "POST"]
-    }
+        // origin: "http://localhost:9000",
+        origin: "*",
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        credentials: false
+    },
 });
 const port = process.env.PORT || 3000;
 const {User} = require('./model/User.js')
@@ -50,7 +52,7 @@ io.on('connection', (socket) => {
         gameEngine.gameStatus.users[newUser.userId] = newUser;
 
         const newUser2 = new User();
-        newUser2.maxBlood = 5;
+        newUser2.maxBlood = 4;
         newUser2.name = "刘备";
         newUser2.cardId = "SHU001";
         newUser2.userId = "user2";
