@@ -1,5 +1,6 @@
 const {getInitCards} = require("../initCards");
-const emitMap = require("../data/emitMap.json");
+const emitMap = require("../config/emitMap.json");
+const responseCardsConfig = require("../config/responseCardsConfig.json");
 
 class GameEngine {
     constructor(io) {
@@ -7,10 +8,10 @@ class GameEngine {
         this.gameStatus = {
             users: {},
             stage: {},
+            action: {},
+            responseStages: []
         }
 
-
-        // TODO let actions = [];// {type:'sha',cards:['1','2'],target:['1'],origin:"2"}
         // TODO let logs = [];
 
         this.initCards = getInitCards();
@@ -37,6 +38,25 @@ class GameEngine {
     }
 
     goNextStage() {
+        this.setGameStatusStage();
+        // 目前只有发牌
+        if (this.gameStatus.stage.stageName == 'draw') {
+            this.userDrawCards();
+        }
+
+        this.io.emit(emitMap.GO_NEXT_STAGE, this.gameStatus); // 只是为了debug status json
+        this.io.emit(emitMap.REFRESH_STATUS, this.gameStatus); // 为了refresh页面所有元素
+
+        if (this.canAutoGoNextStage()) {
+            this.goNextStage()
+        }
+    }
+
+    setGameStatusStage() {
+        if (this.gameStatus.responseStages.length > 0) {
+            return
+        }
+
         this.stageIndex++
         if (this.stageIndex >= this.stageNames.length) {
             this.stageIndex = 0
@@ -47,34 +67,24 @@ class GameEngine {
             }
         }
         this.gameStatus.stage = {userId: this.getCurrentUser().userId, stageName: this.stageNames[this.stageIndex]}
-
-        // 目前只有发牌
-        if (this.gameStatus.stage.stageName == 'draw') {
-
-            // hardcode 补牌
-            if (this.initCards.length < 2) {
-                console.log("补牌")
-                this.initCards = getInitCards()
-            }
-
-            this.getCurrentUser().cards.push(this.getOneCard())
-            this.getCurrentUser().cards.push(this.getOneCard())
-
-            // hardcode 出牌
-            if (this.getCurrentUser().cards.length >= 6) {
-                console.log("出牌")
-                this.getCurrentUser().cards = [this.getCurrentUser().cards[4]]
-            }
-        }
-
-        this.io.emit(emitMap.GO_NEXT_STAGE, this.gameStatus);
-        this.io.emit(emitMap.REFRESH_STATUS, this.gameStatus);
-
-        if (this.canAutoGoNextStage()) {
-            this.goNextStage()
-        }
     }
 
+    userDrawCards() {
+        // hardcode 补牌
+        if (this.initCards.length < 2) {
+            console.log("补牌")
+            this.initCards = getInitCards()
+        }
+
+        this.getCurrentUser().cards.push(this.getOneCard())
+        this.getCurrentUser().cards.push(this.getOneCard())
+
+        // hardcode 出牌
+        if (this.getCurrentUser().cards.length >= 6) {
+            console.log("出牌")
+            this.getCurrentUser().cards = [this.getCurrentUser().cards[4]]
+        }
+    }
 
     canAutoGoNextStage() {
         return ["start", "judge", "draw", "end"].includes(this.gameStatus.stage.stageName)
@@ -84,6 +94,22 @@ class GameEngine {
         const card = JSON.parse(JSON.stringify(this.initCards.shift()))
         return card;
     }
+
+    addAction(action) {
+        this.gameStatus.action = action;
+        this.gameStatus.responseStages = [
+            {
+                userId: action.targetId,
+                cardNames: responseCardsConfig.responseCardMap[action.actionCardName]
+            }
+        ];
+
+        const originUser = this.gameStatus.users[action.originId]
+        originUser.removeCards(action.cards);
+        this.throwCards = this.throwCards.concat(action.cards);
+        this.io.emit(emitMap.REFRESH_STATUS, this.gameStatus);
+    }
+
 }
 
 exports.GameEngine = GameEngine;
