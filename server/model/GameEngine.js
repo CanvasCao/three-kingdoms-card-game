@@ -5,26 +5,29 @@ const responseCardsConfig = require("../config/responseCardsConfig.json");
 class GameEngine {
     constructor(io) {
         this.io = io;
+
+
+        // TODO let logs = [];
+        this.initCards = getInitCards();
+        this.throwedCards = [];
+        this.currentUserIndex = 0;
+        this.stageNamesEN = ["start", "judge", "draw", "play", "throw", "end"];
+        this.stageNamesCN = ["开始", "判定", "摸牌", "出牌", "弃牌", "结束"];
+        this.stageIndex = 0;
+
         this.gameStatus = {
             users: {},
             stage: {},
             action: {},
-            responseStages: []
+            responseStages: [],
+            throwedCards: [],
         }
-
-        // TODO let logs = [];
-
-        this.initCards = getInitCards();
-        this.throwCards = [];
-        this.currentUserIndex = 0;
-        this.stageNames = ["start", "judge", "draw", "play", "throw", "end"];
-        this.stageIndex = 0;
     }
 
     startEngine() {
         this.gameStatus.stage = {
             userId: this.getCurrentUser().userId,
-            stageName: this.stageNames[this.stageIndex]
+            stageName: this.stageNamesEN[this.stageIndex]
         }
         this.io.emit(emitMap.INIT, this.gameStatus);
 
@@ -58,7 +61,7 @@ class GameEngine {
         }
 
         this.stageIndex++
-        if (this.stageIndex >= this.stageNames.length) {
+        if (this.stageIndex >= this.stageNamesEN.length) {
             this.stageIndex = 0
 
             this.currentUserIndex++
@@ -66,7 +69,11 @@ class GameEngine {
                 this.currentUserIndex = 0
             }
         }
-        this.gameStatus.stage = {userId: this.getCurrentUser().userId, stageName: this.stageNames[this.stageIndex]}
+        this.gameStatus.stage = {
+            userId: this.getCurrentUser().userId,
+            stageName: this.stageNamesEN[this.stageIndex],
+            stageNameCN: this.stageNamesCN[this.stageIndex]
+        }
     }
 
     userDrawCards() {
@@ -76,8 +83,7 @@ class GameEngine {
             this.initCards = getInitCards()
         }
 
-        this.getCurrentUser().cards.push(this.getOneCard())
-        this.getCurrentUser().cards.push(this.getOneCard())
+        this.getCurrentUser().cards.push(...this.getCards(2))
 
         // hardcode 出牌
         if (this.getCurrentUser().cards.length >= 6) {
@@ -90,11 +96,19 @@ class GameEngine {
         return ["start", "judge", "draw", "end"].includes(this.gameStatus.stage.stageName)
     }
 
-    getOneCard() {
-        const card = JSON.parse(JSON.stringify(this.initCards.shift()))
-        return card;
+    throwCards(cards) {
+        this.gameStatus.throwedCards = this.gameStatus.throwedCards.concat(cards);
     }
 
+    getCards(number = 2) {
+        let cards = [];
+        for (let i = 1; i <= number; i++) {
+            cards.push(JSON.parse(JSON.stringify(this.initCards.shift())))
+        }
+        return cards;
+    }
+
+    // socket actions
     addAction(action) {
         this.gameStatus.action = action;
         this.gameStatus.responseStages = [
@@ -106,7 +120,32 @@ class GameEngine {
 
         const originUser = this.gameStatus.users[action.originId]
         originUser.removeCards(action.cards);
-        this.throwCards = this.throwCards.concat(action.cards);
+        this.throwCards(action.cards);
+        this.io.emit(emitMap.REFRESH_STATUS, this.gameStatus);
+    }
+
+
+    addResponse(response) {
+        // cards？: gameFEgameFEStatus.selectedCards,
+        // actionCardName？: gameFEgameFEStatus.selectedCards[0].name,
+        // originId: getMyUserId(),
+
+        this.gameStatus.response = response;
+        const originUser = this.gameStatus.users[response.originId]
+
+        if (response.cards) {
+            originUser.removeCards(response.cards);
+            this.throwCards(response.cards);
+        } else {
+            originUser.currentBlood--;
+        }
+
+
+        this.gameStatus.responseStages.shift();
+        if (this.gameStatus.responseStages.length <= 0) {
+            this.gameStatus.action = null;
+        }
+
         this.io.emit(emitMap.REFRESH_STATUS, this.gameStatus);
     }
 

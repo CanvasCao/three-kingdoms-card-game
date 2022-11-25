@@ -69,4 +69,8 @@ io.on('connection', (socket) => {
     socket.on(emitMap.ACTION, (action) => {
         gameEngine.addAction(action);
     });
+
+    socket.on(emitMap.RESPONSE, (response) => {
+        gameEngine.addResponse(response);
+    });
 });

@@ -16,6 +16,7 @@ let cardList = [
 let testCardList = [
     {'huase': '♠️️', number: 1, name: "杀", chineseName: '杀', englishName: 'strike'},
     {'huase': '♦️', number: 2, name: "闪", chineseName: '闪', englishName: 'dodge'},
+    {'huase': '️♥️', number: 3, name: "桃", chineseName: '桃', englishName: 'peach'},
 ]
 
 const getInitCards = () => {
