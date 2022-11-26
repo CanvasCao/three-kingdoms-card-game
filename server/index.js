@@ -54,6 +54,9 @@ io.on('connection', (socket) => {
             userId: 'user2',
             index: userIndex++
         });
+        if (gameEngine.gameStatus.users[newUser2.userId]) {
+            throw new Error("user id already exist")
+        }
         gameEngine.gameStatus.users[newUser2.userId] = newUser2;
 
         addedUser = true;

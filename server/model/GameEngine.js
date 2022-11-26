@@ -1,4 +1,4 @@
-const {getInitCards} = require("../initCards");
+const {getInitCards, CARD_CONFIG,CARD_TYPE} = require("../initCards");
 const emitMap = require("../config/emitMap.json");
 const responseCardsConfig = require("../config/responseCardsConfig.json");
 
@@ -86,10 +86,10 @@ class GameEngine {
         this.getCurrentUser().cards.push(...this.getCards(2))
 
         // hardcode 出牌
-        if (this.getCurrentUser().cards.length >= 6) {
-            console.log("出牌")
-            this.getCurrentUser().cards = [this.getCurrentUser().cards[4]]
-        }
+        // if (this.getCurrentUser().cards.length >= 6) {
+        //     console.log("出牌")
+        //     this.getCurrentUser().cards = [this.getCurrentUser().cards[4]]
+        // }
     }
 
     canAutoGoNextStage() {
@@ -110,15 +110,40 @@ class GameEngine {
 
     // socket actions
     addAction(action) {
-        this.gameStatus.action = action;
-        this.gameStatus.responseStages = [
-            {
-                userId: action.targetId,
-                cardNames: responseCardsConfig.responseCardMap[action.actionCardName]
-            }
-        ];
+        // cards: gameFEgameFEStatus.selectedCards,
+        //     actualCard: gameFEgameFEStatus.selectedCards[0],
+        //     originId: getMyUserId(),
+        //     targetId: gameFEgameFEStatus.selectedTargetUsers?.[0]?.userId,
 
+        this.gameStatus.action = action;
         const originUser = this.gameStatus.users[action.originId]
+
+        if (action.actualCard.CN == CARD_CONFIG.SHA.CN) {
+            this.gameStatus.responseStages = [
+                {
+                    userId: action.targetId,
+                    cardNames: responseCardsConfig.responseCardMap[action.actualCard.CN]
+                }
+            ];
+        } else if (action.actualCard.CN == CARD_CONFIG.TAO.CN) {
+            this.gameStatus.action = null;
+            if (originUser.currentBlood < originUser.maxBlood) {
+                originUser.currentBlood++;
+            }
+        } else if ([CARD_TYPE.PLUS_HORSE, CARD_TYPE.MINUS_HORSE, CARD_TYPE.SHIELD, CARD_TYPE.WEAPON].includes(action.actualCard.type)) {
+            this.gameStatus.action = null;
+            const cardType = action.actualCard.type;
+            if (cardType == CARD_TYPE.PLUS_HORSE) {
+                originUser.plusHorseCard = action.actualCard;
+            } else if (cardType == CARD_TYPE.MINUS_HORSE) {
+                originUser.minusHorseCard = action.actualCard;
+            } else if (cardType == CARD_TYPE.WEAPON) {
+                originUser.weaponCard = action.actualCard;
+            } else if (cardType == CARD_TYPE.SHIELD) {
+                originUser.shieldCard = action.actualCard;
+            }
+        }
+
         originUser.removeCards(action.cards);
         this.throwCards(action.cards);
         this.io.emit(emitMap.REFRESH_STATUS, this.gameStatus);
@@ -127,10 +152,9 @@ class GameEngine {
 
     addResponse(response) {
         // cards？: gameFEgameFEStatus.selectedCards,
-        // actionCardName？: gameFEgameFEStatus.selectedCards[0].name,
+        // actualCard？: gameFEgameFEStatus.selectedCards[0].name,
         // originId: getMyUserId(),
 
-        this.gameStatus.response = response;
         const originUser = this.gameStatus.users[response.originId]
 
         if (response.cards) {
