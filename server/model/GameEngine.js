@@ -37,7 +37,7 @@ class GameEngine {
     }
 
     getCurrentUser() {
-        return Object.values(this.gameStatus.users).find((u) => u.index == this.currentUserIndex)
+        return Object.values(this.gameStatus.users).find((u) => u.location == this.currentUserIndex)
     }
 
     goNextStage() {

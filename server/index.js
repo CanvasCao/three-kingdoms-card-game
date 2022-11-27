@@ -24,7 +24,6 @@ server.listen(port, () => {
 app.use(express.static(path.join(__dirname, '../client')));
 
 const gameEngine = new GameEngine(io);
-let userIndex = 0;
 io.on('connection', (socket) => {
     let addedUser = false;
 
@@ -45,14 +44,14 @@ io.on('connection', (socket) => {
         const newUser = new User({
             cardId: "SHU002",
             userId: data.userId,
-            index: userIndex++
+            location: 0
         });
         gameEngine.gameStatus.users[newUser.userId] = newUser;
 
         const newUser2 = new User({
             cardId: "SHU001",
             userId: 'user2',
-            index: userIndex++
+            location: 1
         });
         if (gameEngine.gameStatus.users[newUser2.userId]) {
             throw new Error("user id already exist")

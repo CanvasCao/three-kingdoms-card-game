@@ -7,7 +7,7 @@ class User {
         this.cardId = user.cardId;
         this.userId = user.userId;
         this.cards = [];
-        this.index = user.index;
+        this.location = user.location;
     }
 
     removeCards(cards) {

@@ -422,6 +422,7 @@ let testCardMetaList = [
     {'huase': '♦️', number: 13, key: CARD_CONFIG.ZHAO_HUANG_FEI_DIAN.KEY},
     {'huase': '♣️', number: 12, key: CARD_CONFIG.ZHANG_BA_SHE_MAO.KEY},
     {'huase': '♣️', number: 13, key: CARD_CONFIG.DA_WAN.KEY},
+    {'huase': '♣️', number: 1, key: CARD_CONFIG.ZHU_GE_LIAN_NU.KEY},
 ]
 
 const metaList = testCardMetaList;
