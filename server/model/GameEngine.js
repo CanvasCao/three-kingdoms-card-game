@@ -154,49 +154,60 @@ class GameEngine {
         // cards？: gameFEgameFEStatus.selectedCards,
         // actualCard？: gameFEgameFEStatus.selectedCards[0].name,
         const needResponseCardName = this.gameStatus.responseStages[0]?.cardNames?.[0];
-        const curResponseStage = this.gameStatus.responseStages[0];
-        const originUser = Object.values(this.gameStatus.users).find((u) => u.userId == curResponseStage.originId);
-        const targetUser = Object.values(this.gameStatus.users).find((u) => u.userId == curResponseStage.targetId);
 
         if (needResponseCardName == CARD_CONFIG.SHAN.CN) { // 需要出的是闪
-            if (response?.actualCard?.CN == CARD_CONFIG.SHAN.CN) { // 出闪了
-                originUser.removeCards(response.cards);
-                this.throwCards(response.cards);
-                this.goToNextResponseStage();
-            } else { // 没出闪
-                originUser.currentBlood--;
-                this.goToNextResponseStage();
-
-                // 求桃不能直接给responseStages赋新值 因为有可能一个杀了多个人 求桃之后 其他人依然需要相应闪
-                if (originUser.currentBlood <= 0) {
-                    const newResponseStages = [];
-                    for (let i = this.currentUserIndex; i < Object.keys(this.gameStatus.users).length; i++) {
-                        const location = i % Object.keys(this.gameStatus.users).length
-                        const user = Object.values(this.gameStatus.users).find((u) => u.location == location)
-                        newResponseStages.push({
-                            originId: user.userId,
-                            targetId: curResponseStage.originId,//相应的origin 才是没有出闪需要求桃的人
-                            cardNames: [CARD_CONFIG.TAO.CN]
-                        })
-                    }
-                    this.gameStatus.responseStages = newResponseStages.concat(this.gameStatus.responseStages);
-                }
-            }
+            this.setStatusByShanResponse(response);
         } else if (needResponseCardName == CARD_CONFIG.TAO.CN) { // 需要出的是桃
-            if (response?.actualCard?.CN == CARD_CONFIG.TAO.CN) { // 出桃了
-                originUser.removeCards(response.cards);
-                this.throwCards(response.cards);
-                const targetUser = this.gameStatus.users[curResponseStage.targetId]
-                targetUser.currentBlood++;
-                if (targetUser.currentBlood > 0) {
-                    this.goToNextResponseStage();
-                }
-            } else { // 没出桃
-                this.goToNextResponseStage();
-            }
+            this.setStatusByTaoResponse(response);
         }
 
         this.io.emit(emitMap.REFRESH_STATUS, this.gameStatus);
+    }
+
+    setStatusByTaoResponse(response) {
+        const curResponseStage = this.gameStatus.responseStages[0];
+        const originUser = this.gameStatus.users[curResponseStage.originId];
+        const targetUser = this.gameStatus.users[curResponseStage.targetId];
+
+        if (response?.actualCard?.CN == CARD_CONFIG.TAO.CN) { // 出桃了
+            originUser.removeCards(response.cards);
+            this.throwCards(response.cards);
+            targetUser.currentBlood++;
+            if (targetUser.currentBlood > 0) {
+                this.goToNextResponseStage();
+            }
+        } else { // 没出桃
+            this.goToNextResponseStage();
+        }
+    }
+
+    setStatusByShanResponse(response) {
+        const curResponseStage = this.gameStatus.responseStages[0];
+        const originUser = this.gameStatus.users[curResponseStage.originId];
+
+        if (response?.actualCard?.CN == CARD_CONFIG.SHAN.CN) { // 出闪了
+            originUser.removeCards(response.cards);
+            this.throwCards(response.cards);
+            this.goToNextResponseStage();
+        } else { // 没出闪
+            originUser.currentBlood--;
+            this.goToNextResponseStage();
+
+            // 求桃不能直接给responseStages赋新值 因为有可能一个杀了多个人 求桃之后 其他人依然需要相应闪
+            if (originUser.currentBlood <= 0) {
+                const newResponseStages = [];
+                for (let i = this.currentUserIndex; i < Object.keys(this.gameStatus.users).length; i++) {
+                    const location = i % Object.keys(this.gameStatus.users).length
+                    const user = Object.values(this.gameStatus.users).find((u) => u.location == location)
+                    newResponseStages.push({
+                        originId: user.userId,
+                        targetId: curResponseStage.originId,//responseStage里的origin 才是没有出闪需要求桃的人
+                        cardNames: [CARD_CONFIG.TAO.CN]
+                    })
+                }
+                this.gameStatus.responseStages = newResponseStages.concat(this.gameStatus.responseStages);
+            }
+        }
     }
 
     goToNextResponseStage() {
