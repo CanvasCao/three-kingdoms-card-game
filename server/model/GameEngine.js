@@ -9,7 +9,7 @@ class GameEngine {
         // TODO let logs = [];
         this.initCards = getInitCards();
         this.throwedCards = [];
-        this.currentUserIndex = 0;
+        this.currentLocation = 0;
         this.stageNamesEN = ["start", "judge", "draw", "play", "throw", "end"];
         this.stageNamesCN = ["开始", "判定", "摸牌", "出牌", "弃牌", "结束"];
         this.stageIndex = 0;
@@ -36,11 +36,11 @@ class GameEngine {
     }
 
     getCurrentUser() {
-        return Object.values(this.gameStatus.users).find((u) => u.location == this.currentUserIndex)
+        return Object.values(this.gameStatus.users).find((u) => u.location == this.currentLocation)
     }
 
     goNextStage() {
-        this.setGameStatusStage();
+        this.setGameStatusToNextStage();
         // 目前只有发牌
         if (this.gameStatus.stage.stageName == 'draw') {
             this.userDrawCards();
@@ -54,7 +54,7 @@ class GameEngine {
         }
     }
 
-    setGameStatusStage() {
+    setGameStatusToNextStage() {
         if (this.gameStatus.responseStages.length > 0) {
             return
         }
@@ -62,16 +62,28 @@ class GameEngine {
         this.stageIndex++
         if (this.stageIndex >= this.stageNamesEN.length) {
             this.stageIndex = 0
-
-            this.currentUserIndex++
-            if (this.currentUserIndex >= Object.keys(this.gameStatus.users).length) {
-                this.currentUserIndex = 0
-            }
+            this.setCurrentLocationToNextLocation();
         }
         this.gameStatus.stage = {
             userId: this.getCurrentUser().userId,
             stageName: this.stageNamesEN[this.stageIndex],
             stageNameCN: this.stageNamesCN[this.stageIndex]
+        }
+    }
+
+    setCurrentLocationToNextLocation() {
+        const filtedNotDead = Object.values(this.gameStatus.users).filter((u) => !u.isDead);
+        if (filtedNotDead.length == 0) {
+            throw new Error("Everyone is dead. Game Over")
+        }
+        const sorted = filtedNotDead.sort((a, b) => a.location - b.location)
+
+        // 可能会在自己的回合自杀 所以不能找到自己再+1
+        const nextUser = sorted.find((u) => u.location > this.currentLocation);
+        if (nextUser) {
+            this.currentLocation = nextUser.location
+        } else {
+            this.currentLocation = sorted[0].location
         }
     }
 
@@ -214,7 +226,7 @@ class GameEngine {
             // 求桃不能直接给responseStages赋新值 因为有可能一个杀了多个人 求桃之后 其他人依然需要相应闪
             if (originUser.currentBlood <= 0) {
                 const newResponseStages = [];
-                for (let i = this.currentUserIndex; i < Object.keys(this.gameStatus.users).length; i++) {
+                for (let i = this.currentLocation; i < Object.keys(this.gameStatus.users).length; i++) {
                     const location = i % Object.keys(this.gameStatus.users).length
                     const user = Object.values(this.gameStatus.users).find((u) => u.location == location)
                     newResponseStages.push({
