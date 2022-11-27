@@ -121,77 +121,88 @@ const CARD_CONFIG = {
         "CN": "诸葛连弩",
         "EN": "Crossbow",
         type: CARD_TYPE.WEAPON,
-        distance: 1
+        distance: 1,
+        distanceDesc: '一'
     },
     "CI_XIONG_SHUANG_GU_JIAN": {
         KEY: "CI_XIONG_SHUANG_GU_JIAN",
         "CN": "雌雄双股剑",
         "EN": "Binary Sword",
         type: CARD_TYPE.WEAPON,
-        distance: 2
+        distance: 2,
+        distanceDesc: '二'
     },
     "GU_DIN_DAO": {
         KEY: "GU_DIN_DAO",
         "CN": "古锭刀",
         "EN": "Ancient Sword",
         type: CARD_TYPE.WEAPON,
-        distance: 2
+        distance: 2,
+        distanceDesc: '二'
     },
     "QING_LONG_YAN_YUE_DAO": {
         KEY: "QING_LONG_YAN_YUE_DAO",
         "CN": "青龙偃月刀",
         "EN": "Green Dragon Sword",
         type: CARD_TYPE.WEAPON,
-        distance: 3
+        distance: 3,
+        distanceDesc: '三'
     },
     "FANG_TIAN_HUA_JI": {
         KEY: "FANG_TIAN_HUA_JI",
         "CN": "方天画戟",
         "EN": "Halberd",
         type: CARD_TYPE.WEAPON,
-        distance: 4
+        distance: 4,
+        distanceDesc: '四'
     },
     "HAN_BIN_JIAN": {
         KEY: "HAN_BIN_JIAN",
         "CN": "寒冰剑",
         "EN": "Ice Sword",
         type: CARD_TYPE.WEAPON,
-        distance: 2
+        distance: 2,
+        distanceDesc: '二'
     },
     "GUAN_SHI_FU": {
         KEY: "GUAN_SHI_FU",
         "CN": "贯石斧",
         "EN": "Stone Axe",
         type: CARD_TYPE.WEAPON,
-        distance: 3
+        distance: 3,
+        distanceDesc: '三'
     },
     "QI_LIN_GONG": {
         KEY: "QI_LIN_GONG",
         "CN": "麒麟弓",
         "EN": "Qilin Bow",
         type: CARD_TYPE.WEAPON,
-        distance: 5
+        distance: 5,
+        distanceDesc: '五'
     },
     "ZHU_QUE_YU_SHAN": {
         KEY: "ZHU_QUE_YU_SHAN",
         "CN": "朱雀羽扇",
         "EN": "Fire Fan",
         type: CARD_TYPE.WEAPON,
-        distance: 4
+        distance: 4,
+        distanceDesc: '四'
     },
     "QIN_GANG_JIAN": {
         KEY: "QIN_GANG_JIAN",
         "CN": "青釭剑",
         "EN": "Green Steel Sword",
         type: CARD_TYPE.WEAPON,
-        distance: 2
+        distance: 2,
+        distanceDesc: '二'
     },
     "ZHANG_BA_SHE_MAO": {
         KEY: "ZHANG_BA_SHE_MAO",
         "CN": "丈八蛇矛",
         "EN": "Snake Spear",
         type: CARD_TYPE.WEAPON,
-        distance: 3
+        distance: 3,
+        distanceDesc: '三'
     },
 
     // 防具
@@ -225,37 +236,49 @@ const CARD_CONFIG = {
         KEY: "DI_LU",
         "CN": "的卢",
         "EN": "Plus horse",
-        type: CARD_TYPE.PLUS_HORSE
+        type: CARD_TYPE.PLUS_HORSE,
+        horseDistance: 1,
+        distanceDesc: "+1",
     }, "JUE_YING": {
         KEY: "JUE_YING",
         "CN": "绝影",
         "EN": "Plus horse",
-        type: CARD_TYPE.PLUS_HORSE
+        type: CARD_TYPE.PLUS_HORSE,
+        horseDistance: 1,
+        distanceDesc: "+1",
     },
     "ZHAO_HUANG_FEI_DIAN": {
         KEY: "ZHAO_HUANG_FEI_DIAN",
         "CN": "爪黄飞电",
         "EN": "Plus horse",
-        type: CARD_TYPE.PLUS_HORSE
+        type: CARD_TYPE.PLUS_HORSE,
+        horseDistance: 1,
+        distanceDesc: "+1",
     },
 
     "CHI_TU": {
         KEY: "CHI_TU",
         "CN": "赤兔",
         "EN": "Minus horse",
-        type: CARD_TYPE.MINUS_HORSE
+        type: CARD_TYPE.MINUS_HORSE,
+        horseDistance: -1,
+        distanceDesc: "-1",
     },
     "DA_WAN": {
         KEY: "DA_WAN",
         "CN": "大宛",
         "EN": "Minus horse",
-        type: CARD_TYPE.MINUS_HORSE
+        type: CARD_TYPE.MINUS_HORSE,
+        horseDistance: -1,
+        distanceDesc: "-1",
     },
     "ZI_XING": {
         KEY: "ZI_XING",
         "CN": "紫骍",
         "EN": "Minus horse",
-        type: CARD_TYPE.MINUS_HORSE
+        type: CARD_TYPE.MINUS_HORSE,
+        horseDistance: -1,
+        distanceDesc: "-1",
     },
 }
 
