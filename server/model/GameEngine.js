@@ -165,7 +165,8 @@ class GameEngine {
                 this.goToNextResponseStage();
             } else { // 没出闪
                 originUser.currentBlood--;
-                this.gameStatus.responseStages.shift();
+                this.goToNextResponseStage();
+
                 // 求桃不能直接给responseStages赋新值 因为有可能一个杀了多个人 求桃之后 其他人依然需要相应闪
                 if (originUser.currentBlood <= 0) {
                     const newResponseStages = [];
@@ -188,29 +189,18 @@ class GameEngine {
                 const targetUser = this.gameStatus.users[curResponseStage.targetId]
                 targetUser.currentBlood++;
                 if (targetUser.currentBlood > 0) {
-                    this.clearResponseStage();
+                    this.goToNextResponseStage();
                 }
             } else { // 没出桃
                 this.goToNextResponseStage();
             }
         }
 
-
         this.io.emit(emitMap.REFRESH_STATUS, this.gameStatus);
     }
 
     goToNextResponseStage() {
-        // 不需要response了就进入下一个stage
         this.gameStatus.responseStages.shift();
-        if (this.gameStatus.responseStages.length <= 0) {
-            this.gameStatus.action = null;
-        }
-    }
-
-    clearResponseStage() {
-        // 不需要response了就进入下一个stage
-        this.gameStatus.responseStages = [];
-        this.gameStatus.action = null;
     }
 }
 
