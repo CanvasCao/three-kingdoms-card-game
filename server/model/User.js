@@ -3,7 +3,7 @@ const {differenceBy} = require("lodash/array");
 class User {
     constructor(user) {
         this.maxBlood = 4;
-        this.currentBlood = 2 || this.maxBlood;
+        this.currentBlood = 1 || this.maxBlood;
         this.cardId = user.cardId;
         this.userId = user.userId;
         this.cards = [];

@@ -1,6 +1,5 @@
-const {getInitCards, CARD_CONFIG,CARD_TYPE} = require("../initCards");
+const {getInitCards, CARD_CONFIG, CARD_TYPE} = require("../initCards");
 const emitMap = require("../config/emitMap.json");
-const responseCardsConfig = require("../config/responseCardsConfig.json");
 
 class GameEngine {
     constructor(io) {
@@ -121,8 +120,9 @@ class GameEngine {
         if (action.actualCard.CN == CARD_CONFIG.SHA.CN) {
             this.gameStatus.responseStages = [
                 {
-                    userId: action.targetId,
-                    cardNames: responseCardsConfig.responseCardMap[action.actualCard.CN]
+                    originId: action.targetId,
+                    targetId: action.originId,
+                    cardNames: [CARD_CONFIG.SHAN.CN]
                 }
             ];
         } else if (action.actualCard.CN == CARD_CONFIG.TAO.CN) {
@@ -153,26 +153,65 @@ class GameEngine {
     addResponse(response) {
         // cards？: gameFEgameFEStatus.selectedCards,
         // actualCard？: gameFEgameFEStatus.selectedCards[0].name,
-        // originId: getMyUserId(),
+        const needResponseCardName = this.gameStatus.responseStages[0]?.cardNames?.[0];
+        const curResponseStage = this.gameStatus.responseStages[0];
+        const originUser = Object.values(this.gameStatus.users).find((u) => u.userId == curResponseStage.originId);
+        const targetUser = Object.values(this.gameStatus.users).find((u) => u.userId == curResponseStage.targetId);
 
-        const originUser = this.gameStatus.users[response.originId]
-
-        if (response.cards) {
-            originUser.removeCards(response.cards);
-            this.throwCards(response.cards);
-        } else {
-            originUser.currentBlood--;
+        if (needResponseCardName == CARD_CONFIG.SHAN.CN) { // 需要出的是闪
+            if (response?.actualCard?.CN == CARD_CONFIG.SHAN.CN) { // 出闪了
+                originUser.removeCards(response.cards);
+                this.throwCards(response.cards);
+                this.goToNextResponseStage();
+            } else { // 没出闪
+                originUser.currentBlood--;
+                this.gameStatus.responseStages.shift();
+                // 求桃不能直接给responseStages赋新值 因为有可能一个杀了多个人 求桃之后 其他人依然需要相应闪
+                if (originUser.currentBlood <= 0) {
+                    const newResponseStages = [];
+                    for (let i = this.currentUserIndex; i < Object.keys(this.gameStatus.users).length; i++) {
+                        const location = i % Object.keys(this.gameStatus.users).length
+                        const user = Object.values(this.gameStatus.users).find((u) => u.location == location)
+                        newResponseStages.push({
+                            originId: user.userId,
+                            targetId: curResponseStage.originId,//相应的origin 才是没有出闪需要求桃的人
+                            cardNames: [CARD_CONFIG.TAO.CN]
+                        })
+                    }
+                    this.gameStatus.responseStages = newResponseStages.concat(this.gameStatus.responseStages);
+                }
+            }
+        } else if (needResponseCardName == CARD_CONFIG.TAO.CN) { // 需要出的是桃
+            if (response?.actualCard?.CN == CARD_CONFIG.TAO.CN) { // 出桃了
+                originUser.removeCards(response.cards);
+                this.throwCards(response.cards);
+                const targetUser = this.gameStatus.users[curResponseStage.targetId]
+                targetUser.currentBlood++;
+                if (targetUser.currentBlood > 0) {
+                    this.clearResponseStage();
+                }
+            } else { // 没出桃
+                this.goToNextResponseStage();
+            }
         }
 
-
-        this.gameStatus.responseStages.shift();
-        if (this.gameStatus.responseStages.length <= 0) {
-            this.gameStatus.action = null;
-        }
 
         this.io.emit(emitMap.REFRESH_STATUS, this.gameStatus);
     }
 
+    goToNextResponseStage() {
+        // 不需要response了就进入下一个stage
+        this.gameStatus.responseStages.shift();
+        if (this.gameStatus.responseStages.length <= 0) {
+            this.gameStatus.action = null;
+        }
+    }
+
+    clearResponseStage() {
+        // 不需要response了就进入下一个stage
+        this.gameStatus.responseStages = [];
+        this.gameStatus.action = null;
+    }
 }
 
 exports.GameEngine = GameEngine;
