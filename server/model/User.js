@@ -7,11 +7,21 @@ class User {
         this.cardId = user.cardId;
         this.userId = user.userId;
         this.cards = [];
+        this.pandingCards = [];
         this.location = user.location;
     }
 
     removeCards(cards) {
         this.cards = differenceBy(this.cards, cards, 'cardId');
+    }
+
+    reset() {
+        this.cards = [];
+        this.pandingCards = [];
+        this.weaponCard = null;
+        this.shieldCard = null;
+        this.plusHorseCard = null;
+        this.minusHorseCard = null;
     }
 }
 

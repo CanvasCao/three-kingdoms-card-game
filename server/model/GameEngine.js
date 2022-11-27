@@ -122,7 +122,7 @@ class GameEngine {
                 {
                     originId: action.targetId,
                     targetId: action.originId,
-                    cardNames: [CARD_CONFIG.SHAN.CN]
+                    cardName: CARD_CONFIG.SHAN.CN
                 }
             ];
         } else if (action.actualCard.CN == CARD_CONFIG.TAO.CN) {
@@ -153,7 +153,7 @@ class GameEngine {
     addResponse(response) {
         // cards？: gameFEgameFEStatus.selectedCards,
         // actualCard？: gameFEgameFEStatus.selectedCards[0].name,
-        const needResponseCardName = this.gameStatus.responseStages[0]?.cardNames?.[0];
+        const needResponseCardName = this.gameStatus.responseStages[0]?.cardName;
 
         if (needResponseCardName == CARD_CONFIG.SHAN.CN) { // 需要出的是闪
             this.setStatusByShanResponse(response);
@@ -176,9 +176,27 @@ class GameEngine {
             if (targetUser.currentBlood > 0) {
                 this.goToNextResponseStage();
             }
-        } else { // 没出桃
+        } else { // 没出桃 下一个人求桃
             this.goToNextResponseStage();
+            // 没有下一个人了 当前角色死亡
+            if (!this.gameStatus.responseStages.find((r) => r.cardName == CARD_CONFIG.TAO.CN)) {
+                this.setUserWhenDie(targetUser);
+            }
         }
+    }
+
+    setUserWhenDie(targetUser) {
+        targetUser.isDead = true;
+        let throwCards = [...targetUser.cards,
+            targetUser.weaponCard,
+            targetUser.shieldCard,
+            targetUser.plusHorseCard,
+            targetUser.minusHorseCard,
+            ...targetUser.pandingCards,
+        ];
+        throwCards = throwCards.filter(x => !!x)
+        this.throwCards(throwCards);
+        targetUser.reset();
     }
 
     setStatusByShanResponse(response) {
@@ -202,7 +220,7 @@ class GameEngine {
                     newResponseStages.push({
                         originId: user.userId,
                         targetId: curResponseStage.originId,//responseStage里的origin 才是没有出闪需要求桃的人
-                        cardNames: [CARD_CONFIG.TAO.CN]
+                        cardName: CARD_CONFIG.TAO.CN
                     })
                 }
                 this.gameStatus.responseStages = newResponseStages.concat(this.gameStatus.responseStages);
