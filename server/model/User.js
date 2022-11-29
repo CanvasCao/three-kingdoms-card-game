@@ -15,6 +15,10 @@ class User {
         this.cards = differenceBy(this.cards, cards, 'cardId');
     }
 
+    reduceBlood(number = 1) {
+        this.currentBlood = this.currentBlood - number;
+    }
+
     reset() {
         this.cards = [];
         this.pandingCards = [];

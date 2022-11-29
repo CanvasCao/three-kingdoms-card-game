@@ -108,8 +108,8 @@ const CARD_CONFIG = {
         "EN": "Contentment",
         type: CARD_TYPE.DELAYED_SCROLL
     },
-    "SHEN_DIAN": {
-        KEY: "SHEN_DIAN",
+    "SHAN_DIAN": {
+        KEY: "SHAN_DIAN",
         "CN": "闪电",
         "EN": "Lightning",
         type: CARD_TYPE.DELAYED_SCROLL
@@ -283,7 +283,7 @@ const CARD_CONFIG = {
 }
 
 let standardCardMetaList = [
-    {'huase': '♠️️', number: 1, key: CARD_CONFIG.SHEN_DIAN.KEY},
+    {'huase': '♠️️', number: 1, key: CARD_CONFIG.SHAN_DIAN.KEY},
     {'huase': '♥️', number: 1, key: CARD_CONFIG.TAO_YUAN_JIE_YI.KEY},
     {'huase': '♣️', number: 1, key: CARD_CONFIG.ZHU_GE_LIAN_NU.KEY},
     {'huase': '♦️', number: 1, key: CARD_CONFIG.ZHU_GE_LIAN_NU.KEY},
@@ -417,13 +417,15 @@ let standardCardMetaList = [
 let testCardMetaList = [
     {'huase': '♥️', number: 13, key: CARD_CONFIG.SHA.KEY},
     // {'huase': '♥️', number: 8, key: CARD_CONFIG.SHAN.KEY},
+    {'huase': '♦️', number: 12, key: CARD_CONFIG.TAO.KEY},
     // {'huase': '♦️', number: 12, key: CARD_CONFIG.TAO.KEY},
-    // {'huase': '♦️', number: 12, key: CARD_CONFIG.TAO.KEY},
-    {'huase': '♠️️', number: 2, key: CARD_CONFIG.BA_GUA_ZHEN.KEY},
-    {'huase': '♦️', number: 13, key: CARD_CONFIG.ZHAO_HUANG_FEI_DIAN.KEY},
-    {'huase': '♣️', number: 12, key: CARD_CONFIG.ZHANG_BA_SHE_MAO.KEY},
+    // {'huase': '♠️️', number: 2, key: CARD_CONFIG.BA_GUA_ZHEN.KEY},
+    // {'huase': '♦️', number: 13, key: CARD_CONFIG.ZHAO_HUANG_FEI_DIAN.KEY},
+    // {'huase': '♣️', number: 12, key: CARD_CONFIG.ZHANG_BA_SHE_MAO.KEY},
     // {'huase': '♣️', number: 13, key: CARD_CONFIG.DA_WAN.KEY},
     // {'huase': '♣️', number: 1, key: CARD_CONFIG.ZHU_GE_LIAN_NU.KEY},
+    // {'huase': '♠️️', number: 1, key: CARD_CONFIG.SHAN_DIAN.KEY},
+    // {'huase': '♦️', number: 6, key: CARD_CONFIG.LE_BU_SI_SHU.KEY},
 ]
 
 const metaList = testCardMetaList;

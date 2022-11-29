@@ -121,47 +121,82 @@ class GameEngine {
 
     // socket actions
     addAction(action) {
-        // cards: gameFEgameFEStatus.selectedCards,
+        //     cards: gameFEgameFEStatus.selectedCards,
         //     actualCard: gameFEgameFEStatus.selectedCards[0],
         //     originId: getMyUserId(),
         //     targetId: gameFEgameFEStatus.selectedTargetUsers?.[0]?.userId,
 
         this.gameStatus.action = action;
         const originUser = this.gameStatus.users[action.originId]
-
         if (action.actualCard.CN == CARD_CONFIG.SHA.CN) {
-            this.gameStatus.responseStages = [
-                {
-                    originId: action.targetId,
-                    targetId: action.originId,
-                    cardName: CARD_CONFIG.SHAN.CN
-                }
-            ];
+            this.setStatusByShaAction();
+            this.throwCards(action.cards);
         } else if (action.actualCard.CN == CARD_CONFIG.TAO.CN) {
-            this.gameStatus.action = null;
-            if (originUser.currentBlood < originUser.maxBlood) {
-                originUser.currentBlood++;
-            }
+            this.setStatusByTaoAction();
+            this.throwCards(action.cards);
         } else if ([CARD_TYPE.PLUS_HORSE, CARD_TYPE.MINUS_HORSE, CARD_TYPE.SHIELD, CARD_TYPE.WEAPON].includes(action.actualCard.type)) {
-            this.gameStatus.action = null;
-            const cardType = action.actualCard.type;
-            if (cardType == CARD_TYPE.PLUS_HORSE) {
-                originUser.plusHorseCard = action.actualCard;
-            } else if (cardType == CARD_TYPE.MINUS_HORSE) {
-                originUser.minusHorseCard = action.actualCard;
-            } else if (cardType == CARD_TYPE.WEAPON) {
-                originUser.weaponCard = action.actualCard;
-            } else if (cardType == CARD_TYPE.SHIELD) {
-                originUser.shieldCard = action.actualCard;
-            }
+            this.setStatusByEquipmentAction();
+            this.throwCards(action.cards);
+        } else if (action.actualCard.CN == CARD_CONFIG.SHAN_DIAN.CN) {
+            this.setStatusByShanDianAction();
+        } else if (action.actualCard.CN == CARD_CONFIG.LE_BU_SI_SHU.CN) {
+            this.setStatusByLeBuSiShuAction();
         }
 
         originUser.removeCards(action.cards);
-        this.throwCards(action.cards);
         this.io.emit(emitMap.REFRESH_STATUS, this.gameStatus);
     }
 
+    // action handler
+    setStatusByLeBuSiShuAction() {
+        const action = this.gameStatus.action;
+        const targetUser = this.gameStatus.users[action.targetId]
+        targetUser.pandingCards.push(action.actualCard)
+    }
 
+    setStatusByShanDianAction() {
+        const action = this.gameStatus.action;
+        const originUser = this.gameStatus.users[action.originId]
+        originUser.pandingCards.push(action.actualCard)
+    }
+
+    setStatusByEquipmentAction() {
+        const action = this.gameStatus.action;
+        const originUser = this.gameStatus.users[action.originId]
+
+        const cardType = action.actualCard.type;
+        if (cardType == CARD_TYPE.PLUS_HORSE) {
+            originUser.plusHorseCard = action.actualCard;
+        } else if (cardType == CARD_TYPE.MINUS_HORSE) {
+            originUser.minusHorseCard = action.actualCard;
+        } else if (cardType == CARD_TYPE.WEAPON) {
+            originUser.weaponCard = action.actualCard;
+        } else if (cardType == CARD_TYPE.SHIELD) {
+            originUser.shieldCard = action.actualCard;
+        }
+    }
+
+    setStatusByTaoAction() {
+        const action = this.gameStatus.action;
+        const originUser = this.gameStatus.users[action.originId]
+        if (originUser.currentBlood < originUser.maxBlood) {
+            originUser.currentBlood++;
+        }
+    }
+
+    setStatusByShaAction() {
+        const action = this.gameStatus.action;
+        this.gameStatus.responseStages = [
+            {
+                originId: action.targetId,
+                targetId: action.originId,
+                cardName: CARD_CONFIG.SHAN.CN,
+                cardNumber: 1
+            }
+        ];
+    }
+
+    // response
     addResponse(response) {
         // cards？: gameFEgameFEStatus.selectedCards,
         // actualCard？: gameFEgameFEStatus.selectedCards[0].name,
@@ -176,6 +211,7 @@ class GameEngine {
         this.io.emit(emitMap.REFRESH_STATUS, this.gameStatus);
     }
 
+    // response handler
     setStatusByTaoResponse(response) {
         const curResponseStage = this.gameStatus.responseStages[0];
         const originUser = this.gameStatus.users[curResponseStage.originId];
@@ -186,10 +222,10 @@ class GameEngine {
             this.throwCards(response.cards);
             targetUser.currentBlood++;
             if (targetUser.currentBlood > 0) {
-                this.goToNextResponseStage();
+                this.gameStatus.responseStages = this.gameStatus.responseStages.filter((r) => r.cardName != CARD_CONFIG.TAO.CN)
             }
         } else { // 没出桃 下一个人求桃
-            this.goToNextResponseStage();
+            this.clearCurrentResponseStage();
             // 没有下一个人了 当前角色死亡
             if (!this.gameStatus.responseStages.find((r) => r.cardName == CARD_CONFIG.TAO.CN)) {
                 this.setUserWhenDie(targetUser);
@@ -199,7 +235,8 @@ class GameEngine {
 
     setUserWhenDie(targetUser) {
         targetUser.isDead = true;
-        let throwCards = [...targetUser.cards,
+        let throwCards = [
+            ...targetUser.cards,
             targetUser.weaponCard,
             targetUser.shieldCard,
             targetUser.plusHorseCard,
@@ -218,10 +255,10 @@ class GameEngine {
         if (response?.actualCard?.CN == CARD_CONFIG.SHAN.CN) { // 出闪了
             originUser.removeCards(response.cards);
             this.throwCards(response.cards);
-            this.goToNextResponseStage();
+            this.clearCurrentResponseStage();
         } else { // 没出闪
-            originUser.currentBlood--;
-            this.goToNextResponseStage();
+            originUser.reduceBlood();
+            this.clearCurrentResponseStage();
 
             // 求桃不能直接给responseStages赋新值 因为有可能一个杀了多个人 求桃之后 其他人依然需要相应闪
             if (originUser.currentBlood <= 0) {
@@ -240,7 +277,7 @@ class GameEngine {
         }
     }
 
-    goToNextResponseStage() {
+    clearCurrentResponseStage() {
         this.gameStatus.responseStages.shift();
     }
 }
