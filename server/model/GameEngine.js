@@ -18,7 +18,9 @@ class GameEngine {
             users: {},
             stage: {},
             action: {},
-            responseStages: [],
+            shanResStages: [],
+            taoResStages: [],
+            tieSuoTempStorage: [],
             throwedCards: [],
         }
     }
@@ -55,7 +57,7 @@ class GameEngine {
     }
 
     setGameStatusToNextStage() {
-        if (this.gameStatus.responseStages.length > 0) {
+        if (this.gameStatus.shanResStages.length > 0 || this.gameStatus.taoResStages.length > 0) {
             return
         }
 
@@ -121,14 +123,31 @@ class GameEngine {
 
     // socket actions
     addAction(action) {
-        //     cards: gameFEgameFEStatus.selectedCards,
-        //     actualCard: gameFEgameFEStatus.selectedCards[0],
-        //     originId: getMyUserId(),
-        //     targetId: gameFEgameFEStatus.selectedTargetUsers?.[0]?.userId,
+        // 桃 武器
+        // {
+        //     "cards": [],
+        //     "actualCard": {},
+        //     "originId": "22c3d181-5d60-4283-a4ce-6f2b14d772bc",
+        //     "targetId": "22c3d181-5d60-4283-a4ce-6f2b14d772bc"
+        // }
+
+        // 杀
+        // {
+        //     "cards": [],
+        //     "actualCard": {},
+        //     "actions": [{
+        //     "originId": "22c3d181-5d60-4283-a4ce-6f2b14d772bc",
+        //     "targetId": "user2",
+        //     }]
+        // }
 
         this.gameStatus.action = action;
-        const originUser = this.gameStatus.users[action.originId]
-        if (action.actualCard.CN == CARD_CONFIG.SHA.CN) {
+        const originUser = action.actions ?
+            this.gameStatus.users[action.actions[0].originId] :
+            this.gameStatus.users[action.originId];
+
+        if ([CARD_CONFIG.SHA.CN, CARD_CONFIG.LEI_SHA.CN, CARD_CONFIG.HUO_SHA.CN].includes(action.actualCard.CN)
+        ) {
             this.setStatusByShaAction();
             this.throwCards(action.cards);
         } else if (action.actualCard.CN == CARD_CONFIG.TAO.CN) {
@@ -180,32 +199,36 @@ class GameEngine {
         const action = this.gameStatus.action;
         const originUser = this.gameStatus.users[action.originId]
         if (originUser.currentBlood < originUser.maxBlood) {
-            originUser.currentBlood++;
+            originUser.addBlood();
         }
     }
 
     setStatusByShaAction() {
         const action = this.gameStatus.action;
-        this.gameStatus.responseStages = [
-            {
-                originId: action.targetId,
-                targetId: action.originId,
-                cardName: CARD_CONFIG.SHAN.CN,
-                cardNumber: 1
+        this.gameStatus.shanResStages = action.actions.map((a) => {
+            return {
+                originId: a.targetId,
+                targetId: a.originId,
+                cardNumber: 1,
             }
-        ];
+        })
     }
 
     // response
     addResponse(response) {
         // cards？: gameFEgameFEStatus.selectedCards,
         // actualCard？: gameFEgameFEStatus.selectedCards[0].name,
-        const needResponseCardName = this.gameStatus.responseStages[0]?.cardName;
+        if (this.gameStatus.taoResStages.length > 0 && response?.actualCard?.CN == CARD_CONFIG.SHAN.CN) {
+            throw new Error("求桃的时候不能出闪")
+        }
 
-        if (needResponseCardName == CARD_CONFIG.SHAN.CN) { // 需要出的是闪
-            this.setStatusByShanResponse(response);
-        } else if (needResponseCardName == CARD_CONFIG.TAO.CN) { // 需要出的是桃
+        const needResponseTao = this.gameStatus.taoResStages.length > 0;
+        const needResponseShan = this.gameStatus.shanResStages.length > 0;
+
+        if (needResponseTao) { // 需要出的是TAO
             this.setStatusByTaoResponse(response);
+        } else if (needResponseShan) { // 需要出的是SHAN
+            this.setStatusByShanResponse(response);
         }
 
         this.io.emit(emitMap.REFRESH_STATUS, this.gameStatus);
@@ -213,72 +236,173 @@ class GameEngine {
 
     // response handler
     setStatusByTaoResponse(response) {
-        const curResponseStage = this.gameStatus.responseStages[0];
-        const originUser = this.gameStatus.users[curResponseStage.originId];
-        const targetUser = this.gameStatus.users[curResponseStage.targetId];
+        const curTaoResStage = this.gameStatus.taoResStages[0];
+        const originUser = this.gameStatus.users[curTaoResStage.originId];
+        const targetUser = this.gameStatus.users[curTaoResStage.targetId];
 
         if (response?.actualCard?.CN == CARD_CONFIG.TAO.CN) { // 出桃了
             originUser.removeCards(response.cards);
             this.throwCards(response.cards);
-            targetUser.currentBlood++;
-            if (targetUser.currentBlood > 0) {
-                this.gameStatus.responseStages = this.gameStatus.responseStages.filter((r) => r.cardName != CARD_CONFIG.TAO.CN)
+
+            targetUser.addBlood();
+
+            if (targetUser.currentBlood > 0) { // 出桃复活 不需要任何人再出桃
+                this.gameStatus.taoResStages = [];
+                this.setStateByTieSuoTempStorage();
+            } else { // 出桃还没复活 更新需要下一个人提示的出桃的数量
+                this.gameStatus.taoResStages.forEach((rs) => {
+                    rs.cardNumber = 1 - targetUser.currentBlood;
+                })
             }
-        } else { // 没出桃 下一个人求桃
-            this.clearCurrentResponseStage();
-            // 没有下一个人了 当前角色死亡
-            if (!this.gameStatus.responseStages.find((r) => r.cardName == CARD_CONFIG.TAO.CN)) {
-                this.setUserWhenDie(targetUser);
+        } else {
+            // 没出桃 下一个人求桃
+            this.clearCurrentTaoResStage();
+
+            // 没有任何人出桃 当前角色死亡
+            if (this.gameStatus.taoResStages.length == 0) {
+                this.setStatusWhenUserDie(targetUser);// TODO 需要过滤掉shan response里面的tar
+                this.setStateByTieSuoTempStorage();
             }
         }
     }
 
-    setUserWhenDie(targetUser) {
-        targetUser.isDead = true;
-        let throwCards = [
-            ...targetUser.cards,
-            targetUser.weaponCard,
-            targetUser.shieldCard,
-            targetUser.plusHorseCard,
-            targetUser.minusHorseCard,
-            ...targetUser.pandingCards,
-        ];
-        throwCards = throwCards.filter(x => !!x)
-        this.throwCards(throwCards);
-        targetUser.reset();
-    }
-
     setStatusByShanResponse(response) {
-        const curResponseStage = this.gameStatus.responseStages[0];
-        const originUser = this.gameStatus.users[curResponseStage.originId];
+        const curShanResStage = this.gameStatus.shanResStages[0];
+        const originUser = this.gameStatus.users[curShanResStage.originId];
 
         if (response?.actualCard?.CN == CARD_CONFIG.SHAN.CN) { // 出闪了
             originUser.removeCards(response.cards);
             this.throwCards(response.cards);
-            this.clearCurrentResponseStage();
-        } else { // 没出闪
-            originUser.reduceBlood();
-            this.clearCurrentResponseStage();
 
-            // 求桃不能直接给responseStages赋新值 因为有可能一个杀了多个人 求桃之后 其他人依然需要相应闪
-            if (originUser.currentBlood <= 0) {
-                const newResponseStages = [];
-                for (let i = this.currentLocation; i < Object.keys(this.gameStatus.users).length; i++) {
-                    const location = i % Object.keys(this.gameStatus.users).length
-                    const user = Object.values(this.gameStatus.users).find((u) => u.location == location)
-                    newResponseStages.push({
-                        originId: user.userId,
-                        targetId: curResponseStage.originId,//responseStage里的origin 才是没有出闪需要求桃的人
-                        cardName: CARD_CONFIG.TAO.CN
-                    })
-                }
-                this.gameStatus.responseStages = newResponseStages.concat(this.gameStatus.responseStages);
+
+            curShanResStage.cardNumber--; // 吕布需要两个杀
+            if (curShanResStage.cardNumber == 0) {
+                this.clearCurrentShanResStage();
+            } else {
+                // do nothing
             }
+        } else { // 没出闪
+            this.clearCurrentShanResStage();
+
+            originUser.reduceBlood();
+            if (originUser.currentBlood <= 0) {
+                this.generateNewRoundQiuTaoResponseStages(originUser);
+            } else {
+                this.setStateByTieSuoTempStorage(); // 第一个中铁锁连环且不出闪的 不会运行
+            }
+            this.generateTieSuoTempStorage(); // 只有第一个中铁锁连环且不出闪的 会运行
         }
     }
 
-    clearCurrentResponseStage() {
-        this.gameStatus.responseStages.shift();
+    setStatusWhenUserDie(user) {
+        user.isDead = true;
+        let throwCards = [
+            ...user.cards,
+            user.weaponCard,
+            user.shieldCard,
+            user.plusHorseCard,
+            user.minusHorseCard,
+            ...user.pandingCards,
+        ];
+        throwCards = throwCards.filter(x => !!x)
+        this.throwCards(throwCards);
+        user.reset();
+    }
+
+    clearCurrentShanResStage() {
+        this.gameStatus.shanResStages.shift();
+    }
+
+    clearCurrentTaoResStage() {
+        this.gameStatus.taoResStages.shift();
+    }
+
+    // 任意角色blood<=0时
+    generateNewRoundQiuTaoResponseStages(qiutaoTargetUser) {
+        if (qiutaoTargetUser.currentBlood > 0) {
+            throw new Error("Don't need TAO")
+        }
+
+        const taoResStages = [];
+
+        for (let i = this.currentLocation; i < this.currentLocation + Object.keys(this.gameStatus.users).length; i++) {
+            const modLocation = i % Object.keys(this.gameStatus.users).length;
+            const user = Object.values(this.gameStatus.users).find((u) => u.location == modLocation);
+            if (user.isDead) {
+
+            } else {
+                newResponseStages.push({
+                    originId: user.userId,
+                    targetId: qiutaoTargetUser.userId,
+                    cardNumber: 1 - qiutaoTargetUser.currentBlood,
+                })
+            }
+        }
+        this.gameStatus.taoResStages = taoResStages
+    }
+
+    resetTieSuo() {
+        Object.values(this.gameStatus.users).forEach((u) => {
+            u.isTieSuo = false;
+        })
+    }
+
+    // 属性杀没出闪的时候需要
+    generateTieSuoTempStorage() {
+        // 只考虑火杀雷杀
+        const batchAction = this.gameStatus.action;
+        const actualCard = batchAction.actualCard;
+        // const action = batchAction.actions ? batchAction.actions[0] : batchAction;
+        const firstAttributeAction = batchAction.actions.find((a) => {
+            const targetUser = this.gameStatus.users[a.targetId];
+            return targetUser.isTieSuo && actualCard.attribute;
+        })
+
+        // 没有对任何人造成属性伤害
+        if (!firstAttributeAction) {
+            return
+        }
+
+        const firstAttributeActionTargetUserId = firstAttributeAction.targetId;
+        const firstLocation = this.gameStatus.users[firstAttributeActionTargetUserId].location;
+        const tieSuoTempStorage = []
+        for (let i = firstLocation; i < firstLocation + Object.keys(this.gameStatus.users).length; i++) {
+            const modLocation = i % Object.keys(this.gameStatus.users).length;
+            const user = Object.values(this.gameStatus.users).find((u) => u.location == modLocation);
+            if (user.isTieSuo && firstAttributeAction.targetId !== user.userId) { // 除了第一个命中的 其他人都要进 tieSuoTempStorage
+                tieSuoTempStorage.push(
+                    {
+                        damage: 1,
+                        targetId: user.userId,
+                        originId: firstAttributeAction.originId,
+                        cards: firstAttributeAction.cards,
+                        actualCard: firstAttributeAction.actualCard,
+                    }
+                )
+            }
+        }
+
+        this.resetTieSuo();
+        this.gameStatus.tieSuoTempStorage = tieSuoTempStorage;
+    }
+
+    // 掉血的时候执行
+    // 1.一个角色求桃后死亡
+    // 2.一个角色求桃后复活
+    // 3.一个角色不出闪 但是没有死亡
+    setStateByTieSuoTempStorage() {
+        if (this.gameStatus.tieSuoTempStorage.length <= 0) {
+            return
+        }
+
+        const nextTieSuoAction = this.gameStatus.tieSuoTempStorage[0];
+
+        const targetUser = this.gameStatus.users[nextTieSuoAction.targetId];
+        targetUser.reduceBlood(nextTieSuoAction.damage);
+        if (targetUser.currentBlood <= 0) {
+            this.generateNewRoundQiuTaoResponseStages(targetUser);
+        }
+        this.gameStatus.tieSuoTempStorage.shift();
     }
 }
 

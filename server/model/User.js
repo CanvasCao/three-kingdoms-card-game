@@ -8,6 +8,7 @@ class User {
         this.userId = user.userId;
         this.cards = [];
         this.pandingCards = [];
+        this.isTieSuo = true;
         this.location = user.location;
     }
 
@@ -19,6 +20,10 @@ class User {
         this.currentBlood = this.currentBlood - number;
     }
 
+    addBlood(number = 1) {
+        this.currentBlood = this.currentBlood + number;
+    }
+
     reset() {
         this.cards = [];
         this.pandingCards = [];
@@ -26,6 +31,7 @@ class User {
         this.shieldCard = null;
         this.plusHorseCard = null;
         this.minusHorseCard = null;
+        this.isTieSuo = false;
     }
 }
 
