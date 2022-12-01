@@ -307,6 +307,9 @@ class GameEngine {
         throwCards = throwCards.filter(x => !!x)
         this.throwCards(throwCards);
         user.reset();
+
+        // 之后如果还需要出闪也不用出了
+        this.gameStatus.shanResStages = this.gameStatus.shanResStages.filter((rs) => rs.originId !== user.userId)
     }
 
     clearCurrentShanResStage() {
@@ -331,7 +334,7 @@ class GameEngine {
             if (user.isDead) {
 
             } else {
-                newResponseStages.push({
+                taoResStages.push({
                     originId: user.userId,
                     targetId: qiutaoTargetUser.userId,
                     cardNumber: 1 - qiutaoTargetUser.currentBlood,
