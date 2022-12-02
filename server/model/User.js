@@ -10,7 +10,13 @@ class User {
         this.pandingCards = [];
         this.isTieSuo = true;
         this.location = user.location;
+        this.skipDraw = false;
+        this.skipPlay = false;
         this.generateNewRoundQiuTaoResponseStages = generateNewRoundQiuTaoResponseStages;
+    }
+
+    addCards(cards) {
+        this.cards = this.cards.concat(cards)
     }
 
     removeCards(cards) {
@@ -32,7 +38,7 @@ class User {
         this.currentBlood = this.currentBlood + number;
     }
 
-    reset() {
+    resetWhenDie() {
         this.cards = [];
         this.pandingCards = [];
         this.weaponCard = null;
@@ -40,6 +46,11 @@ class User {
         this.plusHorseCard = null;
         this.minusHorseCard = null;
         this.isTieSuo = false;
+    }
+
+    resetAfterMyTurn() {
+        this.skipDraw = false;
+        this.skipPlay = false;
     }
 }
 

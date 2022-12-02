@@ -50,8 +50,8 @@ class GameEngine {
         if (this.canAutoGoNextStage()) { //自动跳过的阶段
             this.goToNextStage();
         } else {
+            const user = this.getCurrentUser();
             if (this.gameStatus.stage.stageName == 'judge') {
-                const user = this.getCurrentUser();
                 // if (user.pandingCards.length > 0) {
                 //     const pandingResultCard = this.getCards(1)
                 //     user.removePandingCard(user.pandingCards[user.pandingCards.length - 1])
@@ -59,7 +59,7 @@ class GameEngine {
                 //     this.io.emit(emitMap.PANDING, pandingResultCard); // 为了refresh页面所有元素
                 // }
             } else if (this.gameStatus.stage.stageName == 'draw') {
-                this.userDrawCards();
+                user.addCards(this.getCards())
             } else if (this.gameStatus.stage.stageName == 'play') {
             }
             this.io.emit(emitMap.REFRESH_STATUS, this.gameStatus); // 为了refresh页面所有元素
@@ -99,10 +99,6 @@ class GameEngine {
         } else {
             this.currentLocation = sorted[0].location
         }
-    }
-
-    userDrawCards() {
-        this.getCurrentUser().cards.push(...this.getCards(2))
     }
 
     canAutoGoNextStage() {
@@ -312,7 +308,7 @@ class GameEngine {
         ];
         throwCards = throwCards.filter(x => !!x)
         this.throwCards(throwCards);
-        user.reset();
+        user.resetWhenDie();
 
         // 之后如果还需要出闪也不用出了
         this.gameStatus.shanResStages = this.gameStatus.shanResStages.filter((rs) => rs.originId !== user.userId)
