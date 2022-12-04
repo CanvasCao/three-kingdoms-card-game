@@ -1,9 +1,4 @@
-import { Game } from "../../Game/Game";
-import { User } from "../../User/User";
+import { Event } from "../../Event/Event";
 import { Card } from "../Card";
 
-export interface StageCard extends Card {
-    targets?: User[];
-    preEffect(game: Game): void;
-    effect():void
-}
+export interface StageCard extends Card, Event {}
