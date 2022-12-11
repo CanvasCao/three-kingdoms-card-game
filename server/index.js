@@ -29,7 +29,7 @@ io.on('connection', (socket) => {
 
     socket.on(emitMap.INIT, (data) => {
         // data { userId: '22c3d181-5d60-4283-a4ce-6f2b14d772bc' }
-        if (Object.keys(gameEngine.gameStatus.users).length >= 3) {
+        if (Object.keys(gameEngine.gameStatus.users).length >= 2) {
             io.emit(emitMap.INIT, gameEngine.gameStatus);
             return;
         }
@@ -43,6 +43,7 @@ io.on('connection', (socket) => {
         // hardcode 只有两个角色
         const newUser = new User({
             cardId: "SHU001",
+            name: "刘备",
             userId: data.userId,
             location: 0
         }, gameEngine.generateNewRoundQiuTaoResponseStages.bind(gameEngine));
@@ -50,6 +51,7 @@ io.on('connection', (socket) => {
 
         const newUser2 = new User({
             cardId: "SHU002",
+            name: "关羽",
             userId: 'user2',
             location: 1
         }, gameEngine.generateNewRoundQiuTaoResponseStages.bind(gameEngine));
@@ -60,13 +62,14 @@ io.on('connection', (socket) => {
 
         const newUser3 = new User({
             cardId: "SHU003",
+            name: "张飞",
             userId: 'user3',
             location: 2
         }, gameEngine.generateNewRoundQiuTaoResponseStages.bind(gameEngine));
         if (gameEngine.gameStatus.users[newUser3.userId]) {
             throw new Error("user3 id already exist")
         }
-        gameEngine.gameStatus.users[newUser3.userId] = newUser3;
+        // gameEngine.gameStatus.users[newUser3.userId] = newUser3;
 
         addedUser = true;
 

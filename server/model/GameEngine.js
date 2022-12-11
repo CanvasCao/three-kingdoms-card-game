@@ -7,6 +7,7 @@ const {
     EQUIPMENT_TYPE
 } = require("../initCards");
 const emitMap = require("../config/emitMap.json");
+const {generateBehaviorMessage} = require("../utils/utils");
 
 class GameEngine {
     constructor(io) {
@@ -125,6 +126,8 @@ class GameEngine {
 
     // socket actions
     addAction(action) {
+        this.emitPublicPlayCard(action)
+
         // 桃 武器
         // {
         //     "cards": [],
@@ -220,8 +223,11 @@ class GameEngine {
 
     // response
     addResponse(response) {
+        this.emitPublicPlayCard(response)
+
         // cards？: gameFEgameFEStatus.selectedCards,
         // actualCard？: gameFEgameFEStatus.selectedCards[0].name,
+        // originId
         if (this.gameStatus.taoResStages.length > 0 && response?.actualCard?.CN == BASIC_CARDS_CONFIG.SHAN.CN) {
             throw new Error("求桃的时候不能出闪")
         }
@@ -405,6 +411,16 @@ class GameEngine {
         const targetUser = this.gameStatus.users[nextTieSuoAction.targetId];
         targetUser.reduceBlood(nextTieSuoAction.damage);
         this.gameStatus.tieSuoTempStorage.shift();
+    }
+
+    emitPublicPlayCard(behaviour) {
+        // behaviour is action/response
+        if (behaviour.cards?.[0]) {
+            this.io.emit(emitMap.PLAY_PUBLIC_CARD, {
+                cards: behaviour.cards,
+                message: generateBehaviorMessage(behaviour, this.gameStatus.users)
+            });
+        }
     }
 }
 

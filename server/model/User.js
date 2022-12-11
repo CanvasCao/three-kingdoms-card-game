@@ -6,6 +6,7 @@ class User {
         this.currentBlood = 1 || this.maxBlood;
         this.cardId = user.cardId;
         this.userId = user.userId;
+        this.name = user.name;
         this.cards = [];
         this.pandingCards = [];
         this.isTieSuo = true;
