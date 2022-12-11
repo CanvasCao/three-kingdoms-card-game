@@ -1,6 +1,6 @@
 export interface Card {
-    name: string
-    nameCN: string
-    description: string
-    descriptionCN: string
+    name?: string
+    nameCN?: string
+    description?: string
+    descriptionCN?: string
 }
