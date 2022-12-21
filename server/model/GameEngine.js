@@ -6,8 +6,12 @@ const {
     EQUIPMENT_CARDS_CONFIG,
     EQUIPMENT_TYPE
 } = require("../initCards");
-const emitMap = require("../config/emitMap.json");
-const {generateBehaviorMessage} = require("../utils/utils");
+const {
+    emitBehaviorPublicPlayCard,
+    emitPandingPublicCard,
+    emitRefreshStatus,
+    emitInit,
+} = require("../utils/utils");
 
 class GameEngine {
     constructor(io) {
@@ -32,101 +36,109 @@ class GameEngine {
             tieSuoTempStorage: [],
             throwedCards: [],
         }
+
+        this.userUtils = {
+            getCurrentUser: () => {
+                return Object.values(this.gameStatus.users).find((u) => u.location == this.currentLocation)
+            },
+            setCurrentLocationToNextLocation: () => {
+                const filteredNotDead = Object.values(this.gameStatus.users).filter((u) => !u.isDead);
+                if (filteredNotDead.length == 0) {
+                    throw new Error("Everyone is dead. Game Over")
+                }
+                const sorted = filteredNotDead.sort((a, b) => a.location - b.location)
+
+                // 可能会在自己的回合自杀 所以不能找到自己再+1
+                const nextUser = sorted.find((u) => u.location > this.currentLocation);
+                if (nextUser) {
+                    this.currentLocation = nextUser.location
+                } else {
+                    this.currentLocation = sorted[0].location
+                }
+            }
+        }
+        this.stageUtils = {
+            goToNextStage: () => {
+                if (this.gameStatus.shanResStages.length > 0 || this.gameStatus.taoResStages.length > 0) {
+                    return
+                }
+
+                this.stageIndex++
+                if (this.stageIndex >= this.stageNamesEN.length) {
+                    this.userUtils.getCurrentUser().resetWhenMyTurnEnds()
+                    this.stageIndex = 0;
+                    this.userUtils.setCurrentLocationToNextLocation();
+                }
+                this.gameStatus.stage = {
+                    userId: this.userUtils.getCurrentUser().userId,
+                    stageName: this.stageNamesEN[this.stageIndex],
+                    stageNameCN: this.stageNamesCN[this.stageIndex]
+                }
+                emitRefreshStatus(this.io, this.gameStatus);
+                this.tryGoNextStage();
+            },
+
+            canAutoGoNextStage: () => {
+                return ["start", "end"].includes(this.gameStatus.stage.stageName)
+            }
+        }
+        this.cardUtils = {
+            throwCards: (cards) => {
+                this.gameStatus.throwedCards = this.gameStatus.throwedCards.concat(cards);
+            },
+            getCards: (number = 2) => {
+                // hardcode 补牌
+                if (this.initCards.length < 2) {
+                    console.log("补牌")
+                    this.initCards = getInitCards()
+                }
+
+                if (number > 1) {
+                    let cards = [];
+                    for (let i = 1; i <= number; i++) {
+                        cards.push(JSON.parse(JSON.stringify(this.initCards.shift())))
+                    }
+                    return cards;
+                } else {
+                    return JSON.parse(JSON.stringify(this.initCards.shift()))
+                }
+            }
+        }
     }
 
     startEngine() {
         this.gameStatus.stage = {
-            userId: this.getCurrentUser().userId,
+            userId: this.userUtils.getCurrentUser().userId,
             stageName: this.stageNamesEN[this.stageIndex]
         }
-        this.io.emit(emitMap.INIT, this.gameStatus);
+        emitInit(this.io, this.gameStatus);
         this.tryGoNextStage()
     }
 
-    getCurrentUser() {
-        return Object.values(this.gameStatus.users).find((u) => u.location == this.currentLocation)
-    }
-
     tryGoNextStage() {
-        if (this.canAutoGoNextStage()) { //自动跳过的阶段
-            this.goToNextStage();
+        if (this.stageUtils.canAutoGoNextStage()) {
+            this.stageUtils.goToNextStage();
         } else {
-            const user = this.getCurrentUser();
+            const user = this.userUtils.getCurrentUser();
             if (this.gameStatus.stage.stageName == 'judge') {
-                // if (user.pandingCards.length > 0) {
-                //     const pandingResultCard = this.getCards(1)
-                //     user.removePandingCard(user.pandingCards[user.pandingCards.length - 1])
-                //     this.throwCards(pandingResultCard);
-                //     this.io.emit(emitMap.PANDING, pandingResultCard); // 为了refresh页面所有元素
-                // }
+                if (user.pandingCards.length > 0) {
+                    const pandingResultCard = this.cardUtils.getCards(1)
+                    user.removePandingCard(user.pandingCards[user.pandingCards.length - 1])
+                    this.cardUtils.throwCards(pandingResultCard);
+                    emitPandingPublicCard(this.io, pandingResultCard);
+                }
+                this.stageUtils.goToNextStage();
             } else if (this.gameStatus.stage.stageName == 'draw') {
-                user.addCards(this.getCards())
+                user.addCards(this.cardUtils.getCards())
             } else if (this.gameStatus.stage.stageName == 'play') {
             }
-            this.io.emit(emitMap.REFRESH_STATUS, this.gameStatus); // 为了refresh页面所有元素
+            emitRefreshStatus(this.io, this.gameStatus)
         }
-    }
-
-    goToNextStage() {
-        if (this.gameStatus.shanResStages.length > 0 || this.gameStatus.taoResStages.length > 0) {
-            return
-        }
-
-        this.stageIndex++
-        if (this.stageIndex >= this.stageNamesEN.length) {
-            this.stageIndex = 0
-            this.setCurrentLocationToNextLocation();
-        }
-        this.gameStatus.stage = {
-            userId: this.getCurrentUser().userId,
-            stageName: this.stageNamesEN[this.stageIndex],
-            stageNameCN: this.stageNamesCN[this.stageIndex]
-        }
-        this.io.emit(emitMap.REFRESH_STATUS, this.gameStatus); // 为了refresh页面所有元素
-        this.tryGoNextStage();
-    }
-
-    setCurrentLocationToNextLocation() {
-        const filteredNotDead = Object.values(this.gameStatus.users).filter((u) => !u.isDead);
-        if (filteredNotDead.length == 0) {
-            throw new Error("Everyone is dead. Game Over")
-        }
-        const sorted = filteredNotDead.sort((a, b) => a.location - b.location)
-
-        // 可能会在自己的回合自杀 所以不能找到自己再+1
-        const nextUser = sorted.find((u) => u.location > this.currentLocation);
-        if (nextUser) {
-            this.currentLocation = nextUser.location
-        } else {
-            this.currentLocation = sorted[0].location
-        }
-    }
-
-    canAutoGoNextStage() {
-        return ["start", "end"].includes(this.gameStatus.stage.stageName)
-    }
-
-    throwCards(cards) {
-        this.gameStatus.throwedCards = this.gameStatus.throwedCards.concat(cards);
-    }
-
-    getCards(number = 2) {
-        // hardcode 补牌
-        if (this.initCards.length < 2) {
-            console.log("补牌")
-            this.initCards = getInitCards()
-        }
-
-        let cards = [];
-        for (let i = 1; i <= number; i++) {
-            cards.push(JSON.parse(JSON.stringify(this.initCards.shift())))
-        }
-        return cards;
     }
 
     // socket actions
     addAction(action) {
-        this.emitPublicPlayCard(action)
+        emitBehaviorPublicPlayCard(this.io, action, this.gameStatus);
 
         // 桃 武器
         // {
@@ -156,13 +168,13 @@ class GameEngine {
             BASIC_CARDS_CONFIG.HUO_SHA.CN].includes(action.actualCard.CN)
         ) {
             this.setStatusByShaAction();
-            this.throwCards(action.cards);
+            this.cardUtils.throwCards(action.cards);
         } else if (action.actualCard.CN == BASIC_CARDS_CONFIG.TAO.CN) {
             this.setStatusByTaoAction();
-            this.throwCards(action.cards);
+            this.cardUtils.throwCards(action.cards);
         } else if (CARD_TYPE.EQUIPMENT == action.actualCard.type) {
             this.setStatusByEquipmentAction();
-            this.throwCards(action.cards);
+            this.cardUtils.throwCards(action.cards);
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.SHAN_DIAN.CN) {
             this.setStatusByShanDianAction();
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.LE_BU_SI_SHU.CN) {
@@ -170,7 +182,7 @@ class GameEngine {
         }
 
         originUser.removeCards(action.cards);
-        this.io.emit(emitMap.REFRESH_STATUS, this.gameStatus);
+        emitRefreshStatus(this.io, this.gameStatus);
     }
 
     // action handler
@@ -223,7 +235,7 @@ class GameEngine {
 
     // response
     addResponse(response) {
-        this.emitPublicPlayCard(response)
+        emitBehaviorPublicPlayCard(this.io,response,this.gameStatus)
 
         // cards？: gameFEgameFEStatus.selectedCards,
         // actualCard？: gameFEgameFEStatus.selectedCards[0].name,
@@ -240,8 +252,7 @@ class GameEngine {
         } else if (needResponseShan) { // 需要出的是SHAN
             this.setStatusByShanResponse(response);
         }
-
-        this.io.emit(emitMap.REFRESH_STATUS, this.gameStatus);
+        emitRefreshStatus(this.io, this.gameStatus);
     }
 
     // response handler
@@ -252,7 +263,7 @@ class GameEngine {
 
         if (response?.actualCard?.CN == BASIC_CARDS_CONFIG.TAO.CN) { // 出桃了
             originUser.removeCards(response.cards);
-            this.throwCards(response.cards);
+            this.cardUtils.throwCards(response.cards);
 
             targetUser.addBlood();
 
@@ -282,7 +293,7 @@ class GameEngine {
 
         if (response?.actualCard?.CN == BASIC_CARDS_CONFIG.SHAN.CN) { // 出闪了
             originUser.removeCards(response.cards);
-            this.throwCards(response.cards);
+            this.cardUtils.throwCards(response.cards);
 
 
             curShanResStage.cardNumber--; // 吕布需要两个杀
@@ -313,13 +324,14 @@ class GameEngine {
             ...user.pandingCards,
         ];
         throwCards = throwCards.filter(x => !!x)
-        this.throwCards(throwCards);
+        this.cardUtils.throwCards(throwCards);
         user.resetWhenDie();
 
         // 之后如果还需要出闪也不用出了
         this.gameStatus.shanResStages = this.gameStatus.shanResStages.filter((rs) => rs.originId !== user.userId)
     }
 
+    // clear stage
     clearCurrentShanResStage() {
         this.gameStatus.shanResStages.shift();
     }
@@ -411,16 +423,6 @@ class GameEngine {
         const targetUser = this.gameStatus.users[nextTieSuoAction.targetId];
         targetUser.reduceBlood(nextTieSuoAction.damage);
         this.gameStatus.tieSuoTempStorage.shift();
-    }
-
-    emitPublicPlayCard(behaviour) {
-        // behaviour is action/response
-        if (behaviour.cards?.[0]) {
-            this.io.emit(emitMap.PLAY_PUBLIC_CARD, {
-                cards: behaviour.cards,
-                message: generateBehaviorMessage(behaviour, this.gameStatus.users)
-            });
-        }
     }
 }
 

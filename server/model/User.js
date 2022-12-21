@@ -7,12 +7,25 @@ class User {
         this.cardId = user.cardId;
         this.userId = user.userId;
         this.name = user.name;
+        this.location = user.location;
+
+        // cards
         this.cards = [];
         this.pandingCards = [];
+
+        // tags
         this.isTieSuo = true;
-        this.location = user.location;
+
+        // delay scroll
         this.skipDraw = false;
         this.skipPlay = false;
+
+        // skills
+        this.skills = [
+            {triggerStage: '', name: ''},
+        ]
+
+        // 耦合 掉血和求桃
         this.generateNewRoundQiuTaoResponseStages = generateNewRoundQiuTaoResponseStages;
     }
 
@@ -49,7 +62,7 @@ class User {
         this.isTieSuo = false;
     }
 
-    resetAfterMyTurn() {
+    resetWhenMyTurnEnds() {
         this.skipDraw = false;
         this.skipPlay = false;
     }

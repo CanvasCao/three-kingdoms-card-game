@@ -1,3 +1,5 @@
+const emitMap = require("../config/emitMap.json");
+
 const shuffle = (array) => {
     let currentIndex = array.length, randomIndex;
 
@@ -30,8 +32,36 @@ const generateBehaviorMessage = (behavior, users) => {
     const targetName = behavior.actions ? behavior.actions.map((a) => users[a.targetId].name).join(' ') : users?.[behavior?.targetId]?.name
     const originName = behavior.actions ? users[behavior.actions[0].originId].name : users[behavior.originId].name;
 
-    return targetName?`${originName}对${targetName}使用了${behavior.actualCard.CN}`:`${originName}使用了${behavior.actualCard.CN}`
+    return targetName ? `${originName}对${targetName}使用了${behavior.actualCard.CN}` : `${originName}使用了${behavior.actualCard.CN}`
+}
+
+const emitBehaviorPublicPlayCard = (io, behaviour,gameStatus) => {
+    // behaviour is action/response
+    if (behaviour.cards?.[0]) {
+        io.emit(emitMap.PLAY_PUBLIC_CARD, {
+            cards: behaviour.cards,
+            message: generateBehaviorMessage(behaviour, gameStatus.users)
+        });
+    }
+}
+
+const emitPandingPublicCard=(io,card)=>{
+    io.emit(emitMap.PLAY_PUBLIC_CARD, {
+        cards: [card],
+        message: `判定结果为${pandingResultCard.huase}${pandingResultCard.number}`
+    });
+}
+const emitRefreshStatus = (io, gameStatus) => {
+    io.emit(emitMap.REFRESH_STATUS, gameStatus); // 为了refresh页面所有元素
+}
+
+const emitInit = (io, gameStatus) => {
+    io.emit(emitMap.INIT, gameStatus);
 }
 
 exports.shuffle = shuffle;
 exports.generateBehaviorMessage = generateBehaviorMessage;
+exports.emitBehaviorPublicPlayCard = emitBehaviorPublicPlayCard;
+exports.emitRefreshStatus = emitRefreshStatus;
+exports.emitPandingPublicCard = emitPandingPublicCard;
+exports.emitInit = emitInit;

@@ -78,7 +78,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on(emitMap.GO_NEXT_STAGE, (data) => {
-        gameEngine.goToNextStage();
+        gameEngine.stageUtils.goToNextStage();
     });
 
     socket.on(emitMap.ACTION, (action) => {
