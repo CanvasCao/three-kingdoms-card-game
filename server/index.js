@@ -77,7 +77,7 @@ io.on('connection', (socket) => {
         gameEngine.startEngine();
     });
 
-    socket.on(emitMap.GO_NEXT_STAGE, (data) => {
+    socket.on(emitMap.GO_NEXT_STAGE, () => {
         gameEngine.stageUtils.goToNextStage();
     });
 
@@ -87,5 +87,9 @@ io.on('connection', (socket) => {
 
     socket.on(emitMap.RESPONSE, (response) => {
         gameEngine.addResponse(response);
+    });
+
+    socket.on(emitMap.THROW, (data) => {
+        gameEngine.handleThrowCards(data);
     });
 });

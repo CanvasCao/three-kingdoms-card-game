@@ -2,8 +2,10 @@
   "INIT": "init",
   "GO_NEXT_STAGE": "go_next_stage",
   "REFRESH_STATUS": "refresh_status",
+
   "ACTION": "action",
   "RESPONSE": "response",
+  "THROW": "throw",
 
   "PLAY_PUBLIC_CARD": "play_public_card"
 }

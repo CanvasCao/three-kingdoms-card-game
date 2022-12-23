@@ -35,7 +35,7 @@ const generateBehaviorMessage = (behavior, users) => {
     return targetName ? `${originName}对${targetName}使用了${behavior.actualCard.CN}` : `${originName}使用了${behavior.actualCard.CN}`
 }
 
-const emitBehaviorPublicPlayCard = (io, behaviour,gameStatus) => {
+const emitBehaviorPublicPlayCard = (io, behaviour, gameStatus) => {
     // behaviour is action/response
     if (behaviour.cards?.[0]) {
         io.emit(emitMap.PLAY_PUBLIC_CARD, {
@@ -45,12 +45,20 @@ const emitBehaviorPublicPlayCard = (io, behaviour,gameStatus) => {
     }
 }
 
-const emitPandingPublicCard=(io,card)=>{
+const emitPandingPublicCard = (io, card) => {
     io.emit(emitMap.PLAY_PUBLIC_CARD, {
         cards: [card],
-        message: `判定结果为${pandingResultCard.huase}${pandingResultCard.number}`
+        message: `判定结果为${card.huase}${card.number}`
     });
 }
+
+const emitThrowPublicCard = (io, cards,user) => {
+    io.emit(emitMap.PLAY_PUBLIC_CARD, {
+        cards: cards,
+        message: `${user.name}弃牌`
+    });
+}
+
 const emitRefreshStatus = (io, gameStatus) => {
     io.emit(emitMap.REFRESH_STATUS, gameStatus); // 为了refresh页面所有元素
 }
@@ -64,4 +72,5 @@ exports.generateBehaviorMessage = generateBehaviorMessage;
 exports.emitBehaviorPublicPlayCard = emitBehaviorPublicPlayCard;
 exports.emitRefreshStatus = emitRefreshStatus;
 exports.emitPandingPublicCard = emitPandingPublicCard;
+exports.emitThrowPublicCard = emitThrowPublicCard;
 exports.emitInit = emitInit;

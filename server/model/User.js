@@ -66,6 +66,10 @@ class User {
         this.skipDraw = false;
         this.skipPlay = false;
     }
+
+    needThrow() {
+        return this.cards.length > this.currentBlood
+    }
 }
 
 exports.User = User;

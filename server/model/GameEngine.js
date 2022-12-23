@@ -9,6 +9,7 @@ const {
 const {
     emitBehaviorPublicPlayCard,
     emitPandingPublicCard,
+    emitThrowPublicCard,
     emitRefreshStatus,
     emitInit,
 } = require("../utils/utils");
@@ -76,10 +77,6 @@ class GameEngine {
                 }
                 emitRefreshStatus(this.io, this.gameStatus);
                 this.tryGoNextStage();
-            },
-
-            canAutoGoNextStage: () => {
-                return ["start", "end"].includes(this.gameStatus.stage.stageName)
             }
         }
         this.cardUtils = {
@@ -116,24 +113,31 @@ class GameEngine {
     }
 
     tryGoNextStage() {
-        if (this.stageUtils.canAutoGoNextStage()) {
+        const user = this.userUtils.getCurrentUser();
+        if (this.gameStatus.stage.stageName == 'start') {
             this.stageUtils.goToNextStage();
-        } else {
-            const user = this.userUtils.getCurrentUser();
-            if (this.gameStatus.stage.stageName == 'judge') {
-                if (user.pandingCards.length > 0) {
-                    const pandingResultCard = this.cardUtils.getCards(1)
-                    user.removePandingCard(user.pandingCards[user.pandingCards.length - 1])
-                    this.cardUtils.throwCards(pandingResultCard);
-                    emitPandingPublicCard(this.io, pandingResultCard);
-                }
+        } else if (this.gameStatus.stage.stageName == 'judge') {
+            // if (user.pandingCards.length > 0) {
+            //     const pandingResultCard = this.cardUtils.getCards(1)
+            //     user.removePandingCard(user.pandingCards[user.pandingCards.length - 1])
+            //     this.cardUtils.throwCards(pandingResultCard);
+            //     emitPandingPublicCard(this.io, pandingResultCard);
+            // }
+            // this.stageUtils.goToNextStage();
+        } else if (this.gameStatus.stage.stageName == 'draw') {
+            user.addCards(this.cardUtils.getCards())
+        } else if (this.gameStatus.stage.stageName == 'play') {
+            if (user.skipPlay) {
                 this.stageUtils.goToNextStage();
-            } else if (this.gameStatus.stage.stageName == 'draw') {
-                user.addCards(this.cardUtils.getCards())
-            } else if (this.gameStatus.stage.stageName == 'play') {
             }
-            emitRefreshStatus(this.io, this.gameStatus)
+        } else if (this.gameStatus.stage.stageName == 'throw') {
+            if (!user.needThrow()) {
+                this.stageUtils.goToNextStage();
+            }
+        } else if (this.gameStatus.stage.stageName == 'end') {
+            this.stageUtils.goToNextStage();
         }
+        emitRefreshStatus(this.io, this.gameStatus)
     }
 
     // socket actions
@@ -235,7 +239,7 @@ class GameEngine {
 
     // response
     addResponse(response) {
-        emitBehaviorPublicPlayCard(this.io,response,this.gameStatus)
+        emitBehaviorPublicPlayCard(this.io, response, this.gameStatus)
 
         // cards？: gameFEgameFEStatus.selectedCards,
         // actualCard？: gameFEgameFEStatus.selectedCards[0].name,
@@ -313,6 +317,7 @@ class GameEngine {
         }
     }
 
+    // die handler
     setStatusWhenUserDie(user) {
         user.isDead = true;
         let throwCards = [
@@ -329,6 +334,16 @@ class GameEngine {
 
         // 之后如果还需要出闪也不用出了
         this.gameStatus.shanResStages = this.gameStatus.shanResStages.filter((rs) => rs.originId !== user.userId)
+    }
+
+    // throw actions
+    handleThrowCards(data) {
+        const throwCards = data.cards;
+        this.userUtils.getCurrentUser().removeCards(throwCards);
+        this.cardUtils.throwCards(throwCards);
+        emitRefreshStatus(this.io, this.gameStatus);
+        emitThrowPublicCard(this.io, throwCards, this.userUtils.getCurrentUser());
+        this.stageUtils.goToNextStage();
     }
 
     // clear stage
