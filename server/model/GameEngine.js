@@ -3,6 +3,7 @@ const {
     CARD_TYPE,
     BASIC_CARDS_CONFIG,
     SCROLL_CARDS_CONFIG,
+    DELAY_SCROLL_CARDS_CONFIG,
     EQUIPMENT_CARDS_CONFIG,
     EQUIPMENT_TYPE
 } = require("../initCards");
@@ -56,14 +57,18 @@ class GameEngine {
                 } else {
                     this.currentLocation = sorted[0].location
                 }
+            },
+            getNextShandianUser: () => {
+                const filtered = Object.values(this.gameStatus.users).filter((u) => {
+                    return !u.isDead && !u.pandingCards.find(c => c.CN == DELAY_SCROLL_CARDS_CONFIG.SHAN_DIAN.CN)
+                });
+                const sorted = filtered.sort((a, b) => a.location - b.location);
+                const nextUser = sorted.find((u) => u.location > this.currentLocation);
+                return nextUser
             }
         }
         this.stageUtils = {
             goToNextStage: () => {
-                if (this.gameStatus.shanResStages.length > 0 || this.gameStatus.taoResStages.length > 0) {
-                    return
-                }
-
                 this.stageIndex++
                 if (this.stageIndex >= this.stageNamesEN.length) {
                     this.userUtils.getCurrentUser().resetWhenMyTurnEnds()
@@ -76,12 +81,40 @@ class GameEngine {
                     stageNameCN: this.stageNamesCN[this.stageIndex]
                 }
                 emitRefreshStatus(this.io, this.gameStatus);
-                this.tryGoNextStage();
+                this.stageUtils.tryGoNextStage();
+            },
+            tryGoNextStage: () => {
+                if (this.gameStatus.shanResStages.length > 0 || this.gameStatus.taoResStages.length > 0) {
+                    return
+                }
+
+                const user = this.userUtils.getCurrentUser();
+                if (this.gameStatus.stage.stageName == 'start') {
+                    this.stageUtils.goToNextStage();
+                } else if (this.gameStatus.stage.stageName == 'judge') {
+                    this.executePanding();
+                } else if (this.gameStatus.stage.stageName == 'draw') {
+                    user.addCards(this.cardUtils.getCards())
+                    this.stageUtils.goToNextStage();
+                } else if (this.gameStatus.stage.stageName == 'play') {
+                    if (user.skipPlay) {
+                        this.stageUtils.goToNextStage();
+                    }
+                } else if (this.gameStatus.stage.stageName == 'throw') {
+                    if (!user.needThrow()) {
+                        console.log(352345)
+                        this.stageUtils.goToNextStage();
+                    }
+                } else if (this.gameStatus.stage.stageName == 'end') {
+                    this.stageUtils.goToNextStage();
+                }
+                emitRefreshStatus(this.io, this.gameStatus)
             }
         }
         this.cardUtils = {
             throwCards: (cards) => {
-                this.gameStatus.throwedCards = this.gameStatus.throwedCards.concat(cards);
+                // this.gameStatus.throwedCards = this.gameStatus.throwedCards.concat(cards);
+                this.throwedCards = this.throwedCards.concat(cards);
             },
             getCards: (number = 2) => {
                 // hardcode 补牌
@@ -109,36 +142,9 @@ class GameEngine {
             stageName: this.stageNamesEN[this.stageIndex]
         }
         emitInit(this.io, this.gameStatus);
-        this.tryGoNextStage()
+        this.stageUtils.tryGoNextStage()
     }
 
-    tryGoNextStage() {
-        const user = this.userUtils.getCurrentUser();
-        if (this.gameStatus.stage.stageName == 'start') {
-            this.stageUtils.goToNextStage();
-        } else if (this.gameStatus.stage.stageName == 'judge') {
-            // if (user.pandingCards.length > 0) {
-            //     const pandingResultCard = this.cardUtils.getCards(1)
-            //     user.removePandingCard(user.pandingCards[user.pandingCards.length - 1])
-            //     this.cardUtils.throwCards(pandingResultCard);
-            //     emitPandingPublicCard(this.io, pandingResultCard);
-            // }
-            // this.stageUtils.goToNextStage();
-        } else if (this.gameStatus.stage.stageName == 'draw') {
-            user.addCards(this.cardUtils.getCards())
-        } else if (this.gameStatus.stage.stageName == 'play') {
-            if (user.skipPlay) {
-                this.stageUtils.goToNextStage();
-            }
-        } else if (this.gameStatus.stage.stageName == 'throw') {
-            if (!user.needThrow()) {
-                this.stageUtils.goToNextStage();
-            }
-        } else if (this.gameStatus.stage.stageName == 'end') {
-            this.stageUtils.goToNextStage();
-        }
-        emitRefreshStatus(this.io, this.gameStatus)
-    }
 
     // socket actions
     addAction(action) {
@@ -289,6 +295,9 @@ class GameEngine {
                 this.setStateByTieSuoTempStorage();
             }
         }
+
+        //闪电求桃之后 需要判断是不是从判定阶段到出牌阶段
+        this.stageUtils.tryGoNextStage();
     }
 
     setStatusByShanResponse(response) {
@@ -310,10 +319,11 @@ class GameEngine {
             this.clearCurrentShanResStage();
 
             originUser.reduceBlood();
-            if (originUser.currentBlood > 0) {
-                this.setStateByTieSuoTempStorage(); // 第一个中铁锁连环且不出闪的 不会运行
+            this.generateTieSuoTempStorageByShaAction(); // 只有第一个中铁锁连环且不出闪的 会运行
+
+            if (originUser.currentBlood > 0) { // <0 setStateByTieSuoTempStorage的逻辑在求桃之后 如果我还活着需要立刻结算下一个人的铁锁连环
+                this.setStateByTieSuoTempStorage();
             }
-            this.generateTieSuoTempStorage(); // 只有第一个中铁锁连环且不出闪的 会运行
         }
     }
 
@@ -355,6 +365,59 @@ class GameEngine {
         this.gameStatus.taoResStages.shift();
     }
 
+    // panding
+    executePanding() {
+        const user = this.userUtils.getCurrentUser();
+
+        if (user.pandingCards.length == 0) {
+            this.stageUtils.goToNextStage();
+            return
+        }
+        if (user.pandingCards.length > 0) {
+            const pandingResultCard = this.cardUtils.getCards(1);
+            this.cardUtils.throwCards([pandingResultCard]);
+            const pandingCard = user.pandingCards[user.pandingCards.length - 1]
+
+            emitPandingPublicCard(this.io, pandingResultCard, user, pandingCard);
+
+            if (pandingCard.CN == DELAY_SCROLL_CARDS_CONFIG.LE_BU_SI_SHU.CN) {
+                user.removePandingCard(pandingCard);
+                this.cardUtils.throwCards([pandingCard]);
+                if (pandingResultCard.huase !== "♥️") {
+                    user.skipPlay = true;
+                }
+                this.stageUtils.tryGoNextStage();// 如果还有别的判定牌会再一次回到这里
+            } else if (pandingCard.CN == DELAY_SCROLL_CARDS_CONFIG.SHAN_DIAN.CN) {
+                // 如果闪电移动到自己身上 且闪电判定过 直接到下回合
+                if (user.judgedShandian && user.pandingCards.length == 1 && user.pandingCards[0].CN == DELAY_SCROLL_CARDS_CONFIG.SHAN_DIAN.CN) {
+                    this.stageUtils.goToNextStage();
+                    return;
+                }
+
+                if (pandingResultCard.huase == "♠️️" && pandingResultCard.number >= 2 && pandingResultCard.number <= 9) {
+                    user.removePandingCard(pandingCard);
+                    this.cardUtils.throwCards([pandingCard]);
+
+                    user.reduceBlood(3);
+                    this.generateTieSuoTempStorageByShandian();
+
+                    if (user.currentBlood > 0) { // <0 setStateByTieSuoTempStorage的逻辑在求桃之后 如果我还活着需要立刻结算下一个人的铁锁连环
+                        this.setStateByTieSuoTempStorage();
+                    }
+                } else {
+                    const nextUser = this.userUtils.getNextShandianUser();
+                    //如果人人有闪电 那么闪电原地不动
+                    if (nextUser) {
+                        user.removePandingCard(pandingCard);
+                        nextUser.pandingCards.push(pandingCard);
+                    }
+                }
+                user.judgedShandian = true;
+                this.stageUtils.tryGoNextStage();// 如果还有别的判定牌会再一次回到这里
+            }
+        }
+    }
+
     // 任意角色blood<=0时
     generateNewRoundQiuTaoResponseStages(qiutaoTargetUser) {
         if (qiutaoTargetUser.currentBlood > 0) {
@@ -386,37 +449,53 @@ class GameEngine {
     }
 
     // 属性杀没出闪的时候需要
-    generateTieSuoTempStorage() {
-        // 只考虑火杀雷杀
+    generateTieSuoTempStorageByShaAction() {
         const batchAction = this.gameStatus.action;
         const actualCard = batchAction.actualCard;
+        if (!actualCard.attribute) {
+            return;
+        }
+
         // const action = batchAction.actions ? batchAction.actions[0] : batchAction;
         const firstAttributeAction = batchAction.actions.find((a) => {
             const targetUser = this.gameStatus.users[a.targetId];
-            return targetUser.isTieSuo && actualCard.attribute;
+            return targetUser.isTieSuo;
         })
 
-        // 没有对任何人造成属性伤害
+        // 没有任何人是铁锁状态
         if (!firstAttributeAction) {
             return
         }
 
         const firstAttributeActionTargetUserId = firstAttributeAction.targetId;
-        const firstLocation = this.gameStatus.users[firstAttributeActionTargetUserId].location;
+        const firstAttributeActionTargetUser = this.gameStatus.users[firstAttributeActionTargetUserId]
+        this.generateTieSuoTempStorage(firstAttributeActionTargetUser, firstAttributeAction, 1);
+    }
+
+    generateTieSuoTempStorageByShandian() {
+        this.generateTieSuoTempStorage(this.userUtils.getCurrentUser(), null, 3);
+    }
+
+    generateTieSuoTempStorage(firstAttributeDamageTargetUser, firstAttributeAction, damage) {
+        const firstLocation = firstAttributeDamageTargetUser.location;
         const tieSuoTempStorage = []
         for (let i = firstLocation; i < firstLocation + Object.keys(this.gameStatus.users).length; i++) {
             const modLocation = i % Object.keys(this.gameStatus.users).length;
             const user = Object.values(this.gameStatus.users).find((u) => u.location == modLocation);
-            if (user.isTieSuo && firstAttributeAction.targetId !== user.userId) { // 除了第一个命中的 其他人都要进 tieSuoTempStorage
-                tieSuoTempStorage.push(
-                    {
-                        damage: 1,
-                        targetId: user.userId,
+            if (user.isTieSuo && firstAttributeDamageTargetUser.userId !== user.userId) { // 除了第一个命中的 其他人都要进 tieSuoTempStorage
+                let tempItem = {
+                    damage,
+                    targetId: user.userId,
+                }
+                if (firstAttributeAction) {
+                    tempItem = {
+                        ...tempItem,
                         originId: firstAttributeAction.originId,
                         cards: firstAttributeAction.cards,
                         actualCard: firstAttributeAction.actualCard,
                     }
-                )
+                }
+                tieSuoTempStorage.push(tempItem)
             }
         }
 
@@ -424,7 +503,8 @@ class GameEngine {
         this.gameStatus.tieSuoTempStorage = tieSuoTempStorage;
     }
 
-    // 掉血的时候执行
+
+    // 一个角色掉血的时候 其他铁锁连环角色受到伤害
     // 1.一个角色求桃后死亡
     // 2.一个角色求桃后复活
     // 3.一个角色不出闪 但是没有死亡

@@ -3,7 +3,7 @@ const {differenceBy} = require("lodash/array");
 class User {
     constructor(user, generateNewRoundQiuTaoResponseStages) {
         this.maxBlood = 4;
-        this.currentBlood = 1 || this.maxBlood;
+        this.currentBlood = 2 || this.maxBlood;
         this.cardId = user.cardId;
         this.userId = user.userId;
         this.name = user.name;
@@ -13,8 +13,11 @@ class User {
         this.cards = [];
         this.pandingCards = [];
 
-        // tags
+        // ui tags
         this.isTieSuo = true;
+
+        // tags
+        this.judgedShandian = false;
 
         // delay scroll
         this.skipDraw = false;
@@ -65,6 +68,7 @@ class User {
     resetWhenMyTurnEnds() {
         this.skipDraw = false;
         this.skipPlay = false;
+        this.judgedShandian = false;
     }
 
     needThrow() {

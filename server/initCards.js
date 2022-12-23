@@ -496,18 +496,22 @@ let junzhengCardMetaList = [
 
 let testCardMetaList = [
     // {'huase': '♥️', number: 13, key: CARD_CONFIG.SHA.KEY},
-    {'huase': '♠️️', number: 1, key: CARD_CONFIG.LEI_SHA.KEY},
+    // {'huase': '♠️️', number: 1, key: CARD_CONFIG.LEI_SHA.KEY},
     // {'huase': '♥️', number: 1, key: CARD_CONFIG.HUO_SHA.KEY},
     // {'huase': '♥️', number: 8, key: CARD_CONFIG.SHAN.KEY},
-    {'huase': '♦️', number: 12, key: CARD_CONFIG.TAO.KEY},
+    // {'huase': '♦️', number: 12, key: CARD_CONFIG.TAO.KEY},
     // {'huase': '♦️', number: 12, key: CARD_CONFIG.TAO.KEY},
     // {'huase': '♠️️', number: 2, key: CARD_CONFIG.BA_GUA_ZHEN.KEY},
     // {'huase': '♦️', number: 13, key: CARD_CONFIG.ZHAO_HUANG_FEI_DIAN.KEY},
     // {'huase': '♣️', number: 12, key: CARD_CONFIG.ZHANG_BA_SHE_MAO.KEY},
     // {'huase': '♣️', number: 13, key: CARD_CONFIG.DA_WAN.KEY},
     // {'huase': '♣️', number: 1, key: CARD_CONFIG.ZHU_GE_LIAN_NU.KEY},
+    {'huase': '♠️️', number: 6, key: CARD_CONFIG.SHAN_DIAN.KEY},
+    {'huase': '♠️️', number: 6, key: CARD_CONFIG.SHAN_DIAN.KEY},
+    {'huase': '♠️️', number: 6, key: CARD_CONFIG.SHAN_DIAN.KEY},
     {'huase': '♠️️', number: 1, key: CARD_CONFIG.SHAN_DIAN.KEY},
-    {'huase': '♦️', number: 6, key: CARD_CONFIG.LE_BU_SI_SHU.KEY},
+    // {'huase': '♠️️', number: 2, key: CARD_CONFIG.SHAN_DIAN.KEY},
+    // {'huase': '♦️', number: 6, key: CARD_CONFIG.LE_BU_SI_SHU.KEY},
 ]
 
 const metaList = testCardMetaList;
@@ -527,5 +531,7 @@ exports.CARD_CONFIG = CARD_CONFIG;
 exports.CARD_TYPE = CARD_TYPE;
 exports.BASIC_CARDS_CONFIG = BASIC_CARDS_CONFIG;
 exports.SCROLL_CARDS_CONFIG = SCROLL_CARDS_CONFIG;
+exports.DELAY_SCROLL_CARDS_CONFIG = DELAY_SCROLL_CARDS_CONFIG;
+exports.IMMEDIATE_SCROLL_CARDS_CONFIG = IMMEDIATE_SCROLL_CARDS_CONFIG;
 exports.EQUIPMENT_CARDS_CONFIG = EQUIPMENT_CARDS_CONFIG;
 exports.EQUIPMENT_TYPE = EQUIPMENT_TYPE;
