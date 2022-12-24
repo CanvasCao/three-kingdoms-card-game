@@ -1,6 +1,8 @@
-const {SCROLL_CARDS_CONFIG, EQUIPMENT_TYPE} = require("../initCards")
+const {clearNextScrollStage, clearWuxieResStage} = require("../utils/stageUtils");
+const {EQUIPMENT_TYPE} = require("../initCards")
 const {getCards} = require("../utils/cardUtils")
-const {getCurrentUser} = require("../utils/userUtils")
+const {getCurrentUser, getAllHasWuxiePlayers} = require("../utils/userUtils");
+
 const actionHandler = {
     setStatusByShaAction: (gameStatus) => {
         const action = gameStatus.action;
@@ -29,7 +31,7 @@ const actionHandler = {
             actualCard: action.actualCard,
             isEffect: false,
         }]
-        const hasWuxiePlayers = Object.values(gameStatus.users).filter((u) => u.cards.map((c) => c.CN).includes(SCROLL_CARDS_CONFIG.WU_XIE_KE_JI.CN));
+        const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
 
         if (hasWuxiePlayers.length > 0) {
             gameStatus.wuxieResStage = {
@@ -42,13 +44,9 @@ const actionHandler = {
                 }]
             }
         } else { // 没人有无懈可击直接生效
-            currentUser.addCards(getCards(gameStatus,2));
-            gameStatus.scrollResStages = []
-            gameStatus.wuxieResStage = {
-                hasWuxiePlayerIds: [],
-                wuxieChain: []
-            }
-
+            currentUser.addCards(getCards(gameStatus, 2));
+            clearNextScrollStage(gameStatus);
+            clearWuxieResStage(gameStatus);
         }
     },
     setStatusByLeBuSiShuAction: (gameStatus) => {

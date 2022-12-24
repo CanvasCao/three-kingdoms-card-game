@@ -47,8 +47,8 @@ const emitPandingPublicCard = (io, card, user, pandingCard) => {
     });
 }
 
-const emitThrowPublicCard = (io, cards, user) => {
-    io.emit(emitMap.PLAY_PUBLIC_CARD, {
+const emitThrowPublicCard = (gameStatus, cards, user) => {
+    gameStatus.io.emit(emitMap.PLAY_PUBLIC_CARD, {
         cards: cards,
         message: `${user.name}弃牌`
     });

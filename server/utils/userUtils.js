@@ -1,4 +1,4 @@
-const {DELAY_SCROLL_CARDS_CONFIG} = require("../initCards")
+const {DELAY_SCROLL_CARDS_CONFIG, SCROLL_CARDS_CONFIG} = require("../initCards")
 
 const getCurrentUser = (gameStatus) => {
     return Object.values(gameStatus.users).find((u) => u.location == gameStatus.currentLocation)
@@ -29,6 +29,11 @@ const getNextShandianUser = (gameStatus) => {
     return nextUser ? nextUser : sorted[0]
 }
 
+const getAllHasWuxiePlayers = (gameStatus) => {
+    return Object.values(gameStatus.users).filter((u) => u.cards.map((c) => c.CN).includes(SCROLL_CARDS_CONFIG.WU_XIE_KE_JI.CN));
+}
+
 exports.getCurrentUser = getCurrentUser;
 exports.setCurrentLocationToNextLocation = setCurrentLocationToNextLocation;
 exports.getNextShandianUser = getNextShandianUser;
+exports.getAllHasWuxiePlayers = getAllHasWuxiePlayers;

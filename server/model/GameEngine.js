@@ -27,12 +27,9 @@ const {
     tryGoNextStage,
     goToNextStage,
 } = require("../utils/stageUtils");
-const {
-    actionHandler
-} = require("../handler/actionHandler");
-const {
-    responseHandler
-} = require("../handler/responseHandler");
+const {actionHandler} = require("../handler/actionHandler");
+const {responseHandler} = require("../handler/responseHandler");
+const {throwHandler} = require("../handler/throwHandler");
 
 const stageConfig = require("../config/stageConfig.json")
 
@@ -116,53 +113,28 @@ class GameEngine {
             throw new Error("求桃的时候不能出闪")
         }
 
+        const needResponseWuxie = this.gameStatus.wuxieResStage.hasWuxiePlayerIds.length > 0;
         const needResponseTao = this.gameStatus.taoResStages.length > 0;
         const needResponseShan = this.gameStatus.shanResStages.length > 0;
 
-        if (needResponseTao) { // 需要出的是TAO
-            responseHandler.setStatusByTaoResponse(this.gameStatus,
-                response,
+        if (needResponseWuxie) {
+            responseHandler.setStatusByWuxieResponse(this.gameStatus, response);
+        } else if (needResponseTao) {
+            responseHandler.setStatusByTaoResponse(this.gameStatus, response,
                 this.setStateByTieSuoTempStorage.bind(this),
-                this.setStatusWhenUserDie.bind(this),
-                this.stageUtils);
-        } else if (needResponseShan) { // 需要出的是SHAN
-            responseHandler.setStatusByShanResponse(this.gameStatus,
-                response,
+            );
+        } else if (needResponseShan) {
+            responseHandler.setStatusByShanResponse(this.gameStatus, response,
                 this.generateTieSuoTempStorageByShaAction.bind(this),
                 this.setStateByTieSuoTempStorage.bind(this));
         }
         emitRefreshStatus(this.gameStatus);
     }
 
-    // die handler
-    setStatusWhenUserDie(user) {
-        user.isDead = true;
-        let needThrowCards = [
-            ...user.cards,
-            user.weaponCard,
-            user.shieldCard,
-            user.plusHorseCard,
-            user.minusHorseCard,
-            ...user.pandingCards,
-        ];
-        needThrowCards = needThrowCards.filter(x => !!x)
-        throwCards(this.gameStatus, needThrowCards);
-        user.resetWhenDie();
-
-        // 之后如果还需要出闪也不用出了
-        this.gameStatus.shanResStages = this.gameStatus.shanResStages.filter((rs) => rs.originId !== user.userId)
-    }
-
     // throw actions
     handleThrowCards(data) {
-        const cards = data.cards;
-        getCurrentUser(this.gameStatus).removeCards(cards);
-        throwCards(this.gameStatus, cards);
-        emitRefreshStatus(this.gameStatus);
-        emitThrowPublicCard(this.io, cards, getCurrentUser(this.gameStatus));
-        this.stageUtils.goToNextStage();
+        throwHandler.handleThrowCards(this.gameStatus, data)
     }
-
 
     // 任意角色blood<=0时
     generateNewRoundQiuTaoResponseStages(qiutaoTargetUser) {

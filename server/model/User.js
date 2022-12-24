@@ -3,7 +3,7 @@ const {differenceBy} = require("lodash/array");
 class User {
     constructor(user, generateNewRoundQiuTaoResponseStages) {
         this.maxBlood = 4;
-        this.currentBlood = 2 || this.maxBlood;
+        this.currentBlood = 3 || this.maxBlood;
         this.cardId = user.cardId;
         this.userId = user.userId;
         this.name = user.name;

@@ -512,7 +512,9 @@ let testCardMetaList = [
     // {'huase': '♦️', number: 12, key: CARD_CONFIG.GUO_HE_CHAI_QIAO.KEY},
     // {'huase': '♠️️', number: 13, key: CARD_CONFIG.WU_XIE_KE_JI.KEY},
     // {'huase': '♦️', number: 11, key: CARD_CONFIG.WU_ZHONG_SHENG_YOU.KEY},
-    // {'huase': '♠️️', number: 13, key: CARD_CONFIG.WU_XIE_KE_JI.KEY},
+    {'huase': '♠️️', number: 13, key: CARD_CONFIG.WU_XIE_KE_JI.KEY},
+    {'huase': '♦️', number: 11, key: CARD_CONFIG.WU_ZHONG_SHENG_YOU.KEY},
+    {'huase': '♠️️', number: 13, key: CARD_CONFIG.WU_XIE_KE_JI.KEY},
     {'huase': '♦️', number: 11, key: CARD_CONFIG.WU_ZHONG_SHENG_YOU.KEY},
 ]
 

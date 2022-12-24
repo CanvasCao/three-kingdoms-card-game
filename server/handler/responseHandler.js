@@ -1,8 +1,12 @@
-const {BASIC_CARDS_CONFIG} = require("../initCards")
-const {throwCards} = require("../utils/cardUtils")
+const {clearNextScrollStage, clearWuxieResStage, clearNextShanStage, clearNextTaoStage} = require("../utils/stageUtils");
+const {BASIC_CARDS_CONFIG, SCROLL_CARDS_CONFIG} = require("../initCards")
+const {throwCards, getCards} = require("../utils/cardUtils")
 const {tryGoNextStage} = require("../utils/stageUtils")
+const {getAllHasWuxiePlayers, getCurrentUser,} = require("../utils/userUtils")
+const {dieHandler} = require("../handler/dieHandler")
+
 const responseHandler = {
-    setStatusByTaoResponse: (gameStatus, response, setStateByTieSuoTempStorage, setStatusWhenUserDie, stageUtils) => {
+    setStatusByTaoResponse: (gameStatus, response, setStateByTieSuoTempStorage) => {
         const curTaoResStage = gameStatus.taoResStages[0];
         const originUser = gameStatus.users[curTaoResStage.originId];
         const targetUser = gameStatus.users[curTaoResStage.targetId];
@@ -23,11 +27,11 @@ const responseHandler = {
             }
         } else {
             // 没出桃 下一个人求桃
-            gameStatus.taoResStages.shift();
+            clearNextTaoStage(gameStatus);
 
             // 没有任何人出桃 当前角色死亡
             if (gameStatus.taoResStages.length == 0) {
-                setStatusWhenUserDie(targetUser);// TODO 需要过滤掉shan response里面的tar
+                dieHandler.setStatusWhenUserDie(gameStatus, targetUser);
                 setStateByTieSuoTempStorage();
             }
         }
@@ -45,12 +49,12 @@ const responseHandler = {
 
             curShanResStage.cardNumber--; // 吕布需要两个杀
             if (curShanResStage.cardNumber == 0) {
-                gameStatus.shanResStages.shift();
+                clearNextShanStage(gameStatus);
             } else {
                 // do nothing
             }
         } else { // 没出闪
-            gameStatus.shanResStages.shift();
+            clearNextShanStage(gameStatus);
 
             originUser.reduceBlood();
             generateTieSuoTempStorageByShaAction(); // 只有第一个中铁锁连环且不出闪的 会运行
@@ -62,6 +66,68 @@ const responseHandler = {
             }
         }
     },
+
+    setStatusByWuxieResponse: (gameStatus, response) => {
+        let hasWuxiePlayerIds = gameStatus.wuxieResStage.hasWuxiePlayerIds;
+        let wuxieChain = gameStatus.wuxieResStage.wuxieChain;
+        const originUser = gameStatus.users[response.originId];
+
+        // EmitResponseData = {
+        //     cards: Card[],
+        //     actualCard: Card,
+        //     originId: string,
+        //     targetId: string,
+        //     wuxieTargetCardId?: string,
+        // }
+
+        // 出无懈可击了
+        // 1 校验chain 如果已通过 用户打出
+        // 1.1 如果没人有无懈 清空wuxieResStage 锦囊生效
+        // 1.2 如果还有人有无懈 更新hasWuxiePlayerIds/wuxieChain 前端强制等待三秒
+        // 2 如果不通过 用户不会打出
+
+        // 不出无懈可击
+        // 从hasWuxiePlayerIds移除
+        // 如果 如果没人有无懈 清空wuxieResStage 锦囊生效
+        // 否则 如果还有人有无懈 继续等待
+        if (response?.actualCard?.CN == SCROLL_CARDS_CONFIG.WU_XIE_KE_JI.CN) { // 出无懈可击了
+            const lastWuxieChainItem = wuxieChain[wuxieChain.length - 1];
+            const validatedChainResponse = lastWuxieChainItem.actualCard.cardId === response.wuxieTargetCardId;
+
+            if (validatedChainResponse) {
+                originUser.removeCards(response.cards);
+                const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus);
+                gameStatus.wuxieResStage.hasWuxiePlayerIds = hasWuxiePlayers.map(u => u.userId);
+
+                if (hasWuxiePlayers.length == 0) {
+                } else {
+                    gameStatus.wuxieResStage.wuxieChain.push({
+                        cards: response.cards,
+                        actualCard: response.actualCard,
+                        originId: response.originId,
+                        targetId: response.targetId,
+                        wuxieTargetCardId: response.wuxieTargetCardId,
+                    });
+                    // EMIT.FORCEWIAT()
+                }
+            }
+        } else { // 没出无懈可击
+            gameStatus.wuxieResStage.hasWuxiePlayerIds = hasWuxiePlayerIds.filter((id) => id !== response.originId)
+            if (gameStatus.wuxieResStage.hasWuxiePlayerIds.length == 0) {
+            }
+        }
+
+        // 出和不出无懈可击 锦囊都有可能生效
+        if (gameStatus.wuxieResStage.hasWuxiePlayerIds.length == 0) {
+            if (gameStatus.scrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.CN) {
+                getCurrentUser(gameStatus).addCards(getCards(gameStatus, 2));
+                clearNextScrollStage(gameStatus);
+            } else {
+                gameStatus.scrollResStages[0].isEffect = true;
+            }
+            clearWuxieResStage(gameStatus);
+        }
+    }
 }
 
 exports.responseHandler = responseHandler;
