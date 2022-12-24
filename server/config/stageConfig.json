@@ -1,0 +1,18 @@
+{
+  "stageNamesEN": [
+    "start",
+    "judge",
+    "draw",
+    "play",
+    "throw",
+    "end"
+  ],
+  "stageNamesCN": [
+    "开始",
+    "判定",
+    "摸牌",
+    "出牌",
+    "弃牌",
+    "结束"
+  ]
+}

@@ -1,4 +1,4 @@
-const {DELAY_SCROLL_CARDS_CONFIG} = require("../initCards")
+const {getInitCards} = require("../initCards")
 
 const throwCards = (gameStatus, cards) => {
     gameStatus.throwedCards = gameStatus.throwedCards.concat(cards);

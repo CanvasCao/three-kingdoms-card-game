@@ -1,4 +1,6 @@
 // Setup basic express server
+const {emitInit} = require("./utils/utils");
+const {goToNextStage} = require("./utils/stageUtils");
 const {GameEngine} = require("./model/GameEngine");
 const emitMap = require("./config/emitMap.json");
 const express = require('express');
@@ -31,12 +33,12 @@ io.on('connection', (socket) => {
     socket.on(emitMap.INIT, (data) => {
         // data { userId: '22c3d181-5d60-4283-a4ce-6f2b14d772bc' }
         if (Object.keys(gameEngine.gameStatus.users).length >= 2) {
-            emitInit(io,gameEngine.gameStatus)
+            emitInit(gameEngine.gameStatus)
             return;
         }
 
         if (addedUser) {
-            emitInit(io,gameEngine.gameStatus)
+            emitInit(gameEngine.gameStatus)
             return;
         }
 
@@ -78,7 +80,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on(emitMap.GO_NEXT_STAGE, () => {
-        gameEngine.stageUtils.goToNextStage();
+        goToNextStage(gameEngine.gameStatus);
     });
 
     socket.on(emitMap.ACTION, (action) => {

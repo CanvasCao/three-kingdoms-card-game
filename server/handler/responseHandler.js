@@ -1,5 +1,6 @@
 const {BASIC_CARDS_CONFIG} = require("../initCards")
 const {throwCards} = require("../utils/cardUtils")
+const {tryGoNextStage} = require("../utils/stageUtils")
 const responseHandler = {
     setStatusByTaoResponse: (gameStatus, response, setStateByTieSuoTempStorage, setStatusWhenUserDie, stageUtils) => {
         const curTaoResStage = gameStatus.taoResStages[0];
@@ -8,7 +9,7 @@ const responseHandler = {
 
         if (response?.actualCard?.CN == BASIC_CARDS_CONFIG.TAO.CN) { // 出桃了
             originUser.removeCards(response.cards);
-            throwCards(gameStatus,response.cards);
+            throwCards(gameStatus, response.cards);
 
             targetUser.addBlood();
 
@@ -31,7 +32,7 @@ const responseHandler = {
             }
         }
         //闪电求桃之后 需要判断是不是从判定阶段到出牌阶段
-        stageUtils.tryGoNextStage();
+        tryGoNextStage(gameStatus);
     },
 
     setStatusByShanResponse: (gameStatus, response, generateTieSuoTempStorageByShaAction, setStateByTieSuoTempStorage) => {
@@ -40,7 +41,7 @@ const responseHandler = {
 
         if (response?.actualCard?.CN == BASIC_CARDS_CONFIG.SHAN.CN) { // 出闪了
             originUser.removeCards(response.cards);
-            throwCards(gameStatus,response.cards);
+            throwCards(gameStatus, response.cards);
 
             curShanResStage.cardNumber--; // 吕布需要两个杀
             if (curShanResStage.cardNumber == 0) {

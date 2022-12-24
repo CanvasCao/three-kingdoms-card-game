@@ -54,13 +54,15 @@ const emitThrowPublicCard = (io, cards, user) => {
     });
 }
 
-const omitGSArray = ['throwedCards', 'initCards', 'currentLocation', 'stageIndex']
-const emitRefreshStatus = (io, gameStatus) => {
+const omitGSArray = ['throwedCards', 'initCards', 'currentLocation', 'stageIndex', 'io']
+const emitRefreshStatus = (gameStatus) => {
+    const io = gameStatus.io;
     const omitGS = omit(gameStatus, omitGSArray)
     io.emit(emitMap.REFRESH_STATUS, omitGS); // 为了refresh页面所有元素
 }
 
-const emitInit = (io, gameStatus) => {
+const emitInit = (gameStatus) => {
+    const io = gameStatus.io;
     const omitGS = omit(gameStatus, omitGSArray)
     io.emit(emitMap.INIT, omitGS);
 }
