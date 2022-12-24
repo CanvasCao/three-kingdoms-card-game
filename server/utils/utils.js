@@ -36,6 +36,10 @@ const generateBehaviorMessage = (behavior, users) => {
 }
 
 const emitBehaviorPublicPlayCard = (io, behaviour, gameStatus) => {
+    if (!behaviour) {
+        return
+    }
+
     // behaviour is action/response
     if (behaviour.cards?.[0]) {
         io.emit(emitMap.PLAY_PUBLIC_CARD, {

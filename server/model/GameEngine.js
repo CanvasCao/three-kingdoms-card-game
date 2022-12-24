@@ -14,6 +14,12 @@ const {
     emitRefreshStatus,
     emitInit,
 } = require("../utils/utils");
+const {
+    actionHandler
+} = require("../actionHandler");
+const {
+    responseHandler
+} = require("../responseHandler");
 
 class GameEngine {
     constructor(io) {
@@ -33,10 +39,20 @@ class GameEngine {
             users: {},
             stage: {},
             action: {},
+
+            // 基础牌
             shanResStages: [],
             taoResStages: [],
+
+            // 锦囊
+            scrollResStages: [],
+            wuxieResStage: {
+                hasWuxiePlayerIds: [],
+                wuxieChain: []// 等待全员无懈可击
+            },
+
             tieSuoTempStorage: [],
-            throwedCards: [],
+            // throwedCards: [],
         }
 
         this.userUtils = {
@@ -64,7 +80,7 @@ class GameEngine {
                 });
                 const sorted = filtered.sort((a, b) => a.location - b.location);
                 const nextUser = sorted.find((u) => u.location > this.currentLocation);
-                return nextUser
+                return nextUser ? nextUser : sorted[0]
             }
         }
         this.stageUtils = {
@@ -83,8 +99,16 @@ class GameEngine {
                 emitRefreshStatus(this.io, this.gameStatus);
                 this.stageUtils.tryGoNextStage();
             },
+            canTryGoNextStage: () => {
+                if (this.gameStatus.shanResStages.length > 0 ||
+                    this.gameStatus.taoResStages.length > 0 ||
+                    this.gameStatus.scrollResStages.length > 0) {
+                    return false
+                }
+                return true
+            },
             tryGoNextStage: () => {
-                if (this.gameStatus.shanResStages.length > 0 || this.gameStatus.taoResStages.length > 0) {
+                if (!this.stageUtils.canTryGoNextStage()) {
                     return
                 }
 
@@ -102,7 +126,6 @@ class GameEngine {
                     }
                 } else if (this.gameStatus.stage.stageName == 'throw') {
                     if (!user.needThrow()) {
-                        console.log(352345)
                         this.stageUtils.goToNextStage();
                     }
                 } else if (this.gameStatus.stage.stageName == 'end') {
@@ -113,7 +136,7 @@ class GameEngine {
         }
         this.cardUtils = {
             throwCards: (cards) => {
-                // this.gameStatus.throwedCards = this.gameStatus.throwedCards.concat(cards);
+                // gameStatus.throwedCards = gameStatus.throwedCards.concat(cards);
                 this.throwedCards = this.throwedCards.concat(cards);
             },
             getCards: (number = 2) => {
@@ -149,25 +172,6 @@ class GameEngine {
     // socket actions
     addAction(action) {
         emitBehaviorPublicPlayCard(this.io, action, this.gameStatus);
-
-        // 桃 武器
-        // {
-        //     "cards": [],
-        //     "actualCard": {},
-        //     "originId": "22c3d181-5d60-4283-a4ce-6f2b14d772bc",
-        //     "targetId": "22c3d181-5d60-4283-a4ce-6f2b14d772bc"
-        // }
-
-        // 杀
-        // {
-        //     "cards": [],
-        //     "actualCard": {},
-        //     "actions": [{
-        //     "originId": "22c3d181-5d60-4283-a4ce-6f2b14d772bc",
-        //     "targetId": "user2",
-        //     }]
-        // }
-
         this.gameStatus.action = action;
         const originUser = action.actions ?
             this.gameStatus.users[action.actions[0].originId] :
@@ -177,79 +181,30 @@ class GameEngine {
             BASIC_CARDS_CONFIG.LEI_SHA.CN,
             BASIC_CARDS_CONFIG.HUO_SHA.CN].includes(action.actualCard.CN)
         ) {
-            this.setStatusByShaAction();
+            actionHandler.setStatusByShaAction(this.gameStatus);
             this.cardUtils.throwCards(action.cards);
         } else if (action.actualCard.CN == BASIC_CARDS_CONFIG.TAO.CN) {
-            this.setStatusByTaoAction();
+            actionHandler.setStatusByTaoAction(this.gameStatus);
             this.cardUtils.throwCards(action.cards);
         } else if (CARD_TYPE.EQUIPMENT == action.actualCard.type) {
-            this.setStatusByEquipmentAction();
+            actionHandler.setStatusByEquipmentAction(this.gameStatus);
             this.cardUtils.throwCards(action.cards);
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.SHAN_DIAN.CN) {
-            this.setStatusByShanDianAction();
+            actionHandler.setStatusByShanDianAction(this.gameStatus);
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.LE_BU_SI_SHU.CN) {
-            this.setStatusByLeBuSiShuAction();
+            actionHandler.setStatusByLeBuSiShuAction(this.gameStatus);
+        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.CN) {
+            actionHandler.setStatusByWuZhongShengYouAction(this.gameStatus, this.userUtils.getCurrentUser(), this.cardUtils);
+            this.cardUtils.throwCards(action.cards);
         }
-
         originUser.removeCards(action.cards);
         emitRefreshStatus(this.io, this.gameStatus);
     }
 
-    // action handler
-    setStatusByLeBuSiShuAction() {
-        const action = this.gameStatus.action;
-        const targetUser = this.gameStatus.users[action.targetId]
-        targetUser.pandingCards.push(action.actualCard)
-    }
-
-    setStatusByShanDianAction() {
-        const action = this.gameStatus.action;
-        const originUser = this.gameStatus.users[action.originId]
-        originUser.pandingCards.push(action.actualCard)
-    }
-
-    setStatusByEquipmentAction() {
-        const action = this.gameStatus.action;
-        const originUser = this.gameStatus.users[action.originId]
-
-        const equipmentType = action.actualCard.equipmentType;
-        if (equipmentType == EQUIPMENT_TYPE.PLUS_HORSE) {
-            originUser.plusHorseCard = action.actualCard;
-        } else if (equipmentType == EQUIPMENT_TYPE.MINUS_HORSE) {
-            originUser.minusHorseCard = action.actualCard;
-        } else if (equipmentType == EQUIPMENT_TYPE.WEAPON) {
-            originUser.weaponCard = action.actualCard;
-        } else if (equipmentType == EQUIPMENT_TYPE.SHIELD) {
-            originUser.shieldCard = action.actualCard;
-        }
-    }
-
-    setStatusByTaoAction() {
-        const action = this.gameStatus.action;
-        const originUser = this.gameStatus.users[action.originId]
-        if (originUser.currentBlood < originUser.maxBlood) {
-            originUser.addBlood();
-        }
-    }
-
-    setStatusByShaAction() {
-        const action = this.gameStatus.action;
-        this.gameStatus.shanResStages = action.actions.map((a) => {
-            return {
-                originId: a.targetId,
-                targetId: a.originId,
-                cardNumber: 1,
-            }
-        })
-    }
 
     // response
     addResponse(response) {
         emitBehaviorPublicPlayCard(this.io, response, this.gameStatus)
-
-        // cards？: gameFEgameFEStatus.selectedCards,
-        // actualCard？: gameFEgameFEStatus.selectedCards[0].name,
-        // originId
         if (this.gameStatus.taoResStages.length > 0 && response?.actualCard?.CN == BASIC_CARDS_CONFIG.SHAN.CN) {
             throw new Error("求桃的时候不能出闪")
         }
@@ -258,73 +213,20 @@ class GameEngine {
         const needResponseShan = this.gameStatus.shanResStages.length > 0;
 
         if (needResponseTao) { // 需要出的是TAO
-            this.setStatusByTaoResponse(response);
+            responseHandler.setStatusByTaoResponse(this.gameStatus,
+                response,
+                this.cardUtils,
+                this.setStateByTieSuoTempStorage.bind(this),
+                this.setStatusWhenUserDie.bind(this),
+                this.stageUtils);
         } else if (needResponseShan) { // 需要出的是SHAN
-            this.setStatusByShanResponse(response);
+            responseHandler.setStatusByShanResponse(this.gameStatus,
+                response,
+                this.cardUtils,
+                this.generateTieSuoTempStorageByShaAction.bind(this),
+                this.setStateByTieSuoTempStorage.bind(this));
         }
         emitRefreshStatus(this.io, this.gameStatus);
-    }
-
-    // response handler
-    setStatusByTaoResponse(response) {
-        const curTaoResStage = this.gameStatus.taoResStages[0];
-        const originUser = this.gameStatus.users[curTaoResStage.originId];
-        const targetUser = this.gameStatus.users[curTaoResStage.targetId];
-
-        if (response?.actualCard?.CN == BASIC_CARDS_CONFIG.TAO.CN) { // 出桃了
-            originUser.removeCards(response.cards);
-            this.cardUtils.throwCards(response.cards);
-
-            targetUser.addBlood();
-
-            if (targetUser.currentBlood > 0) { // 出桃复活 不需要任何人再出桃
-                this.gameStatus.taoResStages = [];
-                this.setStateByTieSuoTempStorage();
-            } else { // 出桃还没复活 更新需要下一个人提示的出桃的数量
-                this.gameStatus.taoResStages.forEach((rs) => {
-                    rs.cardNumber = 1 - targetUser.currentBlood;
-                })
-            }
-        } else {
-            // 没出桃 下一个人求桃
-            this.clearCurrentTaoResStage();
-
-            // 没有任何人出桃 当前角色死亡
-            if (this.gameStatus.taoResStages.length == 0) {
-                this.setStatusWhenUserDie(targetUser);// TODO 需要过滤掉shan response里面的tar
-                this.setStateByTieSuoTempStorage();
-            }
-        }
-
-        //闪电求桃之后 需要判断是不是从判定阶段到出牌阶段
-        this.stageUtils.tryGoNextStage();
-    }
-
-    setStatusByShanResponse(response) {
-        const curShanResStage = this.gameStatus.shanResStages[0];
-        const originUser = this.gameStatus.users[curShanResStage.originId];
-
-        if (response?.actualCard?.CN == BASIC_CARDS_CONFIG.SHAN.CN) { // 出闪了
-            originUser.removeCards(response.cards);
-            this.cardUtils.throwCards(response.cards);
-
-
-            curShanResStage.cardNumber--; // 吕布需要两个杀
-            if (curShanResStage.cardNumber == 0) {
-                this.clearCurrentShanResStage();
-            } else {
-                // do nothing
-            }
-        } else { // 没出闪
-            this.clearCurrentShanResStage();
-
-            originUser.reduceBlood();
-            this.generateTieSuoTempStorageByShaAction(); // 只有第一个中铁锁连环且不出闪的 会运行
-
-            if (originUser.currentBlood > 0) { // <0 setStateByTieSuoTempStorage的逻辑在求桃之后 如果我还活着需要立刻结算下一个人的铁锁连环
-                this.setStateByTieSuoTempStorage();
-            }
-        }
     }
 
     // die handler
@@ -354,15 +256,6 @@ class GameEngine {
         emitRefreshStatus(this.io, this.gameStatus);
         emitThrowPublicCard(this.io, throwCards, this.userUtils.getCurrentUser());
         this.stageUtils.goToNextStage();
-    }
-
-    // clear stage
-    clearCurrentShanResStage() {
-        this.gameStatus.shanResStages.shift();
-    }
-
-    clearCurrentTaoResStage() {
-        this.gameStatus.taoResStages.shift();
     }
 
     // panding
@@ -406,11 +299,9 @@ class GameEngine {
                     }
                 } else {
                     const nextUser = this.userUtils.getNextShandianUser();
-                    //如果人人有闪电 那么闪电原地不动
-                    if (nextUser) {
-                        user.removePandingCard(pandingCard);
-                        nextUser.pandingCards.push(pandingCard);
-                    }
+                    // 如果人人有闪电 那么闪电原地不动
+                    user.removePandingCard(pandingCard);
+                    nextUser.pandingCards.push(pandingCard);
                 }
                 user.judgedShandian = true;
                 this.stageUtils.tryGoNextStage();// 如果还有别的判定牌会再一次回到这里

@@ -28,6 +28,8 @@ class User {
             {triggerStage: '', name: ''},
         ]
 
+        this.isDead = false
+
         // 耦合 掉血和求桃
         this.generateNewRoundQiuTaoResponseStages = generateNewRoundQiuTaoResponseStages;
     }
