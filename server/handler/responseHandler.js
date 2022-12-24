@@ -117,13 +117,17 @@ const responseHandler = {
             }
         }
 
-        // 出和不出无懈可击 锦囊都有可能生效
+        // 没有人有无懈可击 wuxieChain长度为奇数个 锦囊生效
         if (gameStatus.wuxieResStage.hasWuxiePlayerIds.length == 0) {
-            if (gameStatus.scrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.CN) {
-                getCurrentUser(gameStatus).addCards(getCards(gameStatus, 2));
+            if (gameStatus.wuxieResStage.wuxieChain.length % 2 == 1) {// 生效
+                if (gameStatus.scrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.CN) {
+                    getCurrentUser(gameStatus).addCards(getCards(gameStatus, 2));
+                    clearNextScrollStage(gameStatus);
+                } else {
+                    gameStatus.scrollResStages[0].isEffect = true;
+                }
+            } else {// 失效
                 clearNextScrollStage(gameStatus);
-            } else {
-                gameStatus.scrollResStages[0].isEffect = true;
             }
             clearWuxieResStage(gameStatus);
         }
