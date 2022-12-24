@@ -24,21 +24,21 @@ server.listen(port, () => {
 app.use(express.static(path.join(__dirname, '../client')));
 
 const gameEngine = new GameEngine(io);
+
 io.on('connection', (socket) => {
     let addedUser = false;
 
     socket.on(emitMap.INIT, (data) => {
         // data { userId: '22c3d181-5d60-4283-a4ce-6f2b14d772bc' }
         if (Object.keys(gameEngine.gameStatus.users).length >= 2) {
-            io.emit(emitMap.INIT, gameEngine.gameStatus);
+            emitInit(io,gameEngine.gameStatus)
             return;
         }
 
         if (addedUser) {
-            io.emit(emitMap.INIT, gameEngine.gameStatus);
+            emitInit(io,gameEngine.gameStatus)
             return;
         }
-
 
         // hardcode 只有两个角色
         const newUser = new User({
@@ -82,11 +82,11 @@ io.on('connection', (socket) => {
     });
 
     socket.on(emitMap.ACTION, (action) => {
-        gameEngine.addAction(action);
+        gameEngine.handleAction(action);
     });
 
     socket.on(emitMap.RESPONSE, (response) => {
-        gameEngine.addResponse(response);
+        gameEngine.handleResponse(response);
     });
 
     socket.on(emitMap.THROW, (data) => {

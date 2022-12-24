@@ -1,14 +1,14 @@
-const {BASIC_CARDS_CONFIG} = require("./initCards")
-
+const {BASIC_CARDS_CONFIG} = require("../initCards")
+const {throwCards} = require("../utils/cardUtils")
 const responseHandler = {
-    setStatusByTaoResponse: (gameStatus, response, cardUtils, setStateByTieSuoTempStorage, setStatusWhenUserDie, stageUtils) => {
+    setStatusByTaoResponse: (gameStatus, response, setStateByTieSuoTempStorage, setStatusWhenUserDie, stageUtils) => {
         const curTaoResStage = gameStatus.taoResStages[0];
         const originUser = gameStatus.users[curTaoResStage.originId];
         const targetUser = gameStatus.users[curTaoResStage.targetId];
 
         if (response?.actualCard?.CN == BASIC_CARDS_CONFIG.TAO.CN) { // 出桃了
             originUser.removeCards(response.cards);
-            cardUtils.throwCards(response.cards);
+            throwCards(gameStatus,response.cards);
 
             targetUser.addBlood();
 
@@ -34,14 +34,13 @@ const responseHandler = {
         stageUtils.tryGoNextStage();
     },
 
-    setStatusByShanResponse: (gameStatus, response, cardUtils, generateTieSuoTempStorageByShaAction, setStateByTieSuoTempStorage) => {
+    setStatusByShanResponse: (gameStatus, response, generateTieSuoTempStorageByShaAction, setStateByTieSuoTempStorage) => {
         const curShanResStage = gameStatus.shanResStages[0];
         const originUser = gameStatus.users[curShanResStage.originId];
 
         if (response?.actualCard?.CN == BASIC_CARDS_CONFIG.SHAN.CN) { // 出闪了
             originUser.removeCards(response.cards);
-            cardUtils.throwCards(response.cards);
-
+            throwCards(gameStatus,response.cards);
 
             curShanResStage.cardNumber--; // 吕布需要两个杀
             if (curShanResStage.cardNumber == 0) {

@@ -1,5 +1,5 @@
-const {SCROLL_CARDS_CONFIG, EQUIPMENT_TYPE} = require("./initCards")
-
+const {SCROLL_CARDS_CONFIG, EQUIPMENT_TYPE} = require("../initCards")
+const {getCards} = require("../utils/cardUtils")
 const actionHandler = {
     setStatusByShaAction: (gameStatus) => {
         const action = gameStatus.action;
@@ -18,7 +18,7 @@ const actionHandler = {
             originUser.addBlood();
         }
     },
-    setStatusByWuZhongShengYouAction(gameStatus, currentUser,cardUtils) {
+    setStatusByWuZhongShengYouAction(gameStatus, currentUser) {
         const action = gameStatus.action;
         gameStatus.scrollResStages = [{
             originId: action.originId,
@@ -40,7 +40,7 @@ const actionHandler = {
                 }]
             }
         } else { // 没人有无懈可击直接生效
-            currentUser.addCards(cardUtils.getCards());
+            currentUser.addCards(getCards(gameStatus));
             gameStatus.scrollResStages = []
             gameStatus.wuxieResStage = {
                 hasWuxiePlayerIds: [],

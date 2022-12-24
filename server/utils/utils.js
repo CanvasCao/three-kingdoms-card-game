@@ -1,5 +1,5 @@
 const emitMap = require("../config/emitMap.json");
-
+const {omit} = require("lodash")
 const shuffle = (array) => {
     let currentIndex = array.length, randomIndex;
 
@@ -19,16 +19,7 @@ const shuffle = (array) => {
 }
 
 const generateBehaviorMessage = (behavior, users) => {
-    // {
-    //     "cards": [],
-    //     "actualCard": {},
-    //     "originId": "22c3d181-5d60-4283-a4ce-6f2b14d772bc",
-    //     "targetId": "22c3d181-5d60-4283-a4ce-6f2b14d772bc"
-    //     "actions": [{
-    //     "originId": "22c3d181-5d60-4283-a4ce-6f2b14d772bc",
-    //     "targetId": "user2",
-    //     }]
-    // }
+    // behaviour is action/response
     const targetName = behavior.actions ? behavior.actions.map((a) => users[a.targetId].name).join(' ') : users?.[behavior?.targetId]?.name
     const originName = behavior.actions ? users[behavior.actions[0].originId].name : users[behavior.originId].name;
 
@@ -63,18 +54,21 @@ const emitThrowPublicCard = (io, cards, user) => {
     });
 }
 
+const omitGSArray = ['throwedCards', 'initCards', 'currentLocation', 'stageIndex']
 const emitRefreshStatus = (io, gameStatus) => {
-    io.emit(emitMap.REFRESH_STATUS, gameStatus); // 为了refresh页面所有元素
+    const omitGS = omit(gameStatus, omitGSArray)
+    io.emit(emitMap.REFRESH_STATUS, omitGS); // 为了refresh页面所有元素
 }
 
 const emitInit = (io, gameStatus) => {
-    io.emit(emitMap.INIT, gameStatus);
+    const omitGS = omit(gameStatus, omitGSArray)
+    io.emit(emitMap.INIT, omitGS);
 }
 
 exports.shuffle = shuffle;
 exports.generateBehaviorMessage = generateBehaviorMessage;
 exports.emitBehaviorPublicPlayCard = emitBehaviorPublicPlayCard;
-exports.emitRefreshStatus = emitRefreshStatus;
 exports.emitPandingPublicCard = emitPandingPublicCard;
 exports.emitThrowPublicCard = emitThrowPublicCard;
+exports.emitRefreshStatus = emitRefreshStatus;
 exports.emitInit = emitInit;

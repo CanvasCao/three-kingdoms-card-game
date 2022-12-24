@@ -15,26 +15,28 @@ const {
     emitInit,
 } = require("../utils/utils");
 const {
+    getCurrentUser,
+    setCurrentLocationToNextLocation,
+    getNextShandianUser
+} = require("../utils/userUtils");
+const {
+    throwCards, getCards
+} = require("../utils/cardUtils");
+const {
     actionHandler
-} = require("../actionHandler");
+} = require("../handler/actionHandler");
 const {
     responseHandler
-} = require("../responseHandler");
+} = require("../handler/responseHandler");
+
+const stageNamesEN = ["start", "judge", "draw", "play", "throw", "end"];
+const stageNamesCN = ["开始", "判定", "摸牌", "出牌", "弃牌", "结束"];
 
 class GameEngine {
     constructor(io) {
         this.io = io;
 
-
         // TODO let logs = [];
-        this.initCards = getInitCards();
-        this.throwedCards = [];
-        this.currentLocation = 0;
-
-        this.stageNamesEN = ["start", "judge", "draw", "play", "throw", "end"];
-        this.stageNamesCN = ["开始", "判定", "摸牌", "出牌", "弃牌", "结束"];
-        this.stageIndex = 0;
-
         this.gameStatus = {
             users: {},
             stage: {},
@@ -52,49 +54,26 @@ class GameEngine {
             },
 
             tieSuoTempStorage: [],
-            // throwedCards: [],
+
+            // 不需要传到前端的
+            throwedCards: [],
+            initCards: getInitCards(),
+            currentLocation: 0,
+            stageIndex: 0,
         }
 
-        this.userUtils = {
-            getCurrentUser: () => {
-                return Object.values(this.gameStatus.users).find((u) => u.location == this.currentLocation)
-            },
-            setCurrentLocationToNextLocation: () => {
-                const filteredNotDead = Object.values(this.gameStatus.users).filter((u) => !u.isDead);
-                if (filteredNotDead.length == 0) {
-                    throw new Error("Everyone is dead. Game Over")
-                }
-                const sorted = filteredNotDead.sort((a, b) => a.location - b.location)
-
-                // 可能会在自己的回合自杀 所以不能找到自己再+1
-                const nextUser = sorted.find((u) => u.location > this.currentLocation);
-                if (nextUser) {
-                    this.currentLocation = nextUser.location
-                } else {
-                    this.currentLocation = sorted[0].location
-                }
-            },
-            getNextShandianUser: () => {
-                const filtered = Object.values(this.gameStatus.users).filter((u) => {
-                    return !u.isDead && !u.pandingCards.find(c => c.CN == DELAY_SCROLL_CARDS_CONFIG.SHAN_DIAN.CN)
-                });
-                const sorted = filtered.sort((a, b) => a.location - b.location);
-                const nextUser = sorted.find((u) => u.location > this.currentLocation);
-                return nextUser ? nextUser : sorted[0]
-            }
-        }
         this.stageUtils = {
             goToNextStage: () => {
-                this.stageIndex++
-                if (this.stageIndex >= this.stageNamesEN.length) {
-                    this.userUtils.getCurrentUser().resetWhenMyTurnEnds()
-                    this.stageIndex = 0;
-                    this.userUtils.setCurrentLocationToNextLocation();
+                this.gameStatus.stageIndex++
+                if (this.gameStatus.stageIndex >= stageNamesEN.length) {
+                    getCurrentUser(this.gameStatus).resetWhenMyTurnEnds()
+                    this.gameStatus.stageIndex = 0;
+                    setCurrentLocationToNextLocation(this.gameStatus);
                 }
                 this.gameStatus.stage = {
-                    userId: this.userUtils.getCurrentUser().userId,
-                    stageName: this.stageNamesEN[this.stageIndex],
-                    stageNameCN: this.stageNamesCN[this.stageIndex]
+                    userId: getCurrentUser(this.gameStatus).userId,
+                    stageName: stageNamesEN[this.gameStatus.stageIndex],
+                    stageNameCN: stageNamesCN[this.gameStatus.stageIndex]
                 }
                 emitRefreshStatus(this.io, this.gameStatus);
                 this.stageUtils.tryGoNextStage();
@@ -112,13 +91,13 @@ class GameEngine {
                     return
                 }
 
-                const user = this.userUtils.getCurrentUser();
+                const user = getCurrentUser(this.gameStatus);
                 if (this.gameStatus.stage.stageName == 'start') {
                     this.stageUtils.goToNextStage();
                 } else if (this.gameStatus.stage.stageName == 'judge') {
                     this.executePanding();
                 } else if (this.gameStatus.stage.stageName == 'draw') {
-                    user.addCards(this.cardUtils.getCards())
+                    user.addCards(getCards(this.gameStatus, 2))
                     this.stageUtils.goToNextStage();
                 } else if (this.gameStatus.stage.stageName == 'play') {
                     if (user.skipPlay) {
@@ -134,43 +113,19 @@ class GameEngine {
                 emitRefreshStatus(this.io, this.gameStatus)
             }
         }
-        this.cardUtils = {
-            throwCards: (cards) => {
-                // gameStatus.throwedCards = gameStatus.throwedCards.concat(cards);
-                this.throwedCards = this.throwedCards.concat(cards);
-            },
-            getCards: (number = 2) => {
-                // hardcode 补牌
-                if (this.initCards.length < 2) {
-                    console.log("补牌")
-                    this.initCards = getInitCards()
-                }
-
-                if (number > 1) {
-                    let cards = [];
-                    for (let i = 1; i <= number; i++) {
-                        cards.push(JSON.parse(JSON.stringify(this.initCards.shift())))
-                    }
-                    return cards;
-                } else {
-                    return JSON.parse(JSON.stringify(this.initCards.shift()))
-                }
-            }
-        }
     }
 
     startEngine() {
         this.gameStatus.stage = {
-            userId: this.userUtils.getCurrentUser().userId,
-            stageName: this.stageNamesEN[this.stageIndex]
+            userId: getCurrentUser(this.gameStatus).userId,
+            stageName: stageNamesEN[this.gameStatus.stageIndex]
         }
         emitInit(this.io, this.gameStatus);
         this.stageUtils.tryGoNextStage()
     }
 
-
     // socket actions
-    addAction(action) {
+    handleAction(action) {
         emitBehaviorPublicPlayCard(this.io, action, this.gameStatus);
         this.gameStatus.action = action;
         const originUser = action.actions ?
@@ -182,28 +137,27 @@ class GameEngine {
             BASIC_CARDS_CONFIG.HUO_SHA.CN].includes(action.actualCard.CN)
         ) {
             actionHandler.setStatusByShaAction(this.gameStatus);
-            this.cardUtils.throwCards(action.cards);
+            throwCards(this.gameStatus, action.cards);
         } else if (action.actualCard.CN == BASIC_CARDS_CONFIG.TAO.CN) {
             actionHandler.setStatusByTaoAction(this.gameStatus);
-            this.cardUtils.throwCards(action.cards);
+            throwCards(this.gameStatus, action.cards);
         } else if (CARD_TYPE.EQUIPMENT == action.actualCard.type) {
             actionHandler.setStatusByEquipmentAction(this.gameStatus);
-            this.cardUtils.throwCards(action.cards);
+            throwCards(this.gameStatus, action.cards);
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.SHAN_DIAN.CN) {
-            actionHandler.setStatusByShanDianAction(this.gameStatus);
+            actionHandler.setStatusByShanDianAction(this.gameStatus, this.gameStatus);
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.LE_BU_SI_SHU.CN) {
-            actionHandler.setStatusByLeBuSiShuAction(this.gameStatus);
+            actionHandler.setStatusByLeBuSiShuAction(this.gameStatus, this.gameStatus);
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.CN) {
-            actionHandler.setStatusByWuZhongShengYouAction(this.gameStatus, this.userUtils.getCurrentUser(), this.cardUtils);
-            this.cardUtils.throwCards(action.cards);
+            actionHandler.setStatusByWuZhongShengYouAction(this.gameStatus, getCurrentUser(this.gameStatus));
+            throwCards(this.gameStatus, action.cards);
         }
         originUser.removeCards(action.cards);
         emitRefreshStatus(this.io, this.gameStatus);
     }
 
-
     // response
-    addResponse(response) {
+    handleResponse(response) {
         emitBehaviorPublicPlayCard(this.io, response, this.gameStatus)
         if (this.gameStatus.taoResStages.length > 0 && response?.actualCard?.CN == BASIC_CARDS_CONFIG.SHAN.CN) {
             throw new Error("求桃的时候不能出闪")
@@ -215,14 +169,12 @@ class GameEngine {
         if (needResponseTao) { // 需要出的是TAO
             responseHandler.setStatusByTaoResponse(this.gameStatus,
                 response,
-                this.cardUtils,
                 this.setStateByTieSuoTempStorage.bind(this),
                 this.setStatusWhenUserDie.bind(this),
                 this.stageUtils);
         } else if (needResponseShan) { // 需要出的是SHAN
             responseHandler.setStatusByShanResponse(this.gameStatus,
                 response,
-                this.cardUtils,
                 this.generateTieSuoTempStorageByShaAction.bind(this),
                 this.setStateByTieSuoTempStorage.bind(this));
         }
@@ -232,7 +184,7 @@ class GameEngine {
     // die handler
     setStatusWhenUserDie(user) {
         user.isDead = true;
-        let throwCards = [
+        let needThrowCards = [
             ...user.cards,
             user.weaponCard,
             user.shieldCard,
@@ -240,8 +192,8 @@ class GameEngine {
             user.minusHorseCard,
             ...user.pandingCards,
         ];
-        throwCards = throwCards.filter(x => !!x)
-        this.cardUtils.throwCards(throwCards);
+        needThrowCards = needThrowCards.filter(x => !!x)
+        throwCards(this.gameStatus, needThrowCards);
         user.resetWhenDie();
 
         // 之后如果还需要出闪也不用出了
@@ -250,32 +202,31 @@ class GameEngine {
 
     // throw actions
     handleThrowCards(data) {
-        const throwCards = data.cards;
-        this.userUtils.getCurrentUser().removeCards(throwCards);
-        this.cardUtils.throwCards(throwCards);
+        const cards = data.cards;
+        getCurrentUser(this.gameStatus).removeCards(cards);
+        throwCards(this.gameStatus, cards);
         emitRefreshStatus(this.io, this.gameStatus);
-        emitThrowPublicCard(this.io, throwCards, this.userUtils.getCurrentUser());
+        emitThrowPublicCard(this.io, cards, getCurrentUser(this.gameStatus));
         this.stageUtils.goToNextStage();
     }
 
     // panding
     executePanding() {
-        const user = this.userUtils.getCurrentUser();
-
+        const user = getCurrentUser(this.gameStatus);
         if (user.pandingCards.length == 0) {
             this.stageUtils.goToNextStage();
             return
         }
         if (user.pandingCards.length > 0) {
-            const pandingResultCard = this.cardUtils.getCards(1);
-            this.cardUtils.throwCards([pandingResultCard]);
+            const pandingResultCard = getCards(this.gameStatus, 1);
+            throwCards(this.gameStatus, [pandingResultCard]);
             const pandingCard = user.pandingCards[user.pandingCards.length - 1]
 
             emitPandingPublicCard(this.io, pandingResultCard, user, pandingCard);
 
             if (pandingCard.CN == DELAY_SCROLL_CARDS_CONFIG.LE_BU_SI_SHU.CN) {
                 user.removePandingCard(pandingCard);
-                this.cardUtils.throwCards([pandingCard]);
+                throwCards(this.gameStatus, [pandingCard]);
                 if (pandingResultCard.huase !== "♥️") {
                     user.skipPlay = true;
                 }
@@ -289,7 +240,7 @@ class GameEngine {
 
                 if (pandingResultCard.huase == "♠️️" && pandingResultCard.number >= 2 && pandingResultCard.number <= 9) {
                     user.removePandingCard(pandingCard);
-                    this.cardUtils.throwCards([pandingCard]);
+                    throwCards(this.gameStatus, [pandingCard]);
 
                     user.reduceBlood(3);
                     this.generateTieSuoTempStorageByShandian();
@@ -298,7 +249,7 @@ class GameEngine {
                         this.setStateByTieSuoTempStorage();
                     }
                 } else {
-                    const nextUser = this.userUtils.getNextShandianUser();
+                    const nextUser = getNextShandianUser(this.gameStatus);
                     // 如果人人有闪电 那么闪电原地不动
                     user.removePandingCard(pandingCard);
                     nextUser.pandingCards.push(pandingCard);
@@ -317,7 +268,7 @@ class GameEngine {
 
         const taoResStages = [];
 
-        for (let i = this.currentLocation; i < this.currentLocation + Object.keys(this.gameStatus.users).length; i++) {
+        for (let i = this.gameStatus.currentLocation; i < this.gameStatus.currentLocation + Object.keys(this.gameStatus.users).length; i++) {
             const modLocation = i % Object.keys(this.gameStatus.users).length;
             const user = Object.values(this.gameStatus.users).find((u) => u.location == modLocation);
             if (user.isDead) {
@@ -364,7 +315,7 @@ class GameEngine {
     }
 
     generateTieSuoTempStorageByShandian() {
-        this.generateTieSuoTempStorage(this.userUtils.getCurrentUser(), null, 3);
+        this.generateTieSuoTempStorage(getCurrentUser(this.gameStatus), null, 3);
     }
 
     generateTieSuoTempStorage(firstAttributeDamageTargetUser, firstAttributeAction, damage) {
@@ -393,7 +344,6 @@ class GameEngine {
         this.resetTieSuo();
         this.gameStatus.tieSuoTempStorage = tieSuoTempStorage;
     }
-
 
     // 一个角色掉血的时候 其他铁锁连环角色受到伤害
     // 1.一个角色求桃后死亡
