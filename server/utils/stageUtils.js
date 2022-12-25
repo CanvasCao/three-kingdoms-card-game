@@ -1,6 +1,10 @@
+const {isNil} = require("lodash");
 const {pandingHandler} = require("../handler/pandingHandler");
 const {emitRefreshStatus} = require("./utils");
-const {getCurrentUser, setCurrentLocationToNextLocation} = require("./userUtils");
+const {getCurrentUser, getAllHasWuxieUsers} = require("./userUtils");
+const {setCurrentLocationToNextLocation} = require("./locationUtils");
+const {generateWuxieSimultaneousResStageByPandingCard} = require("./wuxieUtils");
+const {getNextNeedExecutePandingSign} = require("./pandingUtils");
 const {getCards} = require("./cardUtils");
 const {DELAY_SCROLL_CARDS_CONFIG} = require("../initCards")
 const stageConfig = require("../config/stageConfig.json")
@@ -30,15 +34,17 @@ const tryGoNextStage = (gameStatus) => {
     if (gameStatus.stage.stageName == 'start') {
         goToNextStage(gameStatus);
     } else if (gameStatus.stage.stageName == 'judge') {
-        if (user.pandingCards.length <= 0) {
+        const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus)
+        if (!nextNeedPandingSign) {
             goToNextStage(gameStatus);
-        }
-        // 如果闪电移动到自己身上 且闪电判定过 直接到下回合
-        else if (
-            user.judgedShandian &&
-            user.pandingCards.length == 1 &&
-            user.pandingCards[0].CN == DELAY_SCROLL_CARDS_CONFIG.SHAN_DIAN.CN) {
-            goToNextStage(gameStatus);
+        } else if (isNil(nextNeedPandingSign.isEffect)) { // 有未生效的判定 需要无懈可击
+            const hasWuxiePlayers = getAllHasWuxieUsers(gameStatus)
+            if (hasWuxiePlayers.length > 0) {
+                generateWuxieSimultaneousResStageByPandingCard(gameStatus)
+            } else {
+                nextNeedPandingSign.isEffect = true;
+                tryGoNextStage(gameStatus);// nextNeedPandingSign生效之后进入 判定执行
+            }
         } else {
             pandingHandler.executeNextOnePanding(gameStatus);
             tryGoNextStage(gameStatus);// 如果还有别的判定牌会再一次回到这里
@@ -64,7 +70,7 @@ const canTryGoNextStage = (gameStatus) => {
     if (gameStatus.shanResStages.length > 0 ||
         gameStatus.taoResStages.length > 0 ||
         gameStatus.scrollResStages.length > 0 ||
-        gameStatus.wuxieResStage.hasWuxiePlayerIds.length > 0
+        gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds.length > 0
     ) {
         return false
     }
@@ -84,7 +90,7 @@ const clearNextScrollStage = (gameStatus) => {
 }
 
 const clearWuxieResStage = (gameStatus) => {
-    gameStatus.wuxieResStage = {
+    gameStatus.wuxieSimultaneousResStage = {
         hasWuxiePlayerIds: [],
         wuxieChain: []
     }

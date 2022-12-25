@@ -1,7 +1,8 @@
 const {clearNextScrollStage, clearWuxieResStage} = require("../utils/stageUtils");
 const {EQUIPMENT_TYPE} = require("../initCards")
 const {getCards} = require("../utils/cardUtils")
-const {getCurrentUser, getAllHasWuxiePlayers} = require("../utils/userUtils");
+const {getCurrentUser, getAllHasWuxieUsers} = require("../utils/userUtils");
+const {generateWuxieSimultaneousResStageByScroll} = require("../utils/wuxieUtils");
 
 const actionHandler = {
     setStatusByShaAction: (gameStatus) => {
@@ -31,18 +32,10 @@ const actionHandler = {
             actualCard: action.actualCard,
             isEffect: false,
         }]
-        const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
+        const hasWuxiePlayers = getAllHasWuxieUsers(gameStatus)
 
         if (hasWuxiePlayers.length > 0) {
-            gameStatus.wuxieResStage = {
-                hasWuxiePlayerIds: hasWuxiePlayers.map((u) => u.userId),
-                wuxieChain: [{
-                    originId: action.originId,
-                    targetId: action.targetId,
-                    cards: action.cards,
-                    actualCard: action.actualCard
-                }]
-            }
+            generateWuxieSimultaneousResStageByScroll(gameStatus)
         } else { // 没人有无懈可击直接生效
             currentUser.addCards(getCards(gameStatus, 2));
             clearNextScrollStage(gameStatus);
@@ -52,13 +45,19 @@ const actionHandler = {
     setStatusByLeBuSiShuAction: (gameStatus) => {
         const action = gameStatus.action;
         const targetUser = gameStatus.users[action.targetId]
-        targetUser.pandingCards.push(action.actualCard)
+        targetUser.pandingSigns.push({
+            card: action.cards[0],
+            actualCard: action.actualCard,
+        });
     },
 
     setStatusByShanDianAction: (gameStatus) => {
         const action = gameStatus.action;
         const originUser = gameStatus.users[action.originId]
-        originUser.pandingCards.push(action.actualCard)
+        originUser.pandingSigns.push({
+            card: action.cards[0],
+            actualCard: action.actualCard,
+        });
     },
 
     setStatusByEquipmentAction: (gameStatus) => {

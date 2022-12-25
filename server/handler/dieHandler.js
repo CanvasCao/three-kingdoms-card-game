@@ -8,7 +8,7 @@ const dieHandler = {
             user.shieldCard,
             user.plusHorseCard,
             user.minusHorseCard,
-            ...user.pandingCards,
+            ...user.pandingSigns.map((sign) => sign.actualCard),
         ];
         needThrowCards = needThrowCards.filter(x => !!x)
         throwCards(gameStatus, needThrowCards);

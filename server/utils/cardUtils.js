@@ -1,13 +1,15 @@
 const {getInitCards} = require("../initCards")
 
 const throwCards = (gameStatus, cards) => {
-    gameStatus.throwedCards = gameStatus.throwedCards.concat(cards);
+    if (cards) {
+        gameStatus.throwedCards = gameStatus.throwedCards.concat(cards);
+    }
 }
 
 const getCards = (gameStatus, number = 2) => {
-    // hardcode 补牌
+    // TODO hardcode 补牌
     if (gameStatus.initCards.length < 2) {
-        console.log("补牌")
+        // console.log("补牌")
         gameStatus.initCards = getInitCards()
     }
 

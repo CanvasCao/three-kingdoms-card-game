@@ -2,7 +2,8 @@ const {clearNextScrollStage, clearWuxieResStage, clearNextShanStage, clearNextTa
 const {BASIC_CARDS_CONFIG, SCROLL_CARDS_CONFIG} = require("../initCards")
 const {throwCards, getCards} = require("../utils/cardUtils")
 const {tryGoNextStage} = require("../utils/stageUtils")
-const {getAllHasWuxiePlayers, getCurrentUser,} = require("../utils/userUtils")
+const {getAllHasWuxieUsers, getCurrentUser} = require("../utils/userUtils")
+const {getNextNeedExecutePandingSign} = require("../utils/pandingUtils")
 const {dieHandler} = require("../handler/dieHandler")
 
 const responseHandler = {
@@ -68,8 +69,8 @@ const responseHandler = {
     },
 
     setStatusByWuxieResponse: (gameStatus, response) => {
-        let hasWuxiePlayerIds = gameStatus.wuxieResStage.hasWuxiePlayerIds;
-        let wuxieChain = gameStatus.wuxieResStage.wuxieChain;
+        let hasWuxiePlayerIds = gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds;
+        let wuxieChain = gameStatus.wuxieSimultaneousResStage.wuxieChain;
         const originUser = gameStatus.users[response.originId];
 
         // EmitResponseData = {
@@ -80,6 +81,7 @@ const responseHandler = {
         //     wuxieTargetCardId?: string,
         // }
 
+        // 锦囊
         // 出无懈可击了
         // 1 校验chain 如果已通过 用户打出
         // 1.1 如果没人有无懈 清空wuxieResStage 锦囊生效
@@ -90,46 +92,65 @@ const responseHandler = {
         // 从hasWuxiePlayerIds移除
         // 如果 如果没人有无懈 清空wuxieResStage 锦囊生效
         // 否则 如果还有人有无懈 继续等待
+
+        // 延时锦囊生效之后 set pandingSigns isEffect true/false 给executeNextOnePanding执行
+        // 即时锦囊生效 set scrollResStages isEffect true 或 clear scrollResStages
+
         if (response?.actualCard?.CN == SCROLL_CARDS_CONFIG.WU_XIE_KE_JI.CN) { // 出无懈可击了
             const lastWuxieChainItem = wuxieChain[wuxieChain.length - 1];
             const validatedChainResponse = lastWuxieChainItem.actualCard.cardId === response.wuxieTargetCardId;
 
             if (validatedChainResponse) {
                 originUser.removeCards(response.cards);
-                const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus);
-                gameStatus.wuxieResStage.hasWuxiePlayerIds = hasWuxiePlayers.map(u => u.userId);
+                const hasWuxiePlayers = getAllHasWuxieUsers(gameStatus);
+                gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds = hasWuxiePlayers.map(u => u.userId);
 
                 if (hasWuxiePlayers.length == 0) {
+                    // 锦囊开始结算
                 } else {
-                    gameStatus.wuxieResStage.wuxieChain.push({
+                    gameStatus.wuxieSimultaneousResStage.wuxieChain.push({
                         cards: response.cards,
                         actualCard: response.actualCard,
                         originId: response.originId,
                         targetId: response.targetId,
                         wuxieTargetCardId: response.wuxieTargetCardId,
                     });
-                    // EMIT.FORCEWIAT()
+                    // EMIT.FORCEWAIT()
                 }
             }
         } else { // 没出无懈可击
-            gameStatus.wuxieResStage.hasWuxiePlayerIds = hasWuxiePlayerIds.filter((id) => id !== response.originId)
-            if (gameStatus.wuxieResStage.hasWuxiePlayerIds.length == 0) {
+            gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds = hasWuxiePlayerIds.filter((id) => id !== response.originId)
+            if (gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds.length == 0) {
+                // 锦囊开始结算
             }
         }
 
         // 没有人有无懈可击 wuxieChain长度为奇数个 锦囊生效
-        if (gameStatus.wuxieResStage.hasWuxiePlayerIds.length == 0) {
-            if (gameStatus.wuxieResStage.wuxieChain.length % 2 == 1) {// 生效
-                if (gameStatus.scrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.CN) {
-                    getCurrentUser(gameStatus).addCards(getCards(gameStatus, 2));
-                    clearNextScrollStage(gameStatus);
-                } else {
-                    gameStatus.scrollResStages[0].isEffect = true;
-                }
-            } else {// 失效
-                clearNextScrollStage(gameStatus);
+        if (gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds.length == 0) { // 生效/失效
+
+            const isScrollEffected = gameStatus.wuxieSimultaneousResStage.wuxieChain.length % 2 == 1
+            // 延时锦囊
+            if (gameStatus.stage.stageName == "judge") {
+                const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus);
+                nextNeedPandingSign.isEffect = isScrollEffected;
+
+                // 延时锦囊生效/失效 开始执行判定
+                tryGoNextStage(gameStatus);
             }
-            clearWuxieResStage(gameStatus);
+            // 即时锦囊
+            else if (gameStatus.scrollResStages.length > 0) {
+                if (isScrollEffected) {// 生效
+                    if (gameStatus.scrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.CN) {
+                        getCurrentUser(gameStatus).addCards(getCards(gameStatus, 2));
+                        clearNextScrollStage(gameStatus);
+                    } else {
+                        gameStatus.scrollResStages[0].isEffect = true;
+                    }
+                } else {// 失效
+                    clearNextScrollStage(gameStatus);
+                }
+            }
+            clearWuxieResStage(gameStatus); // 生效后清空WuxieResStage
         }
     }
 }

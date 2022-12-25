@@ -16,8 +16,6 @@ const {
 } = require("../utils/utils");
 const {
     getCurrentUser,
-    setCurrentLocationToNextLocation,
-    getNextShandianUser
 } = require("../utils/userUtils");
 const {
     throwCards, getCards
@@ -49,7 +47,7 @@ class GameEngine {
 
             // 锦囊
             scrollResStages: [],
-            wuxieResStage: {
+            wuxieSimultaneousResStage: {
                 hasWuxiePlayerIds: [],
                 wuxieChain: []// 等待全员无懈可击
             },
@@ -113,7 +111,7 @@ class GameEngine {
             throw new Error("求桃的时候不能出闪")
         }
 
-        const needResponseWuxie = this.gameStatus.wuxieResStage.hasWuxiePlayerIds.length > 0;
+        const needResponseWuxie = this.gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds.length > 0;
         const needResponseTao = this.gameStatus.taoResStages.length > 0;
         const needResponseShan = this.gameStatus.shanResStages.length > 0;
 

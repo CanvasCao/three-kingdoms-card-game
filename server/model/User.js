@@ -11,7 +11,9 @@ class User {
 
         // cards
         this.cards = [];
-        this.pandingCards = [];
+
+        // pandingSigns
+        this.pandingSigns = [];
 
         // ui tags
         this.isTieSuo = true;
@@ -42,8 +44,8 @@ class User {
         this.cards = differenceBy(this.cards, cards, 'cardId');
     }
 
-    removePandingCard(card) {
-        this.pandingCards = differenceBy(this.pandingCards, [card], 'cardId');
+    removePandingSign(sign) {
+        this.pandingSigns = differenceBy(this.pandingSigns, [sign], 'card.cardId');
     }
 
     reduceBlood(number = 1) {
@@ -59,7 +61,7 @@ class User {
 
     resetWhenDie() {
         this.cards = [];
-        this.pandingCards = [];
+        this.pandingSigns = [];
         this.weaponCard = null;
         this.shieldCard = null;
         this.plusHorseCard = null;

@@ -40,10 +40,10 @@ const emitBehaviorPublicPlayCard = (io, behaviour, gameStatus) => {
     }
 }
 
-const emitPandingPublicCard = (io, card, user, pandingCard) => {
-    io.emit(emitMap.PLAY_PUBLIC_CARD, {
-        cards: [card],
-        message: `${user.name}的${pandingCard.CN}判定结果为${card.huase}${card.number}`
+const emitPandingPublicCard = (gameStatus, pandingResultCard, user, pandingCard) => {
+    gameStatus.io.emit(emitMap.PLAY_PUBLIC_CARD, {
+        cards: [pandingResultCard],
+        message: `${user.name}的${pandingCard.CN}判定结果为${pandingResultCard.huase}${pandingResultCard.number}`
     });
 }
 
