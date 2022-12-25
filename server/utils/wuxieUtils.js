@@ -45,7 +45,7 @@ const setGameStatusWhenScrollTakeEffect = (gameStatus) => {
     }
 
     // wuxieChain长度为奇数个 锦囊生效
-    const isScrollEffected = (gameStatus.wuxieSimultaneousResStage.wuxieChain.length % 2 == 1)
+    const isScrollEffected = gameStatus.wuxieSimultaneousResStage.wuxieChain.length % 2 == 1
 
     // 延时锦囊
     if (gameStatus.stage.stageName == "judge") {

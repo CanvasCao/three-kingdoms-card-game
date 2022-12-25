@@ -87,9 +87,9 @@ const responseHandler = {
 
         // 锦囊
         // 出无懈可击了
-        // 1 校验chain 如果已通过 用户打出
+        // 1 校验chain 如果已通过 用户打出 更新hasWuxiePlayerIds/wuxieChain
         // 1.1 如果没人有无懈 清空wuxieResStage 锦囊生效
-        // 1.2 如果还有人有无懈 更新hasWuxiePlayerIds/wuxieChain 前端强制等待三秒
+        // 1.2 如果还有人有无懈 前端强制等待三秒
         // 2 如果不通过 用户不会打出
 
         // 不出无懈可击
@@ -108,18 +108,18 @@ const responseHandler = {
                 originUser.removeCards(response.cards);
                 const newHasWuxiePlayers = getAllHasWuxieUsers(gameStatus);
                 gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds = newHasWuxiePlayers.map(u => u.userId);
+                gameStatus.wuxieSimultaneousResStage.wuxieChain.push({
+                    cards: response.cards,
+                    actualCard: response.actualCard,
+                    originId: response.originId,
+                    targetId: response.targetId,
+                    wuxieTargetCardId: response.wuxieTargetCardId,
+                });
 
                 if (newHasWuxiePlayers.length == 0) {
                     // 锦囊开始结算
                     setGameStatusWhenScrollTakeEffect(gameStatus);
                 } else {
-                    gameStatus.wuxieSimultaneousResStage.wuxieChain.push({
-                        cards: response.cards,
-                        actualCard: response.actualCard,
-                        originId: response.originId,
-                        targetId: response.targetId,
-                        wuxieTargetCardId: response.wuxieTargetCardId,
-                    });
                     // EMIT.FORCEWAIT()
                 }
             }
