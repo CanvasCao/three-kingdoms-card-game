@@ -65,13 +65,11 @@ class GameEngine {
         tryGoNextStage(this.gameStatus)
     }
 
-    // socket actions
+    // socket action
     handleAction(action) {
         emitBehaviorPublicPlayCard(this.io, action, this.gameStatus);
         this.gameStatus.action = action;
-        const originUser = action.actions ?
-            this.gameStatus.users[action.actions[0].originId] :
-            this.gameStatus.users[action.originId];
+        const originUser = this.gameStatus.users[action.originId];
 
         if ([BASIC_CARDS_CONFIG.SHA.CN,
             BASIC_CARDS_CONFIG.LEI_SHA.CN,
@@ -118,7 +116,7 @@ class GameEngine {
         emitRefreshStatus(this.gameStatus);
     }
 
-    // throw actions
+    // throw action
     handleThrowCards(data) {
         throwHandler.handleThrowCards(this.gameStatus, data)
     }

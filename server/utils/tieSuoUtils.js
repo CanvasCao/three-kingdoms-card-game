@@ -35,15 +35,14 @@ const generateTieSuoTempStorage = (gameStatus, firstAttributeDamageTargetUser, f
 
 // 属性杀没出闪的时候需要
 const generateTieSuoTempStorageByShaAction = (gameStatus) => {
-    const batchAction = gameStatus.action;
-    const actualCard = batchAction.actualCard;
+    const action = gameStatus.action;
+    const actualCard = action.actualCard;
     if (!actualCard.attribute) {
         return;
     }
 
-    // const action = batchAction.actions ? batchAction.actions[0] : batchAction;
-    const firstAttributeAction = batchAction.actions.find((a) => {
-        const targetUser = gameStatus.users[a.targetId];
+    const firstAttributeAction = action.targetIds.find((targetId) => {
+        const targetUser = gameStatus.users[targetId];
         return targetUser.isTieSuo;
     })
 

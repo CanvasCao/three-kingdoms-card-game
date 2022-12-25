@@ -20,8 +20,8 @@ const shuffle = (array) => {
 
 const generateBehaviorMessage = (behavior, users) => {
     // behaviour is action/response
-    const targetName = behavior.actions ? behavior.actions.map((a) => users[a.targetId].name).join(' ') : users?.[behavior?.targetId]?.name
-    const originName = behavior.actions ? users[behavior.actions[0].originId].name : users[behavior.originId].name;
+    const targetName = behavior.targetIds ? behavior.targetIds.map((targetId) => users[targetId].name).join(' ') : users[behavior.targetId].name
+    const originName = users[behavior.originId].name;
 
     return targetName ? `${originName}对${targetName}使用了${behavior.actualCard.CN}` : `${originName}使用了${behavior.actualCard.CN}`
 }

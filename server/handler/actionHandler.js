@@ -3,12 +3,13 @@ const {getCurrentUser, getAllHasWuxieUsers} = require("../utils/userUtils");
 const {generateWuxieSimultaneousResStageByScroll, setGameStatusWhenScrollTakeEffect} = require("../utils/wuxieUtils");
 
 const actionHandler = {
+    // BASIC
     setStatusByShaAction: (gameStatus) => {
         const action = gameStatus.action;
-        gameStatus.shanResStages = action.actions.map((a) => {
+        gameStatus.shanResStages = action.targetIds.map((targetId) => {
             return {
-                originId: a.targetId,
-                targetId: a.originId,
+                originId: targetId,
+                targetId: action.originId,
                 cardNumber: 1,
             }
         })
@@ -20,6 +21,8 @@ const actionHandler = {
             originUser.addBlood();
         }
     },
+
+    // SCROLL
     setStatusByWuZhongShengYouAction(gameStatus) {
         const currentUser = getCurrentUser(gameStatus);
         const action = gameStatus.action;
@@ -38,6 +41,26 @@ const actionHandler = {
             setGameStatusWhenScrollTakeEffect(gameStatus);
         }
     },
+    setStatusByGuoHeChaiQiaoAction(gameStatus) {
+        const currentUser = getCurrentUser(gameStatus);
+        const action = gameStatus.action;
+        gameStatus.scrollResStages = [{
+            originId: action.originId,
+            targetId: action.targetId,
+            cards: action.cards,
+            actualCard: action.actualCard,
+            isEffect: false,
+        }]
+        const hasWuxiePlayers = getAllHasWuxieUsers(gameStatus)
+
+        if (hasWuxiePlayers.length > 0) {
+            generateWuxieSimultaneousResStageByScroll(gameStatus)
+        } else { // 没人有无懈可击直接生效
+            setGameStatusWhenScrollTakeEffect(gameStatus);
+        }
+    },
+
+    // DELAY
     setStatusByLeBuSiShuAction: (gameStatus) => {
         const action = gameStatus.action;
         const targetUser = gameStatus.users[action.targetId]
@@ -46,7 +69,6 @@ const actionHandler = {
             actualCard: action.actualCard,
         });
     },
-
     setStatusByShanDianAction: (gameStatus) => {
         const action = gameStatus.action;
         const originUser = gameStatus.users[action.originId]
@@ -56,6 +78,7 @@ const actionHandler = {
         });
     },
 
+    // Equipment
     setStatusByEquipmentAction: (gameStatus) => {
         const action = gameStatus.action;
         const originUser = gameStatus.users[action.originId]
