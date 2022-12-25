@@ -1,8 +1,6 @@
-const {clearNextScrollStage, clearWuxieResStage} = require("../utils/stageUtils");
 const {EQUIPMENT_TYPE} = require("../initCards")
-const {getCards} = require("../utils/cardUtils")
 const {getCurrentUser, getAllHasWuxieUsers} = require("../utils/userUtils");
-const {generateWuxieSimultaneousResStageByScroll} = require("../utils/wuxieUtils");
+const {generateWuxieSimultaneousResStageByScroll, setGameStatusWhenScrollTakeEffect} = require("../utils/wuxieUtils");
 
 const actionHandler = {
     setStatusByShaAction: (gameStatus) => {
@@ -23,7 +21,7 @@ const actionHandler = {
         }
     },
     setStatusByWuZhongShengYouAction(gameStatus) {
-        const currentUser = getCurrentUser(gameStatus)
+        const currentUser = getCurrentUser(gameStatus);
         const action = gameStatus.action;
         gameStatus.scrollResStages = [{
             originId: action.originId,
@@ -37,9 +35,7 @@ const actionHandler = {
         if (hasWuxiePlayers.length > 0) {
             generateWuxieSimultaneousResStageByScroll(gameStatus)
         } else { // 没人有无懈可击直接生效
-            currentUser.addCards(getCards(gameStatus, 2));
-            clearNextScrollStage(gameStatus);
-            clearWuxieResStage(gameStatus);
+            setGameStatusWhenScrollTakeEffect(gameStatus);
         }
     },
     setStatusByLeBuSiShuAction: (gameStatus) => {

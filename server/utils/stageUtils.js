@@ -4,9 +4,9 @@ const {emitRefreshStatus} = require("./utils");
 const {getCurrentUser, getAllHasWuxieUsers} = require("./userUtils");
 const {setCurrentLocationToNextLocation} = require("./locationUtils");
 const {generateWuxieSimultaneousResStageByPandingCard} = require("./wuxieUtils");
+const {clearWuxieResStage} = require("./clearStageUtils");
 const {getNextNeedExecutePandingSign} = require("./pandingUtils");
 const {getCards} = require("./cardUtils");
-const {DELAY_SCROLL_CARDS_CONFIG} = require("../initCards")
 const stageConfig = require("../config/stageConfig.json")
 
 const goToNextStage = (gameStatus) => {
@@ -25,6 +25,12 @@ const goToNextStage = (gameStatus) => {
         stageName: stageConfig.stageNamesEN[gameStatus.stageIndex],
         stageNameCN: stageConfig.stageNamesCN[gameStatus.stageIndex]
     }
+
+    clearWuxieResStage(gameStatus);
+    gameStatus.shanResStages = [];
+    gameStatus.taoResStages = [];
+    gameStatus.scrollResStages = [];
+
     emitRefreshStatus(gameStatus);
     tryGoNextStage(gameStatus);
 }
@@ -81,29 +87,6 @@ const canTryGoNextStage = (gameStatus) => {
     return true
 }
 
-const clearNextTaoStage = (gameStatus) => {
-    gameStatus.taoResStages.shift();
-}
-
-const clearNextShanStage = (gameStatus) => {
-    gameStatus.shanResStages.shift();
-}
-
-const clearNextScrollStage = (gameStatus) => {
-    gameStatus.scrollResStages.shift();
-}
-
-const clearWuxieResStage = (gameStatus) => {
-    gameStatus.wuxieSimultaneousResStage = {
-        hasWuxiePlayerIds: [],
-        wuxieChain: []
-    }
-}
-
 exports.goToNextStage = goToNextStage;
 exports.canTryGoNextStage = canTryGoNextStage;
 exports.tryGoNextStage = tryGoNextStage;
-exports.clearNextTaoStage = clearNextTaoStage;
-exports.clearNextShanStage = clearNextShanStage;
-exports.clearNextScrollStage = clearNextScrollStage;
-exports.clearWuxieResStage = clearWuxieResStage;

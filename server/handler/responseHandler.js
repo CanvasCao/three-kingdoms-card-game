@@ -1,14 +1,13 @@
+const {setGameStatusWhenScrollTakeEffect} = require("../utils/wuxieUtils");
 const {
     generateTieSuoTempStorageByShaAction,
     setGameStatusByTieSuoTempStorage
 } = require("../utils/tieSuoUtils");
-
-const {clearNextScrollStage, clearWuxieResStage, clearNextShanStage, clearNextTaoStage} = require("../utils/stageUtils");
+const {clearNextShanStage, clearNextTaoStage} = require("../utils/clearStageUtils");
 const {BASIC_CARDS_CONFIG, SCROLL_CARDS_CONFIG} = require("../initCards")
 const {throwCards, getCards} = require("../utils/cardUtils")
 const {tryGoNextStage} = require("../utils/stageUtils")
 const {getAllHasWuxieUsers, getCurrentUser} = require("../utils/userUtils")
-const {getNextNeedExecutePandingSign} = require("../utils/pandingUtils")
 const {dieHandler} = require("../handler/dieHandler")
 
 const responseHandler = {
@@ -41,7 +40,7 @@ const responseHandler = {
                 setGameStatusByTieSuoTempStorage(gameStatus);
             }
         }
-        //闪电求桃之后 需要判断是不是从判定阶段到出牌阶段
+        // 闪电求桃之后 需要判断是不是从判定阶段到出牌阶段
         tryGoNextStage(gameStatus);
     },
 
@@ -107,11 +106,12 @@ const responseHandler = {
 
             if (validatedChainResponse) {
                 originUser.removeCards(response.cards);
-                const hasWuxiePlayers = getAllHasWuxieUsers(gameStatus);
-                gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds = hasWuxiePlayers.map(u => u.userId);
+                const newHasWuxiePlayers = getAllHasWuxieUsers(gameStatus);
+                gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds = newHasWuxiePlayers.map(u => u.userId);
 
-                if (hasWuxiePlayers.length == 0) {
+                if (newHasWuxiePlayers.length == 0) {
                     // 锦囊开始结算
+                    setGameStatusWhenScrollTakeEffect(gameStatus);
                 } else {
                     gameStatus.wuxieSimultaneousResStage.wuxieChain.push({
                         cards: response.cards,
@@ -124,38 +124,17 @@ const responseHandler = {
                 }
             }
         } else { // 没出无懈可击
-            gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds = hasWuxiePlayerIds.filter((id) => id !== response.originId)
-            if (gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds.length == 0) {
+            const newHasWuxiePlayersIds = hasWuxiePlayerIds.filter((id) => id !== response.originId);
+            gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds = newHasWuxiePlayersIds;
+            if (newHasWuxiePlayersIds.length == 0) {
                 // 锦囊开始结算
+                setGameStatusWhenScrollTakeEffect(gameStatus)
             }
         }
 
-        // 没有人有无懈可击 wuxieChain长度为奇数个 锦囊生效
-        if (gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds.length == 0) { // 生效/失效
-
-            const isScrollEffected = (gameStatus.wuxieSimultaneousResStage.wuxieChain.length % 2 == 1)
-            // 延时锦囊
-            if (gameStatus.stage.stageName == "judge") {
-                const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus);
-                nextNeedPandingSign.isEffect = isScrollEffected;
-
-                // 延时锦囊生效/失效 开始执行判定
-                tryGoNextStage(gameStatus);
-            }
-            // 即时锦囊
-            else if (gameStatus.scrollResStages.length > 0) {
-                if (isScrollEffected) {// 生效
-                    if (gameStatus.scrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.CN) {
-                        getCurrentUser(gameStatus).addCards(getCards(gameStatus, 2));
-                        clearNextScrollStage(gameStatus);
-                    } else {
-                        gameStatus.scrollResStages[0].isEffect = true;
-                    }
-                } else {// 失效
-                    clearNextScrollStage(gameStatus);
-                }
-            }
-            clearWuxieResStage(gameStatus); // 生效后清空WuxieResStage
+        if (gameStatus.stage.stageName == "judge") {
+            // 延迟锦囊生效后 需要判断是不是从判定阶段到出牌阶段
+            tryGoNextStage(gameStatus);
         }
     }
 }

@@ -10,6 +10,7 @@ const moveShandianToNextUser = (gameStatus, sign) => {
     const currentUser = getCurrentUser(gameStatus);
     const nextUser = getNextShandianUser(gameStatus);
 
+    sign.isEffect = true;
     // isEffect的清空在resetWhenMyTurnStarts
     if (currentUser.userId != nextUser.userId) {
         currentUser.removePandingSign(sign);
