@@ -12,9 +12,13 @@ const stageConfig = require("../config/stageConfig.json")
 const goToNextStage = (gameStatus) => {
     gameStatus.stageIndex++;
     if (gameStatus.stageIndex >= stageConfig.stageNamesEN.length) {
+        // 当前用户结束
         getCurrentUser(gameStatus).resetWhenMyTurnEnds();
+
+        // 下一个用户开始
         gameStatus.stageIndex = 0;
         setCurrentLocationToNextLocation(gameStatus);
+        getCurrentUser(gameStatus).resetWhenMyTurnStarts();
     }
     gameStatus.stage = {
         userId: getCurrentUser(gameStatus).userId,

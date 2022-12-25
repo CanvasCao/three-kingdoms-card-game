@@ -1,3 +1,4 @@
+const {Card} = require("./model/Card");
 const {v4: uuidv4} = require('uuid');
 const {shuffle} = require('./utils/utils');
 
@@ -496,26 +497,23 @@ let junzhengCardMetaList = [
 
 let testCardMetaList = [
     // {'huase': '♥️', number: 13, key: CARD_CONFIG.SHA.KEY},
-    {'huase': '♠️️', number: 1, key: CARD_CONFIG.LEI_SHA.KEY},
-    {'huase': '♥️', number: 1, key: CARD_CONFIG.HUO_SHA.KEY},
-    {'huase': '♥️', number: 8, key: CARD_CONFIG.SHAN.KEY},
-    {'huase': '♦️', number: 12, key: CARD_CONFIG.TAO.KEY},
+    // {'huase': '♠️️', number: 1, key: CARD_CONFIG.LEI_SHA.KEY},
+    // {'huase': '♥️', number: 1, key: CARD_CONFIG.HUO_SHA.KEY},
+    // {'huase': '♥️', number: 8, key: CARD_CONFIG.SHAN.KEY},
+    // {'huase': '♦️', number: 12, key: CARD_CONFIG.TAO.KEY},
     // {'huase': '♦️', number: 12, key: CARD_CONFIG.TAO.KEY},
     // {'huase': '♠️️', number: 2, key: CARD_CONFIG.BA_GUA_ZHEN.KEY},
     // {'huase': '♦️', number: 13, key: CARD_CONFIG.ZHAO_HUANG_FEI_DIAN.KEY},
     // {'huase': '♣️', number: 12, key: CARD_CONFIG.ZHANG_BA_SHE_MAO.KEY},
     // {'huase': '♣️', number: 13, key: CARD_CONFIG.DA_WAN.KEY},
     // {'huase': '♣️', number: 1, key: CARD_CONFIG.ZHU_GE_LIAN_NU.KEY},
-    // {'huase': '♠️️', number: 1, key: CARD_CONFIG.SHAN_DIAN.KEY},
-    // {'huase': '♠️️', number: 2, key: CARD_CONFIG.SHAN_DIAN.KEY},
-    // {'huase': '♦️', number: 6, key: CARD_CONFIG.LE_BU_SI_SHU.KEY},
+    {'huase': '♠️️', number: 1, key: CARD_CONFIG.SHAN_DIAN.KEY},
+    {'huase': '♠️️', number: 1, key: CARD_CONFIG.SHAN_DIAN.KEY},
+    {'huase': '♦️', number: 6, key: CARD_CONFIG.LE_BU_SI_SHU.KEY},
     // {'huase': '♦️', number: 12, key: CARD_CONFIG.GUO_HE_CHAI_QIAO.KEY},
-    // {'huase': '♠️️', number: 13, key: CARD_CONFIG.WU_XIE_KE_JI.KEY},
+    {'huase': '♠️️', number: 13, key: CARD_CONFIG.WU_XIE_KE_JI.KEY},
     // {'huase': '♦️', number: 11, key: CARD_CONFIG.WU_ZHONG_SHENG_YOU.KEY},
-    {'huase': '♠️️', number: 13, key: CARD_CONFIG.WU_XIE_KE_JI.KEY},
-    {'huase': '♦️', number: 11, key: CARD_CONFIG.WU_ZHONG_SHENG_YOU.KEY},
-    {'huase': '♠️️', number: 13, key: CARD_CONFIG.WU_XIE_KE_JI.KEY},
-    {'huase': '♦️', number: 11, key: CARD_CONFIG.WU_ZHONG_SHENG_YOU.KEY},
+
 ]
 
 const metaList = testCardMetaList;
@@ -526,7 +524,7 @@ const getInitCards = () => {
     return shuffled.map(card => {
         card = {...card, ...CARD_CONFIG[card.key], cardId: uuidv4()}
         card.cardNumDesc = CARD_NUM_DESC[card.number] ? CARD_NUM_DESC[card.number] : card.number;
-        return card
+        return new Card(card);
     })
 }
 

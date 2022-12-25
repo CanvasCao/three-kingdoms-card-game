@@ -1,3 +1,4 @@
+const {generateTieSuoTempStorageByShandian, setGameStatusByTieSuoTempStorage} = require("../utils/tieSuoUtils");
 const {isNil} = require("lodash");
 const {emitPandingPublicCard} = require("../utils/utils");
 const {getCurrentUser, getNextShandianUser} = require("../utils/userUtils");
@@ -5,16 +6,16 @@ const {getNextNeedExecutePandingSign} = require("../utils/pandingUtils");
 const {DELAY_SCROLL_CARDS_CONFIG} = require("../initCards")
 const {getCards, throwCards} = require("../utils/cardUtils")
 
-const moveShandianToNextUser = (gameStatus) => {
+const moveShandianToNextUser = (gameStatus, sign) => {
     const currentUser = getCurrentUser(gameStatus);
     const nextUser = getNextShandianUser(gameStatus);
-    const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus);
 
-    // 如果人人有闪电 那么闪电原地不动
+    // isEffect的清空在resetWhenMyTurnStarts
     if (currentUser.userId != nextUser.userId) {
-        nextNeedPandingSign.isEffect = undefined;
-        currentUser.removePandingSign(nextNeedPandingSign);
-        nextUser.pandingSigns.push(nextNeedPandingSign);
+        currentUser.removePandingSign(sign);
+        nextUser.pandingSigns.push(sign);
+    } else {
+        // 如果人人有闪电 那么闪电原地不动
     }
 }
 const pandingHandler = {
@@ -38,7 +39,7 @@ const pandingHandler = {
                 currentUser.removePandingSign(nextNeedPandingSign);
                 throwCards(gameStatus, pandingActualCard);
             } else if (isPandingShandian) {
-                moveShandianToNextUser(gameStatus)
+                moveShandianToNextUser(gameStatus, nextNeedPandingSign)
             }
         } else if (nextNeedPandingSign.isEffect === true) {
             const pandingResultCard = getCards(gameStatus, 1);
@@ -58,13 +59,13 @@ const pandingHandler = {
                     throwCards(gameStatus, pandingActualCard);
 
                     currentUser.reduceBlood(3);
-                    this.generateTieSuoTempStorageByShandian();
+                    generateTieSuoTempStorageByShandian(gameStatus);
 
-                    if (currentUser.currentBlood > 0) { // <0 setStateByTieSuoTempStorage的逻辑在求桃之后 如果我还活着需要立刻结算下一个人的铁锁连环
-                        this.setStateByTieSuoTempStorage();
+                    if (currentUser.currentBlood > 0) { // <0 setGameStatusByTieSuoTempStorage的逻辑在求桃之后 如果我还活着需要立刻结算下一个人的铁锁连环
+                        setGameStatusByTieSuoTempStorage(gameStatus);
                     }
                 } else {
-                    moveShandianToNextUser(gameStatus)
+                    moveShandianToNextUser(gameStatus, nextNeedPandingSign)
                 }
             }
         }

@@ -1,3 +1,8 @@
+const {
+    generateTieSuoTempStorageByShaAction,
+    setGameStatusByTieSuoTempStorage
+} = require("../utils/tieSuoUtils");
+
 const {clearNextScrollStage, clearWuxieResStage, clearNextShanStage, clearNextTaoStage} = require("../utils/stageUtils");
 const {BASIC_CARDS_CONFIG, SCROLL_CARDS_CONFIG} = require("../initCards")
 const {throwCards, getCards} = require("../utils/cardUtils")
@@ -7,7 +12,7 @@ const {getNextNeedExecutePandingSign} = require("../utils/pandingUtils")
 const {dieHandler} = require("../handler/dieHandler")
 
 const responseHandler = {
-    setStatusByTaoResponse: (gameStatus, response, setStateByTieSuoTempStorage) => {
+    setStatusByTaoResponse: (gameStatus, response) => {
         const curTaoResStage = gameStatus.taoResStages[0];
         const originUser = gameStatus.users[curTaoResStage.originId];
         const targetUser = gameStatus.users[curTaoResStage.targetId];
@@ -20,7 +25,7 @@ const responseHandler = {
 
             if (targetUser.currentBlood > 0) { // 出桃复活 不需要任何人再出桃
                 gameStatus.taoResStages = [];
-                setStateByTieSuoTempStorage();
+                setGameStatusByTieSuoTempStorage(gameStatus);
             } else { // 出桃还没复活 更新需要下一个人提示的出桃的数量
                 gameStatus.taoResStages.forEach((rs) => {
                     rs.cardNumber = 1 - targetUser.currentBlood;
@@ -33,14 +38,14 @@ const responseHandler = {
             // 没有任何人出桃 当前角色死亡
             if (gameStatus.taoResStages.length == 0) {
                 dieHandler.setStatusWhenUserDie(gameStatus, targetUser);
-                setStateByTieSuoTempStorage();
+                setGameStatusByTieSuoTempStorage(gameStatus);
             }
         }
         //闪电求桃之后 需要判断是不是从判定阶段到出牌阶段
         tryGoNextStage(gameStatus);
     },
 
-    setStatusByShanResponse: (gameStatus, response, generateTieSuoTempStorageByShaAction, setStateByTieSuoTempStorage) => {
+    setStatusByShanResponse: (gameStatus, response) => {
         const curShanResStage = gameStatus.shanResStages[0];
         const originUser = gameStatus.users[curShanResStage.originId];
 
@@ -58,12 +63,12 @@ const responseHandler = {
             clearNextShanStage(gameStatus);
 
             originUser.reduceBlood();
-            generateTieSuoTempStorageByShaAction(); // 只有第一个中铁锁连环且不出闪的 会运行
+            generateTieSuoTempStorageByShaAction(gameStatus); // 只有第一个中铁锁连环且不出闪的 会运行
 
-            // <0 setStateByTieSuoTempStorage的逻辑在求桃之后
+            // <0 setGameStatusByTieSuoTempStorage的逻辑在求桃之后
             // 如果我还活着需要立刻结算下一个人的铁锁连环
             if (originUser.currentBlood > 0) {
-                setStateByTieSuoTempStorage();
+                setGameStatusByTieSuoTempStorage(gameStatus);
             }
         }
     },
@@ -128,7 +133,7 @@ const responseHandler = {
         // 没有人有无懈可击 wuxieChain长度为奇数个 锦囊生效
         if (gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds.length == 0) { // 生效/失效
 
-            const isScrollEffected = gameStatus.wuxieSimultaneousResStage.wuxieChain.length % 2 == 1
+            const isScrollEffected = (gameStatus.wuxieSimultaneousResStage.wuxieChain.length % 2 == 1)
             // 延时锦囊
             if (gameStatus.stage.stageName == "judge") {
                 const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus);

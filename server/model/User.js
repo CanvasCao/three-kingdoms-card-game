@@ -69,6 +69,13 @@ class User {
         this.isTieSuo = false;
     }
 
+    resetWhenMyTurnStarts() {
+        this.pandingSigns = this.pandingSigns.map((sign) => {
+            sign.isEffect = undefined;
+            return sign
+        })
+    }
+
     resetWhenMyTurnEnds() {
         this.skipDraw = false;
         this.skipPlay = false;

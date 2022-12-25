@@ -3,14 +3,9 @@ const {
     CARD_TYPE,
     BASIC_CARDS_CONFIG,
     SCROLL_CARDS_CONFIG,
-    DELAY_SCROLL_CARDS_CONFIG,
-    EQUIPMENT_CARDS_CONFIG,
-    EQUIPMENT_TYPE
 } = require("../initCards");
 const {
     emitBehaviorPublicPlayCard,
-    emitPandingPublicCard,
-    emitThrowPublicCard,
     emitRefreshStatus,
     emitInit,
 } = require("../utils/utils");
@@ -18,12 +13,10 @@ const {
     getCurrentUser,
 } = require("../utils/userUtils");
 const {
-    throwCards, getCards
+    throwCards
 } = require("../utils/cardUtils");
 const {
-    canTryGoNextStage,
     tryGoNextStage,
-    goToNextStage,
 } = require("../utils/stageUtils");
 const {actionHandler} = require("../handler/actionHandler");
 const {responseHandler} = require("../handler/responseHandler");
@@ -118,13 +111,9 @@ class GameEngine {
         if (needResponseWuxie) {
             responseHandler.setStatusByWuxieResponse(this.gameStatus, response);
         } else if (needResponseTao) {
-            responseHandler.setStatusByTaoResponse(this.gameStatus, response,
-                this.setStateByTieSuoTempStorage.bind(this),
-            );
+            responseHandler.setStatusByTaoResponse(this.gameStatus, response);
         } else if (needResponseShan) {
-            responseHandler.setStatusByShanResponse(this.gameStatus, response,
-                this.generateTieSuoTempStorageByShaAction.bind(this),
-                this.setStateByTieSuoTempStorage.bind(this));
+            responseHandler.setStatusByShanResponse(this.gameStatus, response);
         }
         emitRefreshStatus(this.gameStatus);
     }
@@ -156,83 +145,6 @@ class GameEngine {
             }
         }
         this.gameStatus.taoResStages = taoResStages
-    }
-
-    resetTieSuo() {
-        Object.values(this.gameStatus.users).forEach((u) => {
-            u.isTieSuo = false;
-        })
-    }
-
-    // 属性杀没出闪的时候需要
-    generateTieSuoTempStorageByShaAction() {
-        const batchAction = this.gameStatus.action;
-        const actualCard = batchAction.actualCard;
-        if (!actualCard.attribute) {
-            return;
-        }
-
-        // const action = batchAction.actions ? batchAction.actions[0] : batchAction;
-        const firstAttributeAction = batchAction.actions.find((a) => {
-            const targetUser = this.gameStatus.users[a.targetId];
-            return targetUser.isTieSuo;
-        })
-
-        // 没有任何人是铁锁状态
-        if (!firstAttributeAction) {
-            return
-        }
-
-        const firstAttributeActionTargetUserId = firstAttributeAction.targetId;
-        const firstAttributeActionTargetUser = this.gameStatus.users[firstAttributeActionTargetUserId]
-        this.generateTieSuoTempStorage(firstAttributeActionTargetUser, firstAttributeAction, 1);
-    }
-
-    generateTieSuoTempStorageByShandian() {
-        this.generateTieSuoTempStorage(getCurrentUser(this.gameStatus), null, 3);
-    }
-
-    generateTieSuoTempStorage(firstAttributeDamageTargetUser, firstAttributeAction, damage) {
-        const firstLocation = firstAttributeDamageTargetUser.location;
-        const tieSuoTempStorage = []
-        for (let i = firstLocation; i < firstLocation + Object.keys(this.gameStatus.users).length; i++) {
-            const modLocation = i % Object.keys(this.gameStatus.users).length;
-            const user = Object.values(this.gameStatus.users).find((u) => u.location == modLocation);
-            if (user.isTieSuo && firstAttributeDamageTargetUser.userId !== user.userId) { // 除了第一个命中的 其他人都要进 tieSuoTempStorage
-                let tempItem = {
-                    damage,
-                    targetId: user.userId,
-                }
-                if (firstAttributeAction) {
-                    tempItem = {
-                        ...tempItem,
-                        originId: firstAttributeAction.originId,
-                        cards: firstAttributeAction.cards,
-                        actualCard: firstAttributeAction.actualCard,
-                    }
-                }
-                tieSuoTempStorage.push(tempItem)
-            }
-        }
-
-        this.resetTieSuo();
-        this.gameStatus.tieSuoTempStorage = tieSuoTempStorage;
-    }
-
-    // 一个角色掉血的时候 其他铁锁连环角色受到伤害
-    // 1.一个角色求桃后死亡
-    // 2.一个角色求桃后复活
-    // 3.一个角色不出闪 但是没有死亡
-    setStateByTieSuoTempStorage() {
-        if (this.gameStatus.tieSuoTempStorage.length <= 0) {
-            return
-        }
-
-        const nextTieSuoAction = this.gameStatus.tieSuoTempStorage[0];
-
-        const targetUser = this.gameStatus.users[nextTieSuoAction.targetId];
-        targetUser.reduceBlood(nextTieSuoAction.damage);
-        this.gameStatus.tieSuoTempStorage.shift();
     }
 }
 
