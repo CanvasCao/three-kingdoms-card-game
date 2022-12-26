@@ -41,7 +41,11 @@ class User {
     }
 
     removeCards(cards) {
-        this.cards = differenceBy(this.cards, cards, 'cardId');
+        if (Array.isArray(cards)) {
+            this.cards = differenceBy(this.cards, cards, 'cardId');
+        }
+        this.cards = differenceBy(this.cards, [cards], 'cardId');
+
     }
 
     removePandingSign(sign) {

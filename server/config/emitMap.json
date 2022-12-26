@@ -7,5 +7,6 @@
   "RESPONSE": "response",
   "THROW": "throw",
 
+  "CARD_BOARD_ACTION": "card_board_action",
   "PLAY_PUBLIC_CARD": "play_public_card"
 }

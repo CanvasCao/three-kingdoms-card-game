@@ -55,7 +55,26 @@ const actionHandler = {
         })
 
         const hasWuxiePlayers = getAllHasWuxieUsers(gameStatus)
+        if (hasWuxiePlayers.length > 0) {
+            generateWuxieSimultaneousResStageByScroll(gameStatus)
+        } else { // 没人有无懈可击直接生效
+            setGameStatusWhenScrollTakeEffect(gameStatus);
+        }
+    },
+    setStatusByShunShouQianYangAction(gameStatus) {
+        const action = gameStatus.action;
+        gameStatus.scrollResStages = action.targetIds.map((targetId) => {
+            return {
+                originId: action.originId,
+                targetId: targetId,
+                cards: action.cards,
+                actualCard: action.actualCard,
+                isEffect: false,
+                stageId: uuidv4(), // 前端刷新Board的依据
+            }
+        })
 
+        const hasWuxiePlayers = getAllHasWuxieUsers(gameStatus)
         if (hasWuxiePlayers.length > 0) {
             generateWuxieSimultaneousResStageByScroll(gameStatus)
         } else { // 没人有无懈可击直接生效

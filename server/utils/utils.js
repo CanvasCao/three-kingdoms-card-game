@@ -40,6 +40,19 @@ const emitBehaviorPublicPlayCard = (io, behaviour, gameStatus) => {
     }
 }
 
+const emitCardBoardPublicPlayCard = (io, data, gameStatus) => {
+    // type EmitCardBoardData = {
+    //     originId: string,
+    //     targetId: string,
+    //     card: Card,
+    //     type: "REMOVE" | "MOVE",
+    // }
+    io.emit(emitMap.PLAY_PUBLIC_CARD, {
+        cards: [data.card],
+        message: `${gameStatus.users[data.targetId].name} 被 ${data.type == "REMOVE" ? "拆" : "顺"}`
+    });
+
+}
 const emitPandingPublicCard = (gameStatus, pandingResultCard, user, pandingCard) => {
     gameStatus.io.emit(emitMap.PLAY_PUBLIC_CARD, {
         cards: [pandingResultCard],
@@ -70,6 +83,7 @@ const emitInit = (gameStatus) => {
 exports.shuffle = shuffle;
 exports.generateBehaviorMessage = generateBehaviorMessage;
 exports.emitBehaviorPublicPlayCard = emitBehaviorPublicPlayCard;
+exports.emitCardBoardPublicPlayCard = emitCardBoardPublicPlayCard;
 exports.emitPandingPublicCard = emitPandingPublicCard;
 exports.emitThrowPublicCard = emitThrowPublicCard;
 exports.emitRefreshStatus = emitRefreshStatus;

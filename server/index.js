@@ -91,6 +91,10 @@ io.on('connection', (socket) => {
         gameEngine.handleResponse(response);
     });
 
+    socket.on(emitMap.CARD_BOARD_ACTION, (data) => {
+        gameEngine.handleCardBoardAction(data);
+    });
+
     socket.on(emitMap.THROW, (data) => {
         gameEngine.handleThrowCards(data);
     });

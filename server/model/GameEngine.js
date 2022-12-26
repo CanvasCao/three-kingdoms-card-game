@@ -8,6 +8,8 @@ const {
     emitBehaviorPublicPlayCard,
     emitRefreshStatus,
     emitInit,
+    emitCardBoardPublicPlayCard,
+    emitThrowPublicCard,
 } = require("../utils/utils");
 const {
     getCurrentUser,
@@ -21,6 +23,7 @@ const {
 const {actionHandler} = require("../handler/actionHandler");
 const {responseHandler} = require("../handler/responseHandler");
 const {throwHandler} = require("../handler/throwHandler");
+const {cardBoardHandler} = require("../handler/cardBoardHandler");
 
 const stageConfig = require("../config/stageConfig.json")
 
@@ -100,6 +103,9 @@ class GameEngine {
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.GUO_HE_CHAI_QIAO.CN) {
             actionHandler.setStatusByGuoHeChaiQiaoAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
+        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.CN) {
+            actionHandler.setStatusByShunShouQianYangAction(this.gameStatus);
+            throwCards(this.gameStatus, action.cards);
         }
         originUser.removeCards(action.cards);
         emitRefreshStatus(this.gameStatus);
@@ -128,7 +134,13 @@ class GameEngine {
 
     // throw action
     handleThrowCards(data) {
+        emitThrowPublicCard(this.gameStatus, data.cards, getCurrentUser(this.gameStatus));
         throwHandler.handleThrowCards(this.gameStatus, data)
+    }
+
+    handleCardBoardAction(data) {
+        emitCardBoardPublicPlayCard(this.io, data, this.gameStatus)
+        cardBoardHandler.handleCardBoard(this.gameStatus, data)
     }
 
     // 任意角色blood<=0时
