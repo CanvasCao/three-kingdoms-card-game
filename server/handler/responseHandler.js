@@ -17,7 +17,7 @@ const responseHandler = {
         const targetUser = gameStatus.users[curTaoResStage.targetId];
 
         if (response?.actualCard?.CN == BASIC_CARDS_CONFIG.TAO.CN) { // 出桃了
-            originUser.removeCards(response.cards);
+            originUser.removeHandCards(response.cards);
             throwCards(gameStatus, response.cards);
 
             targetUser.addBlood();
@@ -49,7 +49,7 @@ const responseHandler = {
         const originUser = gameStatus.users[curShanResStage.originId];
 
         if (response?.actualCard?.CN == BASIC_CARDS_CONFIG.SHAN.CN) { // 出闪了
-            originUser.removeCards(response.cards);
+            originUser.removeHandCards(response.cards);
             throwCards(gameStatus, response.cards);
 
             curShanResStage.cardNumber--; // 吕布需要两个杀
@@ -105,7 +105,7 @@ const responseHandler = {
             const validatedChainResponse = lastWuxieChainItem.actualCard.cardId === response.wuxieTargetCardId;
 
             if (validatedChainResponse) {
-                originUser.removeCards(response.cards);
+                originUser.removeHandCards(response.cards);
                 const newHasWuxiePlayers = getAllHasWuxieUsers(gameStatus);
                 gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds = newHasWuxiePlayers.map(u => u.userId);
                 gameStatus.wuxieSimultaneousResStage.wuxieChain.push({

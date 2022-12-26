@@ -14,7 +14,10 @@ class User {
 
         // pandingSigns
         this.pandingSigns = [];
-
+        this.weaponCard = null;
+        this.shieldCard = null;
+        this.plusHorseCard = null;
+        this.minusHorseCard = null;
         // ui tags
         this.isTieSuo = true;
 
@@ -40,12 +43,26 @@ class User {
         this.cards = this.cards.concat(cards)
     }
 
-    removeCards(cards) {
-        if (Array.isArray(cards)) {
-            this.cards = differenceBy(this.cards, cards, 'cardId');
-        }
-        this.cards = differenceBy(this.cards, [cards], 'cardId');
+    removeHandCards(cards) {
+        const removeCards = Array.isArray(cards) ? cards : [cards]
+        this.cards = differenceBy(this.cards, removeCards, 'cardId');
+    }
 
+    removeCards(cards) {
+        this.removeHandCards(cards)
+        const removeCards = Array.isArray(cards) ? cards : [cards]
+        const removeCardIds = removeCards.map(c => c.cardId);
+        this.weaponCard = removeCardIds.includes(this.weaponCard?.cardId) ? null : this.weaponCard;
+        this.shieldCard = removeCardIds.includes(this.shieldCard?.cardId) ? null : this.shieldCard;
+        this.plusHorseCard = removeCardIds.includes(this.plusHorseCard?.cardId) ? null : this.plusHorseCard;
+        this.minusHorseCard = removeCardIds.includes(this.minusHorseCard?.cardId) ? null : this.minusHorseCard;
+
+        const fakeSigns = removeCardIds.map((rId) => {
+            return {
+                card: {cardId: rId}
+            }
+        })
+        this.pandingSigns = differenceBy(this.pandingSigns, fakeSigns, 'card.cardId');
     }
 
     removePandingSign(sign) {

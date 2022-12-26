@@ -107,7 +107,7 @@ class GameEngine {
             actionHandler.setStatusByShunShouQianYangAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
         }
-        originUser.removeCards(action.cards);
+        originUser.removeHandCards(action.cards);
         emitRefreshStatus(this.gameStatus);
     }
 

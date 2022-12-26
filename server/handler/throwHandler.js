@@ -5,7 +5,7 @@ const {goToNextStage} = require("../utils/stageUtils")
 const throwHandler = {
     handleThrowCards(gameStatus, data) {
         const cards = data.cards;
-        getCurrentUser(gameStatus).removeCards(cards);
+        getCurrentUser(gameStatus).removeHandCards(cards);
         throwCards(gameStatus, cards);
 
         emitRefreshStatus(gameStatus);
