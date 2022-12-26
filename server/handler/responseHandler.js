@@ -1,16 +1,19 @@
-const {setGameStatusWhenScrollTakeEffectAndMakeSureNoBodyWantsPlayXuxie} = require("../utils/wuxieUtils");
+const {
+    setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect,
+    resetHasWuxiePlayerIdsAndPushChainAfterAValidatedWuxie
+} = require("../utils/wuxieUtils");
 const {
     generateTieSuoTempStorageByShaAction,
     setGameStatusByTieSuoTempStorage
 } = require("../utils/tieSuoUtils");
-const {clearNextShanStage, clearNextTaoStage} = require("../utils/clearStageUtils");
+const {clearNextShanStage, clearNextTaoStage, clearNextScrollStage} = require("../utils/clearStageUtils");
 const {BASIC_CARDS_CONFIG, SCROLL_CARDS_CONFIG} = require("../initCards")
-const {throwCards, getCards} = require("../utils/cardUtils")
+const {throwCards} = require("../utils/cardUtils")
 const {tryGoNextStage} = require("../utils/stageUtils")
-const {getAllHasWuxieUsers, getCurrentUser} = require("../utils/userUtils")
+const {getAllHasWuxieUsers} = require("../utils/userUtils")
 const {dieHandler} = require("../handler/dieHandler")
 
-const responseHandler = {
+const responseCardHandler = {
     setStatusByTaoResponse: (gameStatus, response) => {
         const curTaoResStage = gameStatus.taoResStages[0];
         const originUser = gameStatus.users[curTaoResStage.originId];
@@ -106,19 +109,11 @@ const responseHandler = {
 
             if (validatedChainResponse) {
                 originUser.removeHandCards(response.cards);
+                resetHasWuxiePlayerIdsAndPushChainAfterAValidatedWuxie(gameStatus, response);
                 const newHasWuxiePlayers = getAllHasWuxieUsers(gameStatus);
-                gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds = newHasWuxiePlayers.map(u => u.userId);
-                gameStatus.wuxieSimultaneousResStage.wuxieChain.push({
-                    cards: response.cards,
-                    actualCard: response.actualCard,
-                    originId: response.originId,
-                    targetId: response.targetId,
-                    wuxieTargetCardId: response.wuxieTargetCardId,
-                });
-
                 if (newHasWuxiePlayers.length == 0) {
                     // 锦囊开始结算
-                    setGameStatusWhenScrollTakeEffectAndMakeSureNoBodyWantsPlayXuxie(gameStatus,"setStatusByWuxieResponse");
+                    setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, "setStatusByWuxieResponse");
                 } else {
                     // EMIT.FORCEWAIT()
                 }
@@ -128,7 +123,7 @@ const responseHandler = {
             gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds = newHasWuxiePlayersIds;
             if (newHasWuxiePlayersIds.length == 0) {
                 // 锦囊开始结算
-                setGameStatusWhenScrollTakeEffectAndMakeSureNoBodyWantsPlayXuxie(gameStatus,"setStatusByWuxieResponse")
+                setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, "setStatusByWuxieResponse")
             }
         }
 
@@ -136,7 +131,28 @@ const responseHandler = {
             // 延迟锦囊生效后 需要判断是不是从判定阶段到出牌阶段
             tryGoNextStage(gameStatus);
         }
-    }
+    },
+
+    setStatusByNanManOrWanJianResponse: (gameStatus, response) => {
+        const originUser = gameStatus.users[response.originId];
+
+        if (response?.actualCard) {
+            clearNextScrollStage(gameStatus);
+            originUser.removeHandCards(response.cards);
+        } else {
+            clearNextScrollStage(gameStatus);
+            originUser.reduceBlood();
+        }
+
+        if (gameStatus.scrollResStages.length > 0) {
+            const newHasWuxiePlayers = getAllHasWuxieUsers(gameStatus);
+            if (newHasWuxiePlayers.length == 0) {
+                setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, "setStatusByNanManResponse");
+            } else {
+                generateWuxieSimultaneousResStageByScroll(gameStatus)
+            }
+        }
+    },
 }
 
-exports.responseHandler = responseHandler;
+exports.responseCardHandler = responseCardHandler;

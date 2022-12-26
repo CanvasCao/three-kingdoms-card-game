@@ -21,7 +21,7 @@ const {
     tryGoNextStage,
 } = require("../utils/stageUtils");
 const {actionHandler} = require("../handler/actionHandler");
-const {responseHandler} = require("../handler/responseHandler");
+const {responseCardHandler} = require("../handler/responseHandler");
 const {throwHandler} = require("../handler/throwHandler");
 const {cardBoardHandler} = require("../handler/cardBoardHandler");
 
@@ -109,6 +109,12 @@ class GameEngine {
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
             actionHandler.setStatusByTaoYuanJieYiAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
+        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.CN) {
+            actionHandler.setStatusByNanManRuQinAction(this.gameStatus);
+            throwCards(this.gameStatus, action.cards);
+        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.CN) {
+            actionHandler.setStatusByWanJianQiFaAction(this.gameStatus);
+            throwCards(this.gameStatus, action.cards);
         }
 
         originUser.removeHandCards(action.cards);
@@ -126,12 +132,18 @@ class GameEngine {
         const needResponseTao = this.gameStatus.taoResStages.length > 0;
         const needResponseShan = this.gameStatus.shanResStages.length > 0;
 
+        const curScrollResStages = this.gameStatus.scrollResStages;
+        const needResponseNanMan = this.gameStatus.scrollResStages.length > 0 && curScrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.CN;
+        const needResponseWanJian = this.gameStatus.scrollResStages.length > 0 && curScrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.CN;
+
         if (needResponseWuxie) {
-            responseHandler.setStatusByWuxieResponse(this.gameStatus, response);
+            responseCardHandler.setStatusByWuxieResponse(this.gameStatus, response);
         } else if (needResponseTao) {
-            responseHandler.setStatusByTaoResponse(this.gameStatus, response);
+            responseCardHandler.setStatusByTaoResponse(this.gameStatus, response);
         } else if (needResponseShan) {
-            responseHandler.setStatusByShanResponse(this.gameStatus, response);
+            responseCardHandler.setStatusByShanResponse(this.gameStatus, response);
+        } else if (needResponseNanMan || needResponseWanJian) {
+            responseCardHandler.setStatusByNanManOrWanJianResponse(this.gameStatus, response);
         }
         emitRefreshStatus(this.gameStatus);
     }

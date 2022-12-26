@@ -40,7 +40,7 @@ const generateWuxieSimultaneousResStageByPandingCard = (gameStatus) => {
 }
 
 
-const setGameStatusWhenScrollTakeEffectAndMakeSureNoBodyWantsPlayXuxie = (gameStatus, from) => {
+const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (gameStatus, from) => {
     // console.log(from)
     if (gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds.length != 0) {
         throw new Error("还有人出无懈可击 不可以结算锦囊");
@@ -69,7 +69,13 @@ const setGameStatusWhenScrollTakeEffectAndMakeSureNoBodyWantsPlayXuxie = (gameSt
             if (curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
                 gameStatus.users[curScrollResStage.targetId].addBlood();
                 clearNextScrollStage(gameStatus);
-            } else {
+            } else if (curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.CN ||
+                curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.GUO_HE_CHAI_QIAO.CN
+            ) { // 顺 拆
+                curScrollResStage.isEffect = true;
+            } else if (curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.CN ||
+                curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.CN
+            ) {
                 curScrollResStage.isEffect = true;
             }
         } else {// 失效
@@ -78,17 +84,32 @@ const setGameStatusWhenScrollTakeEffectAndMakeSureNoBodyWantsPlayXuxie = (gameSt
     }
     clearWuxieResStage(gameStatus); // 生效后清空WuxieResStage
 
-    // 南蛮 万箭齐发 桃园结义 结算scrollResStage之后递归setGameStatusWhenScrollTakeEffectAndMakeSureNoBodyWantsPlayXuxie
-    if ((gameStatus.scrollResStages.length > 0)) {
+    // 桃园结义很特殊
+    // 因为clear scrollResStage之后 不用设置isEffect 直接加血 所以需要递归判断下一个用户
+    // 无中生有 只有一个目标 可以递归但是没必要
+    if ((gameStatus.scrollResStages.length > 0) && gameStatus.scrollResStages[0].CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
         const hasWuxiePlayers = getAllHasWuxieUsers(gameStatus)
         if (hasWuxiePlayers.length > 0) {
             generateWuxieSimultaneousResStageByScroll(gameStatus)
         } else { // 没人有无懈可击直接生效
-            setGameStatusWhenScrollTakeEffectAndMakeSureNoBodyWantsPlayXuxie(gameStatus, "TAO_YUAN_JIE_YI");
+            setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, "TAO_YUAN_JIE_YI");
         }
     }
 }
 
+const resetHasWuxiePlayerIdsAndPushChainAfterAValidatedWuxie = (gameStatus, response) => {
+    const newHasWuxiePlayers = getAllHasWuxieUsers(gameStatus);
+    gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds = newHasWuxiePlayers.map(u => u.userId);
+    gameStatus.wuxieSimultaneousResStage.wuxieChain.push({
+        cards: response.cards,
+        actualCard: response.actualCard,
+        originId: response.originId,
+        targetId: response.targetId,
+        wuxieTargetCardId: response.wuxieTargetCardId,
+    });
+}
+
 exports.generateWuxieSimultaneousResStageByScroll = generateWuxieSimultaneousResStageByScroll;
 exports.generateWuxieSimultaneousResStageByPandingCard = generateWuxieSimultaneousResStageByPandingCard;
-exports.setGameStatusWhenScrollTakeEffectAndMakeSureNoBodyWantsPlayXuxie = setGameStatusWhenScrollTakeEffectAndMakeSureNoBodyWantsPlayXuxie;
+exports.setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect;
+exports.resetHasWuxiePlayerIdsAndPushChainAfterAValidatedWuxie = resetHasWuxiePlayerIdsAndPushChainAfterAValidatedWuxie;

@@ -1,6 +1,9 @@
 const {EQUIPMENT_TYPE, SCROLL_CARDS_CONFIG} = require("../initCards")
-const {getAllHasWuxieUsers} = require("../utils/userUtils");
-const {generateWuxieSimultaneousResStageByScroll, setGameStatusWhenScrollTakeEffectAndMakeSureNoBodyWantsPlayXuxie} = require("../utils/wuxieUtils");
+const {getAllHasWuxieUsers, getCurrentUser} = require("../utils/userUtils");
+const {
+    generateWuxieSimultaneousResStageByScroll,
+    setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect
+} = require("../utils/wuxieUtils");
 const {v4: uuidv4} = require('uuid');
 
 const actionHandler = {
@@ -36,9 +39,16 @@ const actionHandler = {
     setStatusByTaoYuanJieYiAction(gameStatus) {
         actionHandler.setStatusByScrollAction(gameStatus);
     },
+    setStatusByNanManRuQinAction(gameStatus) {
+        actionHandler.setStatusByScrollAction(gameStatus);
+    },
+    setStatusByWanJianQiFaAction(gameStatus) {
+        actionHandler.setStatusByScrollAction(gameStatus);
+    },
     setStatusByScrollAction(gameStatus) {
         const action = gameStatus.action;
 
+        // TODO hardcode 只有顺和拆 桃园 originId targetId的值和action一样
         if (action.targetIds) {
             gameStatus.scrollResStages = action.targetIds.map((targetId) => {
                 return {
@@ -50,7 +60,6 @@ const actionHandler = {
                     stageId: uuidv4(), // 前端刷新Board的依据
                 }
             })
-
         } else if (action.targetId) {
             gameStatus.scrollResStages = [{
                 originId: action.originId,
@@ -75,13 +84,33 @@ const actionHandler = {
             } else {
                 return // 都满血直接return
             }
+        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.CN ||
+            action.actualCard.CN == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.CN) {
+            const currentUser = getCurrentUser(gameStatus);
+            const firstLocation = getCurrentUser(gameStatus).location;
+            const scrollResStages = []
+            for (let i = firstLocation; i < firstLocation + Object.keys(gameStatus.users).length; i++) {
+                const modLocation = i % Object.keys(gameStatus.users).length;
+                const user = Object.values(gameStatus.users).find((u) => u.location == modLocation);
+                if (!user.isDead && currentUser.userId !== user.userId) { // 除了第一个命中的 其他人都要进 tieSuoTempStorage
+                    scrollResStages.push({
+                        originId: user.userId,
+                        targetId: action.originId,
+                        cards: action.cards,
+                        actualCard: action.actualCard,
+                        isEffect: false,
+                        stageId: uuidv4(), // 前端刷新Board的依据
+                    })
+                }
+            }
+            gameStatus.scrollResStages = scrollResStages
         }
 
         const hasWuxiePlayers = getAllHasWuxieUsers(gameStatus)
         if (hasWuxiePlayers.length > 0) {
             generateWuxieSimultaneousResStageByScroll(gameStatus)
         } else { // 没人有无懈可击直接生效
-            setGameStatusWhenScrollTakeEffectAndMakeSureNoBodyWantsPlayXuxie(gameStatus);
+            setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus);
         }
     },
 

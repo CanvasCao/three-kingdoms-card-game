@@ -12,12 +12,12 @@ const generateTieSuoTempStorage = (gameStatus, firstAttributeDamageTargetUser, f
     for (let i = firstLocation; i < firstLocation + Object.keys(gameStatus.users).length; i++) {
         const modLocation = i % Object.keys(gameStatus.users).length;
         const user = Object.values(gameStatus.users).find((u) => u.location == modLocation);
-        if (user.isTieSuo && firstAttributeDamageTargetUser.userId !== user.userId) { // 除了第一个命中的 其他人都要进 tieSuoTempStorage
+        if (user.isTieSuo && !user.isDead && firstAttributeDamageTargetUser.userId !== user.userId) { // 除了第一个命中的 其他人都要进 tieSuoTempStorage
             let tempItem = {
                 damage,
                 targetId: user.userId,
             }
-            if (firstAttributeAction) {
+            if (firstAttributeAction) { // 如果杀是来源
                 tempItem = {
                     ...tempItem,
                     originId: firstAttributeAction.originId,
