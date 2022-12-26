@@ -1,4 +1,4 @@
-const {emitRefreshStatus} = require("../utils/utils");
+const {emitRefreshStatus} = require("../utils/emitUtils");
 const {throwCards} = require("../utils/cardUtils")
 const {clearNextScrollStage} = require("../utils/clearStageUtils")
 const cardBoardHandler = {

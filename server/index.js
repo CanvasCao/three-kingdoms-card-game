@@ -1,5 +1,5 @@
 // Setup basic express server
-const {emitInit} = require("./utils/utils");
+const {emitInit} = require("./utils/emitUtils");
 const {goToNextStage} = require("./utils/stageUtils");
 const {GameEngine} = require("./model/GameEngine");
 const emitMap = require("./config/emitMap.json");

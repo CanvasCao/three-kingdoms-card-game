@@ -1,6 +1,6 @@
 const {Card} = require("./model/Card");
 const {v4: uuidv4} = require('uuid');
-const {shuffle} = require('./utils/utils');
+const {shuffle} = require('./utils/emitUtils');
 
 const CARD_NUM_DESC = {
     1: "A",

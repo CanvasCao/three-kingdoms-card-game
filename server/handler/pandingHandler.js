@@ -1,6 +1,6 @@
 const {generateTieSuoTempStorageByShandian, setGameStatusByTieSuoTempStorage} = require("../utils/tieSuoUtils");
 const {isNil} = require("lodash");
-const {emitPandingPublicCard} = require("../utils/utils");
+const {emitPandingPublicCard} = require("../utils/emitUtils");
 const {getCurrentUser, getNextShandianUser} = require("../utils/userUtils");
 const {getNextNeedExecutePandingSign} = require("../utils/pandingUtils");
 const {DELAY_SCROLL_CARDS_CONFIG} = require("../initCards")

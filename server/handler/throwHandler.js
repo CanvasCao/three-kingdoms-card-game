@@ -1,4 +1,4 @@
-const {emitRefreshStatus} = require("../utils/utils");
+const {emitRefreshStatus} = require("../utils/emitUtils");
 const {getCurrentUser} = require("../utils/userUtils");
 const {throwCards} = require("../utils/cardUtils")
 const {goToNextStage} = require("../utils/stageUtils")

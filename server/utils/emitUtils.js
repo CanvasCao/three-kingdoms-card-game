@@ -20,10 +20,19 @@ const shuffle = (array) => {
 
 const generateBehaviorMessage = (behavior, users) => {
     // behaviour is action/response
-    const targetName = behavior.targetIds ? behavior.targetIds.map((targetId) => users[targetId].name).join(' ') : users[behavior.targetId].name
     const originName = users[behavior.originId].name;
 
-    return targetName ? `${originName}对${targetName}使用了${behavior.actualCard.CN}` : `${originName}使用了${behavior.actualCard.CN}`
+    if (!behavior.targetIds && !behavior.targetId) {
+        return `${originName}使用`
+    }
+
+    const targetName = behavior.targetIds ? behavior.targetIds.map((targetId) => users[targetId].name).join(' ') : users[behavior.targetId].name
+
+    if (targetName == originName) {
+        return `${originName}使用`
+    } else {
+        return `${originName}对${targetName}`//使用了${behavior.actualCard.CN}`
+    }
 }
 
 const emitBehaviorPublicPlayCard = (io, behaviour, gameStatus) => {
@@ -56,7 +65,7 @@ const emitCardBoardPublicPlayCard = (io, data, gameStatus) => {
 const emitPandingPublicCard = (gameStatus, pandingResultCard, user, pandingCard) => {
     gameStatus.io.emit(emitMap.PLAY_PUBLIC_CARD, {
         cards: [pandingResultCard],
-        message: `${user.name}的${pandingCard.CN}判定结果为${pandingResultCard.huase}${pandingResultCard.number}`
+        message: `${user.name}的${pandingCard.CN}判定结果`
     });
 }
 
@@ -81,7 +90,6 @@ const emitInit = (gameStatus) => {
 }
 
 exports.shuffle = shuffle;
-exports.generateBehaviorMessage = generateBehaviorMessage;
 exports.emitBehaviorPublicPlayCard = emitBehaviorPublicPlayCard;
 exports.emitCardBoardPublicPlayCard = emitCardBoardPublicPlayCard;
 exports.emitPandingPublicCard = emitPandingPublicCard;

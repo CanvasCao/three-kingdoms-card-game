@@ -10,7 +10,7 @@ const {
     emitInit,
     emitCardBoardPublicPlayCard,
     emitThrowPublicCard,
-} = require("../utils/utils");
+} = require("../utils/emitUtils");
 const {
     getCurrentUser,
 } = require("../utils/userUtils");
