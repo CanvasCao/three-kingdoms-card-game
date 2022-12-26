@@ -31,7 +31,7 @@ const BASIC_CARDS_CONFIG = {
         KEY: "SHA",
         "CN": "杀",
         "EN": "Strike",
-        type: CARD_TYPE.BASIC
+        type: CARD_TYPE.BASIC,
     },
     "LEI_SHA": {
         KEY: "LEI_SHA",
@@ -51,13 +51,13 @@ const BASIC_CARDS_CONFIG = {
         KEY: "SHAN",
         "CN": "闪",
         "EN": "Dodge",
-        type: CARD_TYPE.BASIC
+        type: CARD_TYPE.BASIC,
     },
     "TAO": {
         KEY: "TAO",
         "CN": "桃",
         "EN": "Peach",
-        type: CARD_TYPE.BASIC
+        type: CARD_TYPE.BASIC,
     },
 }
 
@@ -67,13 +67,13 @@ const IMMEDIATE_SCROLL_CARDS_CONFIG = {
         KEY: "WAN_JIAN_QI_FA",
         "CN": "万箭齐发",
         "EN": "Arrow Barrage",
-        type: CARD_TYPE.SCROLL
+        type: CARD_TYPE.SCROLL,
     },
     "NAN_MAN_RU_QIN": {
         KEY: "NAN_MAN_RU_QIN",
         "CN": "南蛮入侵",
         "EN": "Barbarian Invasion",
-        type: CARD_TYPE.SCROLL
+        type: CARD_TYPE.SCROLL,
     },
     "TAO_YUAN_JIE_YI": {
         KEY: "TAO_YUAN_JIE_YI",
@@ -122,6 +122,14 @@ const IMMEDIATE_SCROLL_CARDS_CONFIG = {
         "CN": "无懈可击",
         "EN": "Cancel",
         type: CARD_TYPE.SCROLL
+    },
+
+    // junzheng
+    "HUO_GONG": {
+        KEY: "HUO_GONG",
+        "CN": "火攻",
+        "EN": "Fire Attack",
+        type: CARD_TYPE.SCROLL,
     },
 }
 
@@ -500,18 +508,16 @@ let testCardMetaList = [
     // {'huase': '♠️️', number: 1, key: CARD_CONFIG.LEI_SHA.KEY},
     // {'huase': '♥️', number: 1, key: CARD_CONFIG.HUO_SHA.KEY},
     // {'huase': '♥️', number: 8, key: CARD_CONFIG.SHAN.KEY},
-    // {'huase': '♦️', number: 12, key: CARD_CONFIG.TAO.KEY},
-    // {'huase': '♦️', number: 12, key: CARD_CONFIG.TAO.KEY},
-    // {'huase': '♠️️', number: 2, key: CARD_CONFIG.BA_GUA_ZHEN.KEY},
-    // {'huase': '♦️', number: 13, key: CARD_CONFIG.ZHAO_HUANG_FEI_DIAN.KEY},
-    // {'huase': '♣️', number: 12, key: CARD_CONFIG.ZHANG_BA_SHE_MAO.KEY},
-    // {'huase': '♣️', number: 13, key: CARD_CONFIG.DA_WAN.KEY},
-    // {'huase': '♣️', number: 1, key: CARD_CONFIG.ZHU_GE_LIAN_NU.KEY},
-    // {'huase': '♠️️', number: 1, key: CARD_CONFIG.SHAN_DIAN.KEY},
-    // {'huase': '♦️', number: 6, key: CARD_CONFIG.LE_BU_SI_SHU.KEY},
+    {'huase': '♦️', number: 12, key: CARD_CONFIG.TAO.KEY},
+    {'huase': '♦️', number: 12, key: CARD_CONFIG.TAO.KEY},
+    {'huase': '♠️️', number: 2, key: CARD_CONFIG.BA_GUA_ZHEN.KEY},
+    {'huase': '♦️', number: 13, key: CARD_CONFIG.ZHAO_HUANG_FEI_DIAN.KEY},
+    {'huase': '♣️', number: 12, key: CARD_CONFIG.ZHANG_BA_SHE_MAO.KEY},
+    {'huase': '♣️', number: 13, key: CARD_CONFIG.DA_WAN.KEY},
+    {'huase': '♣️', number: 1, key: CARD_CONFIG.ZHU_GE_LIAN_NU.KEY},
+    {'huase': '♠️️', number: 1, key: CARD_CONFIG.SHAN_DIAN.KEY},
+    {'huase': '♦️', number: 6, key: CARD_CONFIG.LE_BU_SI_SHU.KEY},
     {'huase': '♦️', number: 12, key: CARD_CONFIG.GUO_HE_CHAI_QIAO.KEY},
-    {'huase': '♦️', number: 12, key: CARD_CONFIG.GUO_HE_CHAI_QIAO.KEY},
-    {'huase': '♦️', number: 12, key: CARD_CONFIG.SHUN_SHOU_QIAN_YANG.KEY},
     {'huase': '♦️', number: 12, key: CARD_CONFIG.SHUN_SHOU_QIAN_YANG.KEY},
     {'huase': '♠️️', number: 13, key: CARD_CONFIG.WU_XIE_KE_JI.KEY},
     // {'huase': '♦️', number: 11, key: CARD_CONFIG.WU_ZHONG_SHENG_YOU.KEY},
@@ -523,8 +529,12 @@ const getInitCards = () => {
     const shuffled = shuffle(metaList);
 
     return shuffled.map(card => {
-        card = {...card, ...CARD_CONFIG[card.key], cardId: uuidv4()}
-        card.cardNumDesc = CARD_NUM_DESC[card.number] ? CARD_NUM_DESC[card.number] : card.number;
+        card = {
+            ...card,
+            ...CARD_CONFIG[card.key],
+            cardId: uuidv4(),
+            cardNumDesc: CARD_NUM_DESC[card.number] ? CARD_NUM_DESC[card.number] : card.number,
+        }
         return new Card(card);
     })
 }
