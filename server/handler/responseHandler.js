@@ -1,4 +1,4 @@
-const {setGameStatusWhenScrollTakeEffect} = require("../utils/wuxieUtils");
+const {setGameStatusWhenScrollTakeEffectAndMakeSureNoBodyWantsPlayXuxie} = require("../utils/wuxieUtils");
 const {
     generateTieSuoTempStorageByShaAction,
     setGameStatusByTieSuoTempStorage
@@ -118,7 +118,7 @@ const responseHandler = {
 
                 if (newHasWuxiePlayers.length == 0) {
                     // 锦囊开始结算
-                    setGameStatusWhenScrollTakeEffect(gameStatus);
+                    setGameStatusWhenScrollTakeEffectAndMakeSureNoBodyWantsPlayXuxie(gameStatus,"setStatusByWuxieResponse");
                 } else {
                     // EMIT.FORCEWAIT()
                 }
@@ -128,7 +128,7 @@ const responseHandler = {
             gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds = newHasWuxiePlayersIds;
             if (newHasWuxiePlayersIds.length == 0) {
                 // 锦囊开始结算
-                setGameStatusWhenScrollTakeEffect(gameStatus)
+                setGameStatusWhenScrollTakeEffectAndMakeSureNoBodyWantsPlayXuxie(gameStatus,"setStatusByWuxieResponse")
             }
         }
 

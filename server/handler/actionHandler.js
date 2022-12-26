@@ -1,6 +1,6 @@
-const {EQUIPMENT_TYPE} = require("../initCards")
-const {getCurrentUser, getAllHasWuxieUsers} = require("../utils/userUtils");
-const {generateWuxieSimultaneousResStageByScroll, setGameStatusWhenScrollTakeEffect} = require("../utils/wuxieUtils");
+const {EQUIPMENT_TYPE, SCROLL_CARDS_CONFIG} = require("../initCards")
+const {getAllHasWuxieUsers} = require("../utils/userUtils");
+const {generateWuxieSimultaneousResStageByScroll, setGameStatusWhenScrollTakeEffectAndMakeSureNoBodyWantsPlayXuxie} = require("../utils/wuxieUtils");
 const {v4: uuidv4} = require('uuid');
 
 const actionHandler = {
@@ -25,60 +25,63 @@ const actionHandler = {
 
     // SCROLL
     setStatusByWuZhongShengYouAction(gameStatus) {
-        const action = gameStatus.action;
-        gameStatus.scrollResStages = [{
-            originId: action.originId,
-            targetId: action.targetId,
-            cards: action.cards,
-            actualCard: action.actualCard,
-            isEffect: false,
-        }]
-        const hasWuxiePlayers = getAllHasWuxieUsers(gameStatus)
-
-        if (hasWuxiePlayers.length > 0) {
-            generateWuxieSimultaneousResStageByScroll(gameStatus)
-        } else { // 没人有无懈可击直接生效
-            setGameStatusWhenScrollTakeEffect(gameStatus);
-        }
+        actionHandler.setStatusByScrollAction(gameStatus);
     },
     setStatusByGuoHeChaiQiaoAction(gameStatus) {
-        const action = gameStatus.action;
-        gameStatus.scrollResStages = action.targetIds.map((targetId) => {
-            return {
-                originId: action.originId,
-                targetId: targetId,
-                cards: action.cards,
-                actualCard: action.actualCard,
-                isEffect: false,
-                stageId: uuidv4(), // 前端刷新Board的依据
-            }
-        })
-
-        const hasWuxiePlayers = getAllHasWuxieUsers(gameStatus)
-        if (hasWuxiePlayers.length > 0) {
-            generateWuxieSimultaneousResStageByScroll(gameStatus)
-        } else { // 没人有无懈可击直接生效
-            setGameStatusWhenScrollTakeEffect(gameStatus);
-        }
+        actionHandler.setStatusByScrollAction(gameStatus);
     },
     setStatusByShunShouQianYangAction(gameStatus) {
+        actionHandler.setStatusByScrollAction(gameStatus);
+    },
+    setStatusByTaoYuanJieYiAction(gameStatus) {
+        actionHandler.setStatusByScrollAction(gameStatus);
+    },
+    setStatusByScrollAction(gameStatus) {
         const action = gameStatus.action;
-        gameStatus.scrollResStages = action.targetIds.map((targetId) => {
-            return {
+
+        if (action.targetIds) {
+            gameStatus.scrollResStages = action.targetIds.map((targetId) => {
+                return {
+                    originId: action.originId,
+                    targetId: targetId,
+                    cards: action.cards,
+                    actualCard: action.actualCard,
+                    isEffect: false,
+                    stageId: uuidv4(), // 前端刷新Board的依据
+                }
+            })
+
+        } else if (action.targetId) {
+            gameStatus.scrollResStages = [{
                 originId: action.originId,
-                targetId: targetId,
+                targetId: action.targetId,
                 cards: action.cards,
                 actualCard: action.actualCard,
                 isEffect: false,
-                stageId: uuidv4(), // 前端刷新Board的依据
+            }]
+        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
+            const targetIds = Object.values(gameStatus.users).filter((u) => u.currentBlood < u.maxBlood).map((u) => u.userId);
+            if (targetIds.length) {
+                gameStatus.scrollResStages = targetIds.map((targetId) => {
+                    return {
+                        originId: action.originId,
+                        targetId: targetId,
+                        cards: action.cards,
+                        actualCard: action.actualCard,
+                        isEffect: false,
+                        stageId: uuidv4(), // 前端刷新Board的依据
+                    }
+                })
+            } else {
+                return // 都满血直接return
             }
-        })
+        }
 
         const hasWuxiePlayers = getAllHasWuxieUsers(gameStatus)
         if (hasWuxiePlayers.length > 0) {
             generateWuxieSimultaneousResStageByScroll(gameStatus)
         } else { // 没人有无懈可击直接生效
-            setGameStatusWhenScrollTakeEffect(gameStatus);
+            setGameStatusWhenScrollTakeEffectAndMakeSureNoBodyWantsPlayXuxie(gameStatus);
         }
     },
 

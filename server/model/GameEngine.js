@@ -106,7 +106,11 @@ class GameEngine {
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.CN) {
             actionHandler.setStatusByShunShouQianYangAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
+        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
+            actionHandler.setStatusByTaoYuanJieYiAction(this.gameStatus);
+            throwCards(this.gameStatus, action.cards);
         }
+
         originUser.removeHandCards(action.cards);
         emitRefreshStatus(this.gameStatus);
     }
