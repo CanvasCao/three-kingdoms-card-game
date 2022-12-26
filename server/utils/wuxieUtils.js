@@ -1,5 +1,5 @@
 const {getNextNeedExecutePandingSign} = require("./pandingUtils");
-const {DELAY_SCROLL_CARDS_CONFIG} = require("../initCards");
+const {SCROLL_CARDS_CONFIG} = require("../initCards");
 const {getAllHasWuxieUsers, getCurrentUser} = require("./userUtils");
 const {clearNextScrollStage, clearWuxieResStage} = require("./clearStageUtils");
 

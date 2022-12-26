@@ -1,6 +1,7 @@
 const {EQUIPMENT_TYPE} = require("../initCards")
 const {getCurrentUser, getAllHasWuxieUsers} = require("../utils/userUtils");
 const {generateWuxieSimultaneousResStageByScroll, setGameStatusWhenScrollTakeEffect} = require("../utils/wuxieUtils");
+const {v4: uuidv4} = require('uuid');
 
 const actionHandler = {
     // BASIC
@@ -24,7 +25,6 @@ const actionHandler = {
 
     // SCROLL
     setStatusByWuZhongShengYouAction(gameStatus) {
-        const currentUser = getCurrentUser(gameStatus);
         const action = gameStatus.action;
         gameStatus.scrollResStages = [{
             originId: action.originId,
@@ -42,15 +42,18 @@ const actionHandler = {
         }
     },
     setStatusByGuoHeChaiQiaoAction(gameStatus) {
-        const currentUser = getCurrentUser(gameStatus);
         const action = gameStatus.action;
-        gameStatus.scrollResStages = [{
-            originId: action.originId,
-            targetId: action.targetId,
-            cards: action.cards,
-            actualCard: action.actualCard,
-            isEffect: false,
-        }]
+        gameStatus.scrollResStages = action.targetIds.map((targetId) => {
+            return {
+                originId: action.originId,
+                targetId: targetId,
+                cards: action.cards,
+                actualCard: action.actualCard,
+                isEffect: false,
+                stageId: uuidv4(), // 前端刷新Board的依据
+            }
+        })
+
         const hasWuxiePlayers = getAllHasWuxieUsers(gameStatus)
 
         if (hasWuxiePlayers.length > 0) {

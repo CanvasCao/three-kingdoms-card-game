@@ -71,6 +71,7 @@ class GameEngine {
         this.gameStatus.action = action;
         const originUser = this.gameStatus.users[action.originId];
 
+        // BASIC
         if ([BASIC_CARDS_CONFIG.SHA.CN,
             BASIC_CARDS_CONFIG.LEI_SHA.CN,
             BASIC_CARDS_CONFIG.HUO_SHA.CN].includes(action.actualCard.CN)
@@ -80,15 +81,24 @@ class GameEngine {
         } else if (action.actualCard.CN == BASIC_CARDS_CONFIG.TAO.CN) {
             actionHandler.setStatusByTaoAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
-        } else if (CARD_TYPE.EQUIPMENT == action.actualCard.type) {
+        }
+        // Equipment
+        else if (CARD_TYPE.EQUIPMENT == action.actualCard.type) {
             actionHandler.setStatusByEquipmentAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
-        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.SHAN_DIAN.CN) {
+        }
+        // DELAY
+        else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.SHAN_DIAN.CN) {
             actionHandler.setStatusByShanDianAction(this.gameStatus, this.gameStatus);
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.LE_BU_SI_SHU.CN) {
             actionHandler.setStatusByLeBuSiShuAction(this.gameStatus, this.gameStatus);
-        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.CN) {
+        }
+        // SCROLL
+        else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.CN) {
             actionHandler.setStatusByWuZhongShengYouAction(this.gameStatus);
+            throwCards(this.gameStatus, action.cards);
+        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.GUO_HE_CHAI_QIAO.CN) {
+            actionHandler.setStatusByGuoHeChaiQiaoAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
         }
         originUser.removeCards(action.cards);
