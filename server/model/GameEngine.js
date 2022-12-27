@@ -118,6 +118,9 @@ class GameEngine {
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.JUE_DOU.CN) {
             actionHandler.setStatusByJueDouAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
+        }else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.CN) {
+            actionHandler.setStatusByJieDaoShaRenAction(this.gameStatus);
+            throwCards(this.gameStatus, action.cards);
         }
 
         originUser.removeHandCards(action.cards);
@@ -140,6 +143,9 @@ class GameEngine {
         const needResponseWanJian = this.gameStatus.scrollResStages.length > 0 && curScrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.CN;
         const needResponseJueDou = this.gameStatus.scrollResStages.length > 0 && curScrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.JUE_DOU.CN;
 
+        // 只是响应是否出杀
+        const needResponseJieDao = this.gameStatus.scrollResStages.length > 0 && curScrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.CN;
+
         if (needResponseWuxie) {
             responseCardHandler.setStatusByWuxieResponse(this.gameStatus, response);
         } else if (needResponseTao) {
@@ -150,6 +156,8 @@ class GameEngine {
             responseCardHandler.setStatusByNanManOrWanJianResponse(this.gameStatus, response);
         } else if (needResponseJueDou) {
             responseCardHandler.setStatusByJueDouResponse(this.gameStatus, response);
+        }else if (needResponseJieDao) {
+            responseCardHandler.setStatusByJieDaoResponse(this.gameStatus, response);
         }
         emitRefreshStatus(this.gameStatus);
     }

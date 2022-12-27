@@ -60,6 +60,7 @@ const generateTieSuoTempStorageByShandian = (gameStatus) => {
     generateTieSuoTempStorage(gameStatus, getCurrentUser(gameStatus), null, 3);
 }
 
+// TODO 任何响应时候都执行setGameStatusByTieSuoTempStorage
 // 一个角色掉血的时候 其他铁锁连环角色受到伤害
 // 1.一个角色求桃后死亡
 // 2.一个角色求桃后复活

@@ -1,3 +1,4 @@
+const {cloneDeep} = require("lodash");
 const {
     setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect,
     resetHasWuxiePlayerIdsAndPushChainAfterValidatedWuxie
@@ -10,7 +11,7 @@ const {clearNextShanStage, clearNextTaoStage, clearNextScrollStage} = require(".
 const {BASIC_CARDS_CONFIG, SCROLL_CARDS_CONFIG} = require("../initCards")
 const {throwCards} = require("../utils/cardUtils")
 const {tryGoNextStage} = require("../utils/stageUtils")
-const {getAllHasWuxieUsers} = require("../utils/userUtils")
+const {getAllHasWuxieUsers, getCurrentUser} = require("../utils/userUtils")
 const {dieHandler} = require("../handler/dieHandler")
 
 const responseCardHandler = {
@@ -171,6 +172,31 @@ const responseCardHandler = {
 
             clearNextScrollStage(gameStatus);
         }
+    },
+
+    setStatusByJieDaoResponse: (gameStatus, response) => {
+        if (response?.actualCard) { // 出杀 A=>B A出杀 B响应闪
+            const curScrollResStage = gameStatus.scrollResStages[0];
+            const AUser = gameStatus.users[curScrollResStage.originId]
+            const BUser = gameStatus.users[curScrollResStage.targetId]
+            gameStatus.users[AUser.userId].removeHandCards(response.cards);
+            gameStatus.shanResStages = [{
+                originId: BUser.userId,
+                targetId: AUser.userId,
+                cardNumber: 1,
+            }]
+        } else {
+            // TODO 如果没有杀 自动不出
+            // 不出杀 A=>B A不出 A把刀给当前用户
+            const curScrollResStage = gameStatus.scrollResStages[0];
+            const AUser = gameStatus.users[curScrollResStage.originId]
+            const currentUser = getCurrentUser(gameStatus);
+
+            const weaponCard = cloneDeep(AUser.weaponCard);
+            AUser.removeCards(weaponCard)
+            currentUser.addCards(weaponCard)
+        }
+        clearNextScrollStage(gameStatus);
     }
 }
 

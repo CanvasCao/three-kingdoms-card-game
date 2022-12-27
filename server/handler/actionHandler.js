@@ -48,21 +48,42 @@ const actionHandler = {
     setStatusByJueDouAction(gameStatus) {
         actionHandler.setStatusByScrollAction(gameStatus);
     },
+    setStatusByJieDaoShaRenAction(gameStatus) {
+        actionHandler.setStatusByScrollAction(gameStatus);
+    },
     setStatusByScrollAction(gameStatus) {
         const action = gameStatus.action;
 
         // TODO hardcode 只有顺和拆 桃园 originId targetId的值和action一样
         if (action.targetIds) {
-            gameStatus.scrollResStages = action.targetIds.map((targetId) => {
-                return {
-                    originId: action.originId,
-                    targetId: targetId,
+            if (action.actualCard.CN == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.CN ||
+                action.actualCard.CN == SCROLL_CARDS_CONFIG.GUO_HE_CHAI_QIAO.CN) {
+                gameStatus.scrollResStages = action.targetIds.map((targetId) => {
+                    return {
+                        originId: action.originId,
+                        targetId: targetId,
+                        cards: action.cards,
+                        actualCard: action.actualCard,
+                        isEffect: false,
+                        stageId: uuidv4(), // 前端刷新Board的依据
+                    }
+                })
+            } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.CN) {
+                // 是否出杀
+                // 1.是
+                // 1.1 响应闪
+                // 1.2 不响应闪
+                // 2.不出 移动刀
+                gameStatus.scrollResStages = [{
+                    originId: action.targetIds[0],
+                    targetId: action.targetIds[1],
                     cards: action.cards,
                     actualCard: action.actualCard,
                     isEffect: false,
-                    stageId: uuidv4(), // 前端刷新Board的依据
-                }
-            })
+
+                    agreeJieDao: undefined,
+                }]
+            }
         } else if (action.targetId) {
             if (action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.CN) {
                 gameStatus.scrollResStages = [{
@@ -82,6 +103,7 @@ const actionHandler = {
                 }]
             }
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
+            // TODO 桃园结义
             const targetIds = Object.values(gameStatus.users).filter((u) => u.currentBlood < u.maxBlood).map((u) => u.userId);
             if (targetIds.length) {
                 gameStatus.scrollResStages = targetIds.map((targetId) => {
@@ -104,7 +126,7 @@ const actionHandler = {
             for (let i = firstLocation; i < firstLocation + Object.keys(gameStatus.users).length; i++) {
                 const modLocation = i % Object.keys(gameStatus.users).length;
                 const user = Object.values(gameStatus.users).find((u) => u.location == modLocation);
-                if (!user.isDead && currentUser.userId !== user.userId) { // 除了第一个命中的 其他人都要进 tieSuoTempStorage
+                if (!user.isDead && currentUser.userId !== user.userId) {
                     scrollResStages.push({
                         originId: user.userId,
                         targetId: action.originId,

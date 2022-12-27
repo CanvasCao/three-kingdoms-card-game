@@ -65,8 +65,7 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
             if (curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.CN) {
                 getCurrentUser(gameStatus).addCards(getCards(gameStatus, 2));
                 clearNextScrollStage(gameStatus);
-            }
-            if (curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
+            } else if (curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
                 gameStatus.users[curScrollResStage.targetId].addBlood();
                 clearNextScrollStage(gameStatus);
             } else if (curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.CN ||
@@ -77,7 +76,12 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
                 curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.CN
             ) {
                 curScrollResStage.isEffect = true;
+            } else if (curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.CN) {
+                curScrollResStage.isEffect = true;
+            } else if (curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.JUE_DOU.CN) {
+                curScrollResStage.isEffect = true;
             }
+
         } else {// 失效
             clearNextScrollStage(gameStatus);
         }

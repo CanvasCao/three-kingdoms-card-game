@@ -1,4 +1,5 @@
 const {differenceBy} = require("lodash/array");
+const {v4: uuidv4} = require('uuid');
 
 class User {
     constructor(user, generateNewRoundQiuTaoResponseStages) {
@@ -14,7 +15,30 @@ class User {
 
         // pandingSigns
         this.pandingSigns = [];
-        this.weaponCard = null;
+        this.weaponCard = {
+            "huase": "♣️",
+            "number": 1,
+            "key": "ZHU_GE_LIAN_NU",
+            "KEY": "ZHU_GE_LIAN_NU",
+            "cardId": uuidv4(),
+            "cardNumDesc": "A",
+            "CN": "诸葛连弩",
+            "EN": "Crossbow",
+            "type": "EQUIPMENT",
+            "equipmentType": "WEAPON",
+            "distance": 1,
+            "distanceDesc": "一",
+            "canClickMySelfAsFirstTarget": false,
+            "canClickMySelfAsSecondTarget": false,
+            "canPlayInMyTurn": true,
+            "targetMinMax": {
+                "min": 0,
+                "max": 0
+            },
+            "noNeedSetTargetDueToImDefaultTarget": true
+        };
+
+
         this.shieldCard = null;
         this.plusHorseCard = null;
         this.minusHorseCard = null;
