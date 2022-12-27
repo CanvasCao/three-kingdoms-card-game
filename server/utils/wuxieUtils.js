@@ -97,7 +97,7 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
     }
 }
 
-const resetHasWuxiePlayerIdsAndPushChainAfterAValidatedWuxie = (gameStatus, response) => {
+const resetHasWuxiePlayerIdsAndPushChainAfterValidatedWuxie = (gameStatus, response) => {
     const newHasWuxiePlayers = getAllHasWuxieUsers(gameStatus);
     gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds = newHasWuxiePlayers.map(u => u.userId);
     gameStatus.wuxieSimultaneousResStage.wuxieChain.push({
@@ -112,4 +112,4 @@ const resetHasWuxiePlayerIdsAndPushChainAfterAValidatedWuxie = (gameStatus, resp
 exports.generateWuxieSimultaneousResStageByScroll = generateWuxieSimultaneousResStageByScroll;
 exports.generateWuxieSimultaneousResStageByPandingCard = generateWuxieSimultaneousResStageByPandingCard;
 exports.setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect;
-exports.resetHasWuxiePlayerIdsAndPushChainAfterAValidatedWuxie = resetHasWuxiePlayerIdsAndPushChainAfterAValidatedWuxie;
+exports.resetHasWuxiePlayerIdsAndPushChainAfterValidatedWuxie = resetHasWuxiePlayerIdsAndPushChainAfterValidatedWuxie;

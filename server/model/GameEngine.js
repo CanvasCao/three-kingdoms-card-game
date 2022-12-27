@@ -115,6 +115,9 @@ class GameEngine {
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.CN) {
             actionHandler.setStatusByWanJianQiFaAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
+        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.JUE_DOU.CN) {
+            actionHandler.setStatusByJueDouAction(this.gameStatus);
+            throwCards(this.gameStatus, action.cards);
         }
 
         originUser.removeHandCards(action.cards);
@@ -135,6 +138,7 @@ class GameEngine {
         const curScrollResStages = this.gameStatus.scrollResStages;
         const needResponseNanMan = this.gameStatus.scrollResStages.length > 0 && curScrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.CN;
         const needResponseWanJian = this.gameStatus.scrollResStages.length > 0 && curScrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.CN;
+        const needResponseJueDou = this.gameStatus.scrollResStages.length > 0 && curScrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.JUE_DOU.CN;
 
         if (needResponseWuxie) {
             responseCardHandler.setStatusByWuxieResponse(this.gameStatus, response);
@@ -144,6 +148,8 @@ class GameEngine {
             responseCardHandler.setStatusByShanResponse(this.gameStatus, response);
         } else if (needResponseNanMan || needResponseWanJian) {
             responseCardHandler.setStatusByNanManOrWanJianResponse(this.gameStatus, response);
+        } else if (needResponseJueDou) {
+            responseCardHandler.setStatusByJueDouResponse(this.gameStatus, response);
         }
         emitRefreshStatus(this.gameStatus);
     }

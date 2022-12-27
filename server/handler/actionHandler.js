@@ -45,6 +45,9 @@ const actionHandler = {
     setStatusByWanJianQiFaAction(gameStatus) {
         actionHandler.setStatusByScrollAction(gameStatus);
     },
+    setStatusByJueDouAction(gameStatus) {
+        actionHandler.setStatusByScrollAction(gameStatus);
+    },
     setStatusByScrollAction(gameStatus) {
         const action = gameStatus.action;
 
@@ -61,13 +64,23 @@ const actionHandler = {
                 }
             })
         } else if (action.targetId) {
-            gameStatus.scrollResStages = [{
-                originId: action.originId,
-                targetId: action.targetId,
-                cards: action.cards,
-                actualCard: action.actualCard,
-                isEffect: false,
-            }]
+            if (action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.CN) {
+                gameStatus.scrollResStages = [{
+                    originId: action.originId,
+                    targetId: action.targetId,
+                    cards: action.cards,
+                    actualCard: action.actualCard,
+                    isEffect: false,
+                }]
+            } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.JUE_DOU.CN) { // 决斗originId targetId的值相反
+                gameStatus.scrollResStages = [{
+                    originId: action.targetId,
+                    targetId: action.originId,
+                    cards: action.cards,
+                    actualCard: action.actualCard,
+                    isEffect: false,
+                }]
+            }
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
             const targetIds = Object.values(gameStatus.users).filter((u) => u.currentBlood < u.maxBlood).map((u) => u.userId);
             if (targetIds.length) {
@@ -78,7 +91,6 @@ const actionHandler = {
                         cards: action.cards,
                         actualCard: action.actualCard,
                         isEffect: false,
-                        stageId: uuidv4(), // 前端刷新Board的依据
                     }
                 })
             } else {
@@ -99,7 +111,6 @@ const actionHandler = {
                         cards: action.cards,
                         actualCard: action.actualCard,
                         isEffect: false,
-                        stageId: uuidv4(), // 前端刷新Board的依据
                     })
                 }
             }

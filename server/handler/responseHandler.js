@@ -1,6 +1,6 @@
 const {
     setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect,
-    resetHasWuxiePlayerIdsAndPushChainAfterAValidatedWuxie
+    resetHasWuxiePlayerIdsAndPushChainAfterValidatedWuxie
 } = require("../utils/wuxieUtils");
 const {
     generateTieSuoTempStorageByShaAction,
@@ -109,7 +109,7 @@ const responseCardHandler = {
 
             if (validatedChainResponse) {
                 originUser.removeHandCards(response.cards);
-                resetHasWuxiePlayerIdsAndPushChainAfterAValidatedWuxie(gameStatus, response);
+                resetHasWuxiePlayerIdsAndPushChainAfterValidatedWuxie(gameStatus, response);
                 const newHasWuxiePlayers = getAllHasWuxieUsers(gameStatus);
                 if (newHasWuxiePlayers.length == 0) {
                     // 锦囊开始结算
@@ -127,6 +127,7 @@ const responseCardHandler = {
             }
         }
 
+        // TODO tryGoNextStage能不能放在handler？
         if (gameStatus.stage.stageName == "judge") {
             // 延迟锦囊生效后 需要判断是不是从判定阶段到出牌阶段
             tryGoNextStage(gameStatus);
@@ -153,6 +154,24 @@ const responseCardHandler = {
             }
         }
     },
+
+    setStatusByJueDouResponse: (gameStatus, response) => {
+        if (response?.actualCard) {
+            const curScrollResStage = gameStatus.scrollResStages[0];
+            gameStatus.users[curScrollResStage.originId].removeHandCards(response.cards);
+
+            // 决斗出杀之后 需要互换目标
+            const oriTargetId = curScrollResStage.targetId;
+            const oriOriginId = curScrollResStage.originId;
+            curScrollResStage.targetId = oriOriginId;
+            curScrollResStage.originId = oriTargetId;
+        } else {
+            const curScrollResStage = gameStatus.scrollResStages[0];
+            gameStatus.users[curScrollResStage.originId].reduceBlood();
+
+            clearNextScrollStage(gameStatus);
+        }
+    }
 }
 
 exports.responseCardHandler = responseCardHandler;
