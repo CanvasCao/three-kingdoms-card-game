@@ -43,7 +43,7 @@ const emitBehaviorPublicPlayCard = (io, behaviour, gameStatus) => {
     // behaviour is action/response
     if (behaviour.cards?.[0]) {
         io.emit(emitMap.PLAY_PUBLIC_CARD, {
-            cards: behaviour.cards,
+            behaviour: behaviour,
             message: generateBehaviorMessage(behaviour, gameStatus.users)
         });
     }
