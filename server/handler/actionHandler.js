@@ -49,6 +49,40 @@ const actionHandler = {
         actionHandler.setStatusByScrollAction(gameStatus);
     },
     setStatusByJieDaoShaRenAction(gameStatus) {
+        // action={
+        //     origin:C,
+        //     targetIds:[A,B],
+        //     isEffect:false,
+        // }
+        // scrollResStages=[{
+        //     originId: A,
+        //     targetId: B,
+        //     isEffect:false,
+        // }]
+
+        // 1.失效
+        // scrollResStages=[]
+        //
+        // 2.生效
+        // scrollResStages=[{
+        //     originId: A,
+        //     targetId: B,
+        //     isEffect:true,
+        // }]
+        //
+        // 2.1 出杀
+        // scrollResStages=[]
+        // shanResStages = [{
+        //     originId: B,
+        //     targetId: A,
+        //     cardNumber: 1,
+        // }]
+        //
+        // 2.2 不出杀
+        // scrollResStages=[]
+        // A remove weapon
+        // CurrentUser add weapon
+
         actionHandler.setStatusByScrollAction(gameStatus);
     },
     setStatusByScrollAction(gameStatus) {
@@ -69,19 +103,12 @@ const actionHandler = {
                     }
                 })
             } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.CN) {
-                // 是否出杀
-                // 1.是
-                // 1.1 响应闪
-                // 1.2 不响应闪
-                // 2.不出 移动刀
                 gameStatus.scrollResStages = [{
                     originId: action.targetIds[0],
                     targetId: action.targetIds[1],
                     cards: action.cards,
                     actualCard: action.actualCard,
                     isEffect: false,
-
-                    agreeJieDao: undefined,
                 }]
             }
         } else if (action.targetId) {
