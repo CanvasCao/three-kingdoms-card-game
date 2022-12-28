@@ -8,5 +8,6 @@
   "THROW": "throw",
 
   "CARD_BOARD_ACTION": "card_board_action",
-  "PLAY_PUBLIC_CARD": "play_public_card"
+  "PLAY_BEHAVIOR_PUBLIC_CARD": "play_behavior_public_card",
+  "PLAY_NON_BEHAVIOR_PUBLIC_CARD": "play_non_behavior_public_card"
 }

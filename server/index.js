@@ -29,6 +29,7 @@ const gameEngine = new GameEngine(io);
 
 io.on('connection', (socket) => {
     let addedUser = false;
+    let location = 0;
 
     socket.on(emitMap.INIT, (data) => {
         // data { userId: '22c3d181-5d60-4283-a4ce-6f2b14d772bc' }
@@ -47,7 +48,7 @@ io.on('connection', (socket) => {
             cardId: "SHU001",
             name: "刘备",
             userId: data.userId,
-            location: 0
+            location: location++
         }, gameEngine.generateNewRoundQiuTaoResponseStages.bind(gameEngine));
         gameEngine.gameStatus.users[newUser.userId] = newUser;
 
@@ -55,23 +56,22 @@ io.on('connection', (socket) => {
             cardId: "SHU002",
             name: "关羽",
             userId: 'user2',
-            location: 1
+            location: location++
         }, gameEngine.generateNewRoundQiuTaoResponseStages.bind(gameEngine));
         if (gameEngine.gameStatus.users[newUser2.userId]) {
             throw new Error("user2 id already exist")
         }
         gameEngine.gameStatus.users[newUser2.userId] = newUser2;
 
-        const newUser3 = new User({
-            cardId: "SHU003",
-            name: "张飞",
-            userId: 'user3',
-            location: 2
-        }, gameEngine.generateNewRoundQiuTaoResponseStages.bind(gameEngine));
-        if (gameEngine.gameStatus.users[newUser3.userId]) {
-            throw new Error("user3 id already exist")
+        for (i = 0; i < 6; i++) {
+            const newUser = new User({
+                cardId: "SHU003",
+                name: "张飞",
+                userId: 'user' + (i + 3),
+                location: location++
+            }, gameEngine.generateNewRoundQiuTaoResponseStages.bind(gameEngine));
+            gameEngine.gameStatus.users[newUser.userId] = newUser;
         }
-        // gameEngine.gameStatus.users[newUser3.userId] = newUser3;
 
         addedUser = true;
 

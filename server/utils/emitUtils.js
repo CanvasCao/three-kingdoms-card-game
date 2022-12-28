@@ -42,7 +42,7 @@ const emitBehaviorPublicPlayCard = (io, behaviour, gameStatus) => {
 
     // behaviour is action/response
     if (behaviour.cards?.[0]) {
-        io.emit(emitMap.PLAY_PUBLIC_CARD, {
+        io.emit(emitMap.PLAY_BEHAVIOR_PUBLIC_CARD, {
             behaviour: behaviour,
             message: generateBehaviorMessage(behaviour, gameStatus.users)
         });
@@ -56,21 +56,21 @@ const emitCardBoardPublicPlayCard = (io, data, gameStatus) => {
     //     card: Card,
     //     type: "REMOVE" | "MOVE",
     // }
-    io.emit(emitMap.PLAY_PUBLIC_CARD, {
+    io.emit(emitMap.PLAY_NON_BEHAVIOR_PUBLIC_CARD, {
         cards: [data.card],
         message: `${gameStatus.users[data.targetId].name} 被 ${data.type == "REMOVE" ? "拆" : "顺"}`
     });
 
 }
 const emitPandingPublicCard = (gameStatus, pandingResultCard, user, pandingCard) => {
-    gameStatus.io.emit(emitMap.PLAY_PUBLIC_CARD, {
+    gameStatus.io.emit(emitMap.PLAY_NON_BEHAVIOR_PUBLIC_CARD, {
         cards: [pandingResultCard],
         message: `${user.name}的${pandingCard.CN}判定结果`
     });
 }
 
 const emitThrowPublicCard = (gameStatus, cards, user) => {
-    gameStatus.io.emit(emitMap.PLAY_PUBLIC_CARD, {
+    gameStatus.io.emit(emitMap.PLAY_NON_BEHAVIOR_PUBLIC_CARD, {
         cards: cards,
         message: `${user.name}弃牌`
     });
