@@ -16,7 +16,7 @@ const io = require('socket.io')(server, {
     },
 });
 const port = process.env.PORT || 3000;
-const {User} = require('./model/User.js')
+const {Player} = require('./model/Player.js')
 
 server.listen(port, () => {
     console.log('Server listening at port %d', port);
@@ -28,52 +28,52 @@ app.use(express.static(path.join(__dirname, '../client')));
 const gameEngine = new GameEngine(io);
 
 io.on('connection', (socket) => {
-    let addedUser = false;
+    let addedPlayer = false;
     let location = 0;
 
     socket.on(emitMap.INIT, (data) => {
-        // data { userId: '22c3d181-5d60-4283-a4ce-6f2b14d772bc' }
-        if (Object.keys(gameEngine.gameStatus.users).length >= 2) {
+        // data { playerId: '22c3d181-5d60-4283-a4ce-6f2b14d772bc' }
+        if (Object.keys(gameEngine.gameStatus.players).length >= 2) {
             emitInit(gameEngine.gameStatus)
             return;
         }
 
-        if (addedUser) {
+        if (addedPlayer) {
             emitInit(gameEngine.gameStatus)
             return;
         }
 
         // hardcode 只有两个角色
-        const newUser = new User({
+        const newPlayer = new Player({
             cardId: "SHU001",
             name: "刘备",
-            userId: data.userId,
+            playerId: data.playerId,
             location: location++
         }, gameEngine.generateNewRoundQiuTaoResponseStages.bind(gameEngine));
-        gameEngine.gameStatus.users[newUser.userId] = newUser;
+        gameEngine.gameStatus.players[newPlayer.playerId] = newPlayer;
 
-        const newUser2 = new User({
+        const newPlayer2 = new Player({
             cardId: "SHU002",
             name: "关羽",
-            userId: 'user2',
+            playerId: 'player2',
             location: location++
         }, gameEngine.generateNewRoundQiuTaoResponseStages.bind(gameEngine));
-        if (gameEngine.gameStatus.users[newUser2.userId]) {
-            throw new Error("user2 id already exist")
+        if (gameEngine.gameStatus.players[newPlayer2.playerId]) {
+            throw new Error("player2 id already exist")
         }
-        gameEngine.gameStatus.users[newUser2.userId] = newUser2;
+        gameEngine.gameStatus.players[newPlayer2.playerId] = newPlayer2;
 
         for (i = 0; i < 6; i++) {
-            const newUser = new User({
+            const newPlayer = new Player({
                 cardId: "SHU003",
                 name: "张飞",
-                userId: 'user' + (i + 3),
+                playerId: 'player' + (i + 3),
                 location: location++
             }, gameEngine.generateNewRoundQiuTaoResponseStages.bind(gameEngine));
-            gameEngine.gameStatus.users[newUser.userId] = newUser;
+            gameEngine.gameStatus.players[newPlayer.playerId] = newPlayer;
         }
 
-        addedUser = true;
+        addedPlayer = true;
 
         // startEngine
         gameEngine.startEngine();

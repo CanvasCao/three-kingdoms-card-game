@@ -1,6 +1,6 @@
 import { StageCard } from "../Card/StageCards/StageCard";
 import { Game, Stage } from "../Game/Game";
-import { User } from "../User/User";
+import { Player } from "../Player/Player";
 
 
 export class Event {
@@ -8,10 +8,10 @@ export class Event {
     objected?: boolean;
     objectable?: boolean;
     objectionCards?: StageCard[];
-    targets?: User[];
+    targets?: Player[];
     shouldTrigger?(): void;
-    effect?(users?: User[]):void
-    constructor(game: Game, targets?: User[]) {
+    effect?(players?: Player[]):void
+    constructor(game: Game, targets?: Player[]) {
         this.game = game;
     }
     start?() {

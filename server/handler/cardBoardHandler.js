@@ -4,11 +4,11 @@ const {clearNextScrollStage} = require("../utils/clearStageUtils")
 const cardBoardHandler = {
     handleCardBoard(gameStatus, data) {
         const {card, originId, targetId, type} = data;
-        gameStatus.users[targetId].removeCards(card);
+        gameStatus.players[targetId].removeCards(card);
         if (type == "REMOVE") {
             throwCards(gameStatus, card);
         } else if (type == "MOVE") {
-            gameStatus.users[originId].addCards(card);
+            gameStatus.players[originId].addCards(card);
         }
         clearNextScrollStage(gameStatus)
         emitRefreshStatus(gameStatus);

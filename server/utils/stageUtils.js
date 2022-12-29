@@ -1,7 +1,7 @@
 const {isNil} = require("lodash");
 const {pandingHandler} = require("../handler/pandingHandler");
 const {emitRefreshStatus} = require("./emitUtils");
-const {getCurrentUser, getAllHasWuxieUsers} = require("./userUtils");
+const {getCurrentPlayer, getAllHasWuxiePlayers} = require("./playerUtils");
 const {setCurrentLocationToNextLocation} = require("./locationUtils");
 const {generateWuxieSimultaneousResStageByPandingCard} = require("./wuxieUtils");
 const {clearWuxieResStage} = require("./clearStageUtils");
@@ -13,15 +13,15 @@ const goToNextStage = (gameStatus) => {
     gameStatus.stageIndex++;
     if (gameStatus.stageIndex >= stageConfig.stageNamesEN.length) {
         // 当前用户结束
-        getCurrentUser(gameStatus).resetWhenMyTurnEnds();
+        getCurrentPlayer(gameStatus).resetWhenMyTurnEnds();
 
         // 下一个用户开始
         gameStatus.stageIndex = 0;
         setCurrentLocationToNextLocation(gameStatus);
-        getCurrentUser(gameStatus).resetWhenMyTurnStarts();
+        getCurrentPlayer(gameStatus).resetWhenMyTurnStarts();
     }
     gameStatus.stage = {
-        userId: getCurrentUser(gameStatus).userId,
+        playerId: getCurrentPlayer(gameStatus).playerId,
         stageName: stageConfig.stageNamesEN[gameStatus.stageIndex],
         stageNameCN: stageConfig.stageNamesCN[gameStatus.stageIndex]
     }
@@ -40,7 +40,7 @@ const tryGoNextStage = (gameStatus) => {
         return
     }
 
-    const user = getCurrentUser(gameStatus);
+    const player = getCurrentPlayer(gameStatus);
     if (gameStatus.stage.stageName == 'start') {
         goToNextStage(gameStatus);
     } else if (gameStatus.stage.stageName == 'judge') {
@@ -48,7 +48,7 @@ const tryGoNextStage = (gameStatus) => {
         if (!nextNeedPandingSign) {
             goToNextStage(gameStatus);
         } else if (isNil(nextNeedPandingSign.isEffect)) { // 有未生效的判定 需要无懈可击
-            const hasWuxiePlayers = getAllHasWuxieUsers(gameStatus)
+            const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
             if (hasWuxiePlayers.length > 0) {
                 generateWuxieSimultaneousResStageByPandingCard(gameStatus)
             } else {
@@ -60,14 +60,14 @@ const tryGoNextStage = (gameStatus) => {
             tryGoNextStage(gameStatus);// 如果还有别的判定牌会再一次回到这里
         }
     } else if (gameStatus.stage.stageName == 'draw') {
-        user.addCards(getCards(gameStatus, 2))
+        player.addCards(getCards(gameStatus, 2))
         goToNextStage(gameStatus);
     } else if (gameStatus.stage.stageName == 'play') {
-        if (user.skipPlay) {
+        if (player.skipPlay) {
             goToNextStage(gameStatus);
         }
     } else if (gameStatus.stage.stageName == 'throw') {
-        if (!user.needThrow()) {
+        if (!player.needThrow()) {
             goToNextStage(gameStatus);
         }
     } else if (gameStatus.stage.stageName == 'end') {

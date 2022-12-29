@@ -1,5 +1,5 @@
 const {EQUIPMENT_TYPE, SCROLL_CARDS_CONFIG} = require("../initCards")
-const {getAllHasWuxieUsers, getCurrentUser} = require("../utils/userUtils");
+const {getAllHasWuxiePlayers, getCurrentPlayer} = require("../utils/playerUtils");
 const {
     generateWuxieSimultaneousResStageByScroll,
     setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect
@@ -10,6 +10,10 @@ const actionHandler = {
     // BASIC
     setStatusByShaAction: (gameStatus) => {
         const action = gameStatus.action;
+
+        gameStatus = reducer(action.type = sha, gameStatus)
+
+        //reducer
         gameStatus.shanResStages = action.targetIds.map((targetId) => {
             return {
                 originId: targetId,
@@ -17,12 +21,14 @@ const actionHandler = {
                 cardNumber: 1,
             }
         })
+        gameStatus.zhiling = [action];
+
     },
     setStatusByTaoAction: (gameStatus) => {
         const action = gameStatus.action;
-        const originUser = gameStatus.users[action.originId]
-        if (originUser.currentBlood < originUser.maxBlood) {
-            originUser.addBlood();
+        const originPlayer = gameStatus.players[action.originId]
+        if (originPlayer.currentBlood < originPlayer.maxBlood) {
+            originPlayer.addBlood();
         }
     },
 
@@ -81,7 +87,7 @@ const actionHandler = {
         // 2.2 不出杀
         // scrollResStages=[]
         // A remove weapon
-        // CurrentUser add weapon
+        // CurrentPlayer add weapon
 
         actionHandler.setStatusByScrollAction(gameStatus);
     },
@@ -131,7 +137,7 @@ const actionHandler = {
             }
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
             // TODO 桃园结义
-            const targetIds = Object.values(gameStatus.users).filter((u) => u.currentBlood < u.maxBlood).map((u) => u.userId);
+            const targetIds = Object.values(gameStatus.players).filter((u) => u.currentBlood < u.maxBlood).map((u) => u.playerId);
             if (targetIds.length) {
                 gameStatus.scrollResStages = targetIds.map((targetId) => {
                     return {
@@ -147,15 +153,15 @@ const actionHandler = {
             }
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.CN ||
             action.actualCard.CN == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.CN) {
-            const currentUser = getCurrentUser(gameStatus);
-            const firstLocation = getCurrentUser(gameStatus).location;
+            const currentPlayer = getCurrentPlayer(gameStatus);
+            const firstLocation = getCurrentPlayer(gameStatus).location;
             const scrollResStages = []
-            for (let i = firstLocation; i < firstLocation + Object.keys(gameStatus.users).length; i++) {
-                const modLocation = i % Object.keys(gameStatus.users).length;
-                const user = Object.values(gameStatus.users).find((u) => u.location == modLocation);
-                if (!user.isDead && currentUser.userId !== user.userId) {
+            for (let i = firstLocation; i < firstLocation + Object.keys(gameStatus.players).length; i++) {
+                const modLocation = i % Object.keys(gameStatus.players).length;
+                const player = Object.values(gameStatus.players).find((u) => u.location == modLocation);
+                if (!player.isDead && currentPlayer.playerId !== player.playerId) {
                     scrollResStages.push({
-                        originId: user.userId,
+                        originId: player.playerId,
                         targetId: action.originId,
                         cards: action.cards,
                         actualCard: action.actualCard,
@@ -166,7 +172,7 @@ const actionHandler = {
             gameStatus.scrollResStages = scrollResStages
         }
 
-        const hasWuxiePlayers = getAllHasWuxieUsers(gameStatus)
+        const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
         if (hasWuxiePlayers.length > 0) {
             generateWuxieSimultaneousResStageByScroll(gameStatus)
         } else { // 没人有无懈可击直接生效
@@ -177,16 +183,16 @@ const actionHandler = {
     // DELAY
     setStatusByLeBuSiShuAction: (gameStatus) => {
         const action = gameStatus.action;
-        const targetUser = gameStatus.users[action.targetId]
-        targetUser.pandingSigns.push({
+        const targetPlayer = gameStatus.players[action.targetId]
+        targetPlayer.pandingSigns.push({
             card: action.cards[0],
             actualCard: action.actualCard,
         });
     },
     setStatusByShanDianAction: (gameStatus) => {
         const action = gameStatus.action;
-        const originUser = gameStatus.users[action.originId]
-        originUser.pandingSigns.push({
+        const originPlayer = gameStatus.players[action.originId]
+        originPlayer.pandingSigns.push({
             card: action.cards[0],
             actualCard: action.actualCard,
         });
@@ -195,17 +201,17 @@ const actionHandler = {
     // Equipment
     setStatusByEquipmentAction: (gameStatus) => {
         const action = gameStatus.action;
-        const originUser = gameStatus.users[action.originId]
+        const originPlayer = gameStatus.players[action.originId]
 
         const equipmentType = action.actualCard.equipmentType;
         if (equipmentType == EQUIPMENT_TYPE.PLUS_HORSE) {
-            originUser.plusHorseCard = action.actualCard;
+            originPlayer.plusHorseCard = action.actualCard;
         } else if (equipmentType == EQUIPMENT_TYPE.MINUS_HORSE) {
-            originUser.minusHorseCard = action.actualCard;
+            originPlayer.minusHorseCard = action.actualCard;
         } else if (equipmentType == EQUIPMENT_TYPE.WEAPON) {
-            originUser.weaponCard = action.actualCard;
+            originPlayer.weaponCard = action.actualCard;
         } else if (equipmentType == EQUIPMENT_TYPE.SHIELD) {
-            originUser.shieldCard = action.actualCard;
+            originPlayer.shieldCard = action.actualCard;
         }
     },
 }

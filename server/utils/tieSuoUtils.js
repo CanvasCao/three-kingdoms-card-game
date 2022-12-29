@@ -1,21 +1,21 @@
-const {getCurrentUser} = require("./userUtils");
+const {getCurrentPlayer} = require("./playerUtils");
 
 const resetTieSuo = (gameStatus) => {
-    Object.values(gameStatus.users).forEach((user) => {
-        user.isTieSuo = false;
+    Object.values(gameStatus.players).forEach((player) => {
+        player.isTieSuo = false;
     })
 }
 
-const generateTieSuoTempStorage = (gameStatus, firstAttributeDamageTargetUser, firstAttributeAction, damage) => {
-    const firstLocation = firstAttributeDamageTargetUser.location;
+const generateTieSuoTempStorage = (gameStatus, firstAttributeDamageTargetPlayer, firstAttributeAction, damage) => {
+    const firstLocation = firstAttributeDamageTargetPlayer.location;
     const tieSuoTempStorage = []
-    for (let i = firstLocation; i < firstLocation + Object.keys(gameStatus.users).length; i++) {
-        const modLocation = i % Object.keys(gameStatus.users).length;
-        const user = Object.values(gameStatus.users).find((u) => u.location == modLocation);
-        if (user.isTieSuo && !user.isDead && firstAttributeDamageTargetUser.userId !== user.userId) { // 除了第一个命中的 其他人都要进 tieSuoTempStorage
+    for (let i = firstLocation; i < firstLocation + Object.keys(gameStatus.players).length; i++) {
+        const modLocation = i % Object.keys(gameStatus.players).length;
+        const player = Object.values(gameStatus.players).find((u) => u.location == modLocation);
+        if (player.isTieSuo && !player.isDead && firstAttributeDamageTargetPlayer.playerId !== player.playerId) { // 除了第一个命中的 其他人都要进 tieSuoTempStorage
             let tempItem = {
                 damage,
-                targetId: user.userId,
+                targetId: player.playerId,
             }
             if (firstAttributeAction) { // 如果杀是来源
                 tempItem = {
@@ -42,8 +42,8 @@ const generateTieSuoTempStorageByShaAction = (gameStatus) => {
     }
 
     const firstAttributeAction = action.targetIds.find((targetId) => {
-        const targetUser = gameStatus.users[targetId];
-        return targetUser.isTieSuo;
+        const targetPlayer = gameStatus.players[targetId];
+        return targetPlayer.isTieSuo;
     })
 
     // 没有任何人是铁锁状态
@@ -51,13 +51,13 @@ const generateTieSuoTempStorageByShaAction = (gameStatus) => {
         return
     }
 
-    const firstAttributeActionTargetUserId = firstAttributeAction.targetId;
-    const firstAttributeActionTargetUser = gameStatus.users[firstAttributeActionTargetUserId]
-    generateTieSuoTempStorage(gameStatus, firstAttributeActionTargetUser, firstAttributeAction, 1);
+    const firstAttributeActionTargetPlayerId = firstAttributeAction.targetId;
+    const firstAttributeActionTargetPlayer = gameStatus.players[firstAttributeActionTargetPlayerId]
+    generateTieSuoTempStorage(gameStatus, firstAttributeActionTargetPlayer, firstAttributeAction, 1);
 }
 
 const generateTieSuoTempStorageByShandian = (gameStatus) => {
-    generateTieSuoTempStorage(gameStatus, getCurrentUser(gameStatus), null, 3);
+    generateTieSuoTempStorage(gameStatus, getCurrentPlayer(gameStatus), null, 3);
 }
 
 // TODO 任何响应时候都执行setGameStatusByTieSuoTempStorage
@@ -73,8 +73,8 @@ const setGameStatusByTieSuoTempStorage = (gameStatus) => {
 
     const nextTieSuoAction = gameStatus.tieSuoTempStorage[0];
 
-    const targetUser = gameStatus.users[nextTieSuoAction.targetId];
-    targetUser.reduceBlood(nextTieSuoAction.damage);
+    const targetPlayer = gameStatus.players[nextTieSuoAction.targetId];
+    targetPlayer.reduceBlood(nextTieSuoAction.damage);
     gameStatus.tieSuoTempStorage.shift();
 }
 

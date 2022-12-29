@@ -1,6 +1,6 @@
 import { Tao } from "../Card/StageCards/MagicCards/Tao";
 import { Game } from "../Game/Game";
-import { User } from "../User/User";
+import { Player } from "../Player/Player";
 import { Event } from "./Event";
 
 export class QiuTao extends Event {
@@ -8,10 +8,10 @@ export class QiuTao extends Event {
     objected = false;
     objectable = true;
     objectionCards: [Tao];
-    targets?: User[] | undefined;
+    targets?: Player[] | undefined;
     shouldTrigger() {
-        return this.game.users.some((user) => {
-            return user.currentBlood === 0;
+        return this.game.players.some((player) => {
+            return player.currentBlood === 0;
         })
     }
     effect() {

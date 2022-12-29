@@ -1,11 +1,11 @@
 const {emitRefreshStatus} = require("../utils/emitUtils");
-const {getCurrentUser} = require("../utils/userUtils");
+const {getCurrentPlayer} = require("../utils/playerUtils");
 const {throwCards} = require("../utils/cardUtils")
 const {goToNextStage} = require("../utils/stageUtils")
 const throwHandler = {
     handleThrowCards(gameStatus, data) {
         const cards = data.cards;
-        getCurrentUser(gameStatus).removeHandCards(cards);
+        getCurrentPlayer(gameStatus).removeHandCards(cards);
         throwCards(gameStatus, cards);
 
         emitRefreshStatus(gameStatus);

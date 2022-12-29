@@ -12,8 +12,8 @@ const {
     emitThrowPublicCard,
 } = require("../utils/emitUtils");
 const {
-    getCurrentUser,
-} = require("../utils/userUtils");
+    getCurrentPlayer,
+} = require("../utils/playerUtils");
 const {
     throwCards
 } = require("../utils/cardUtils");
@@ -33,7 +33,7 @@ class GameEngine {
         this.io = io;
 
         this.gameStatus = {
-            users: {},
+            players: {},
             stage: {},
             action: {},
 
@@ -61,7 +61,7 @@ class GameEngine {
 
     startEngine() {
         this.gameStatus.stage = {
-            userId: getCurrentUser(this.gameStatus).userId,
+            playerId: getCurrentPlayer(this.gameStatus).playerId,
             stageName: stageConfig.stageNamesEN[this.gameStatus.stageIndex]
         }
         emitInit(this.gameStatus);
@@ -72,7 +72,7 @@ class GameEngine {
     handleAction(action) {
         emitBehaviorPublicPlayCard(this.io, action, this.gameStatus);
         this.gameStatus.action = action;
-        const originUser = this.gameStatus.users[action.originId];
+        const originPlayer = this.gameStatus.players[action.originId];
 
         // BASIC
         if ([BASIC_CARDS_CONFIG.SHA.CN,
@@ -118,12 +118,12 @@ class GameEngine {
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.JUE_DOU.CN) {
             actionHandler.setStatusByJueDouAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
-        }else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.CN) {
+        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.CN) {
             actionHandler.setStatusByJieDaoShaRenAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
         }
 
-        originUser.removeHandCards(action.cards);
+        originPlayer.removeHandCards(action.cards);
         emitRefreshStatus(this.gameStatus);
     }
 
@@ -156,7 +156,7 @@ class GameEngine {
             responseCardHandler.setStatusByNanManOrWanJianResponse(this.gameStatus, response);
         } else if (needResponseJueDou) {
             responseCardHandler.setStatusByJueDouResponse(this.gameStatus, response);
-        }else if (needResponseJieDao) {
+        } else if (needResponseJieDao) {
             responseCardHandler.setStatusByJieDaoResponse(this.gameStatus, response);
         }
         emitRefreshStatus(this.gameStatus);
@@ -164,7 +164,7 @@ class GameEngine {
 
     // throw action
     handleThrowCards(data) {
-        emitThrowPublicCard(this.gameStatus, data.cards, getCurrentUser(this.gameStatus));
+        emitThrowPublicCard(this.gameStatus, data.cards, getCurrentPlayer(this.gameStatus));
         throwHandler.handleThrowCards(this.gameStatus, data)
     }
 
@@ -174,23 +174,23 @@ class GameEngine {
     }
 
     // 任意角色blood<=0时
-    generateNewRoundQiuTaoResponseStages(qiutaoTargetUser) {
-        if (qiutaoTargetUser.currentBlood > 0) {
+    generateNewRoundQiuTaoResponseStages(qiutaoTargetPlayer) {
+        if (qiutaoTargetPlayer.currentBlood > 0) {
             throw new Error("Don't need TAO")
         }
 
         const taoResStages = [];
 
-        for (let i = this.gameStatus.currentLocation; i < this.gameStatus.currentLocation + Object.keys(this.gameStatus.users).length; i++) {
-            const modLocation = i % Object.keys(this.gameStatus.users).length;
-            const user = Object.values(this.gameStatus.users).find((u) => u.location == modLocation);
-            if (user.isDead) {
+        for (let i = this.gameStatus.currentLocation; i < this.gameStatus.currentLocation + Object.keys(this.gameStatus.players).length; i++) {
+            const modLocation = i % Object.keys(this.gameStatus.players).length;
+            const player = Object.values(this.gameStatus.players).find((u) => u.location == modLocation);
+            if (player.isDead) {
 
             } else {
                 taoResStages.push({
-                    originId: user.userId,
-                    targetId: qiutaoTargetUser.userId,
-                    cardNumber: 1 - qiutaoTargetUser.currentBlood,
+                    originId: player.playerId,
+                    targetId: qiutaoTargetPlayer.playerId,
+                    cardNumber: 1 - qiutaoTargetPlayer.currentBlood,
                 })
             }
         }

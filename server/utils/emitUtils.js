@@ -18,15 +18,15 @@ const shuffle = (array) => {
     return array;
 }
 
-const generateBehaviorMessage = (behavior, users) => {
+const generateBehaviorMessage = (behavior, players) => {
     // behaviour is action/response
-    const originName = users[behavior.originId].name;
+    const originName = players[behavior.originId].name;
 
     if (!behavior.targetIds && !behavior.targetId) {
         return `${originName}使用`
     }
 
-    const targetName = behavior.targetIds ? behavior.targetIds.map((targetId) => users[targetId].name).join(' ') : users[behavior.targetId].name
+    const targetName = behavior.targetIds ? behavior.targetIds.map((targetId) => players[targetId].name).join(' ') : players[behavior.targetId].name
 
     if (targetName == originName) {
         return `${originName}使用`
@@ -44,7 +44,7 @@ const emitBehaviorPublicPlayCard = (io, behaviour, gameStatus) => {
     if (behaviour.cards?.[0]) {
         io.emit(emitMap.PLAY_BEHAVIOR_PUBLIC_CARD, {
             behaviour: behaviour,
-            message: generateBehaviorMessage(behaviour, gameStatus.users)
+            message: generateBehaviorMessage(behaviour, gameStatus.players)
         });
     }
 }
@@ -58,21 +58,21 @@ const emitCardBoardPublicPlayCard = (io, data, gameStatus) => {
     // }
     io.emit(emitMap.PLAY_NON_BEHAVIOR_PUBLIC_CARD, {
         cards: [data.card],
-        message: `${gameStatus.users[data.targetId].name} 被 ${data.type == "REMOVE" ? "拆" : "顺"}`
+        message: `${gameStatus.players[data.targetId].name} 被 ${data.type == "REMOVE" ? "拆" : "顺"}`
     });
 
 }
-const emitPandingPublicCard = (gameStatus, pandingResultCard, user, pandingCard) => {
+const emitPandingPublicCard = (gameStatus, pandingResultCard, player, pandingCard) => {
     gameStatus.io.emit(emitMap.PLAY_NON_BEHAVIOR_PUBLIC_CARD, {
         cards: [pandingResultCard],
-        message: `${user.name}的${pandingCard.CN}判定结果`
+        message: `${player.name}的${pandingCard.CN}判定结果`
     });
 }
 
-const emitThrowPublicCard = (gameStatus, cards, user) => {
+const emitThrowPublicCard = (gameStatus, cards, player) => {
     gameStatus.io.emit(emitMap.PLAY_NON_BEHAVIOR_PUBLIC_CARD, {
         cards: cards,
-        message: `${user.name}弃牌`
+        message: `${player.name}弃牌`
     });
 }
 

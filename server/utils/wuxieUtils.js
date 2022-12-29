@@ -1,17 +1,17 @@
 const {getNextNeedExecutePandingSign} = require("./pandingUtils");
 const {SCROLL_CARDS_CONFIG} = require("../initCards");
-const {getAllHasWuxieUsers, getCurrentUser} = require("./userUtils");
+const {getAllHasWuxiePlayers, getCurrentPlayer} = require("./playerUtils");
 const {getCards} = require("./cardUtils");
 const {clearNextScrollStage, clearWuxieResStage} = require("./clearStageUtils");
 
 const generateWuxieSimultaneousResStageByScroll = (gameStatus) => {
     const action = gameStatus.action;
-    const hasWuxiePlayers = getAllHasWuxieUsers(gameStatus);
+    const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus);
     if (hasWuxiePlayers.length <= 0) {
         throw Error("没有人有无懈可击 不需要生成wuxieSimultaneousResStage")
     }
     gameStatus.wuxieSimultaneousResStage = {
-        hasWuxiePlayerIds: hasWuxiePlayers.map((u) => u.userId),
+        hasWuxiePlayerIds: hasWuxiePlayers.map((u) => u.playerId),
         wuxieChain: [{
             originId: action.originId,
             targetId: action.targetId,
@@ -22,17 +22,17 @@ const generateWuxieSimultaneousResStageByScroll = (gameStatus) => {
 }
 
 const generateWuxieSimultaneousResStageByPandingCard = (gameStatus) => {
-    const currentUser = getCurrentUser(gameStatus);
+    const currentPlayer = getCurrentPlayer(gameStatus);
     const nextPandingSign = getNextNeedExecutePandingSign(gameStatus);
-    const hasWuxiePlayers = getAllHasWuxieUsers(gameStatus);
+    const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus);
     if (hasWuxiePlayers.length <= 0) {
         throw Error("没有人有无懈可击 不需要生成wuxieSimultaneousResStage")
     }
     gameStatus.wuxieSimultaneousResStage = {
-        hasWuxiePlayerIds: hasWuxiePlayers.map((u) => u.userId),
+        hasWuxiePlayerIds: hasWuxiePlayers.map((u) => u.playerId),
         wuxieChain: [{
-            originId: currentUser.userId, // 判定的来源和目标都是自己
-            targetId: currentUser.userId,
+            originId: currentPlayer.playerId, // 判定的来源和目标都是自己
+            targetId: currentPlayer.playerId,
             cards: [nextPandingSign.card],
             actualCard: nextPandingSign.actualCard
         }]
@@ -63,10 +63,10 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
         const curScrollResStage = gameStatus.scrollResStages[0]
         if (isScrollEffected) {// 生效
             if (curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.CN) {
-                getCurrentUser(gameStatus).addCards(getCards(gameStatus, 2));
+                getCurrentPlayer(gameStatus).addCards(getCards(gameStatus, 2));
                 clearNextScrollStage(gameStatus);
             } else if (curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
-                gameStatus.users[curScrollResStage.targetId].addBlood();
+                gameStatus.players[curScrollResStage.targetId].addBlood();
                 clearNextScrollStage(gameStatus);
             } else if (curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.CN ||
                 curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.GUO_HE_CHAI_QIAO.CN
@@ -92,7 +92,7 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
     // 因为clear scrollResStage之后 不用设置isEffect 直接加血 所以需要递归判断下一个用户
     // 无中生有 只有一个目标 可以递归但是没必要
     if ((gameStatus.scrollResStages.length > 0) && gameStatus.scrollResStages[0].CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
-        const hasWuxiePlayers = getAllHasWuxieUsers(gameStatus)
+        const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
         if (hasWuxiePlayers.length > 0) {
             generateWuxieSimultaneousResStageByScroll(gameStatus)
         } else { // 没人有无懈可击直接生效
@@ -102,8 +102,8 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
 }
 
 const resetHasWuxiePlayerIdsAndPushChainAfterValidatedWuxie = (gameStatus, response) => {
-    const newHasWuxiePlayers = getAllHasWuxieUsers(gameStatus);
-    gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds = newHasWuxiePlayers.map(u => u.userId);
+    const newHasWuxiePlayers = getAllHasWuxiePlayers(gameStatus);
+    gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds = newHasWuxiePlayers.map(u => u.playerId);
     gameStatus.wuxieSimultaneousResStage.wuxieChain.push({
         cards: response.cards,
         actualCard: response.actualCard,

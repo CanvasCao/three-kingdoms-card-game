@@ -1,12 +1,12 @@
-import { User } from "../../../User/User";
+import { Player } from "../../../Player/Player";
 import { MagicCard } from "./MagicCard";
 
 export class Tao implements MagicCard {
     name = "Tao"
     nameCN = "桃"
-    effect(users?: User[]) {
-        users?.forEach((user) => {
-            user.currentBlood ++;
+    effect(players?: Player[]) {
+        players?.forEach((player) => {
+            player.currentBlood ++;
         })
     }
 }

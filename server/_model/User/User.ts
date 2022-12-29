@@ -5,7 +5,7 @@ import { StageCard } from "../Card/StageCards/StageCard";
 import { Game } from "../Game/Game";
 import { Role } from "../Role/Role";
 
-export class User {
+export class Player {
     game: Game;
     id: string;
     location: number;
@@ -29,7 +29,7 @@ export class User {
         this.stageCards.push(...cards);
     }
 
-    useCard(card: StageCard, targets: User[]) {
+    useCard(card: StageCard, targets: Player[]) {
         card.targets = targets;
         this.game.tableCard = card;
         this.stageCards = differenceBy(this.stageCards, [card], 'cardId');
@@ -54,4 +54,4 @@ export class User {
 
 }
 
-exports.User = User;
+exports.Player = Player;

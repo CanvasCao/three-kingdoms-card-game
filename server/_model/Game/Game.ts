@@ -1,7 +1,7 @@
 import { StageCard } from "../Card/StageCards/StageCard";
 import { Event } from "../Event/Event";
 import { QiuTao } from "../Event/QiuTao";
-import { User } from "../User/User";
+import { Player } from "../Player/Player";
 
 export enum Stage {
     USER, // 当前轮的用户可出牌的阶段
@@ -10,10 +10,10 @@ export enum Stage {
 }
 
 export class Game {
-    users: User[] = [];
+    players: Player[] = [];
     round: number = 0;
     currentLocation: number = 0;
-    currentUser: User;
+    currentPlayer: Player;
     cards: StageCard[] = [];
     _tableCard: StageCard;
     throwedCards: StageCard[] = [];
@@ -60,8 +60,8 @@ export class Game {
     goToNextRound() {
         this.round ++;
         this.currentLocation ++;
-        this.currentUser = this.users[this.currentLocation];
-        this.currentUser.pandingCards?.forEach(card => {
+        this.currentPlayer = this.players[this.currentLocation];
+        this.currentPlayer.pandingCards?.forEach(card => {
             card.effect?.();
         });
     }
@@ -69,10 +69,10 @@ export class Game {
     judgement() {
         if (this.tableCard.targets) {
             while(this.tableCard.targets.length > 0) {
-                this.currentUser = this.tableCard.targets[0];
+                this.currentPlayer = this.tableCard.targets[0];
             }
         } else {
-            this.tableCard.effect?.(this.users);
+            this.tableCard.effect?.(this.players);
         }
     }
 

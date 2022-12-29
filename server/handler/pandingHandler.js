@@ -1,27 +1,27 @@
 const {generateTieSuoTempStorageByShandian, setGameStatusByTieSuoTempStorage} = require("../utils/tieSuoUtils");
 const {isNil} = require("lodash");
 const {emitPandingPublicCard} = require("../utils/emitUtils");
-const {getCurrentUser, getNextShandianUser} = require("../utils/userUtils");
+const {getCurrentPlayer, getNextShandianPlayer} = require("../utils/playerUtils");
 const {getNextNeedExecutePandingSign} = require("../utils/pandingUtils");
 const {DELAY_SCROLL_CARDS_CONFIG} = require("../initCards")
 const {getCards, throwCards} = require("../utils/cardUtils")
 
-const moveShandianToNextUser = (gameStatus, sign) => {
-    const currentUser = getCurrentUser(gameStatus);
-    const nextUser = getNextShandianUser(gameStatus);
+const moveShandianToNextPlayer = (gameStatus, sign) => {
+    const currentPlayer = getCurrentPlayer(gameStatus);
+    const nextPlayer = getNextShandianPlayer(gameStatus);
 
     sign.isEffect = true;
     // isEffect的清空在resetWhenMyTurnStarts
-    if (currentUser.userId != nextUser.userId) {
-        currentUser.removePandingSign(sign);
-        nextUser.pandingSigns.push(sign);
+    if (currentPlayer.playerId != nextPlayer.playerId) {
+        currentPlayer.removePandingSign(sign);
+        nextPlayer.pandingSigns.push(sign);
     } else {
         // 如果人人有闪电 那么闪电原地不动
     }
 }
 const pandingHandler = {
     executeNextOnePanding: (gameStatus) => {
-        const currentUser = getCurrentUser(gameStatus);
+        const currentPlayer = getCurrentPlayer(gameStatus);
         const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus);
         if (!nextNeedPandingSign) {
             throw new Error("用户没有需要判定的牌")
@@ -37,36 +37,36 @@ const pandingHandler = {
 
         if (nextNeedPandingSign.isEffect === false) {
             if (isPandingLebusishu) {
-                currentUser.removePandingSign(nextNeedPandingSign);
+                currentPlayer.removePandingSign(nextNeedPandingSign);
                 throwCards(gameStatus, pandingActualCard);
             } else if (isPandingShandian) {
-                moveShandianToNextUser(gameStatus, nextNeedPandingSign)
+                moveShandianToNextPlayer(gameStatus, nextNeedPandingSign)
             }
         } else if (nextNeedPandingSign.isEffect === true) {
             const pandingResultCard = getCards(gameStatus, 1);
             throwCards(gameStatus, pandingResultCard);
-            emitPandingPublicCard(gameStatus, pandingResultCard, currentUser, pandingCard);
+            emitPandingPublicCard(gameStatus, pandingResultCard, currentPlayer, pandingCard);
 
             if (isPandingLebusishu) {
-                currentUser.removePandingSign(nextNeedPandingSign);
+                currentPlayer.removePandingSign(nextNeedPandingSign);
                 throwCards(gameStatus, pandingActualCard);
                 if (pandingResultCard.huase !== "♥️") {
-                    currentUser.skipPlay = true;
+                    currentPlayer.skipPlay = true;
                 }
             } else if (isPandingShandian) {
-                currentUser.judgedShandian = true;
+                currentPlayer.judgedShandian = true;
                 if (pandingResultCard.huase == "♠️️" && pandingResultCard.number >= 2 && pandingResultCard.number <= 9) {
-                    currentUser.removePandingSign(nextNeedPandingSign);
+                    currentPlayer.removePandingSign(nextNeedPandingSign);
                     throwCards(gameStatus, pandingActualCard);
 
-                    currentUser.reduceBlood(3);
+                    currentPlayer.reduceBlood(3);
                     generateTieSuoTempStorageByShandian(gameStatus);
 
-                    if (currentUser.currentBlood > 0) { // <0 setGameStatusByTieSuoTempStorage的逻辑在求桃之后 如果我还活着需要立刻结算下一个人的铁锁连环
+                    if (currentPlayer.currentBlood > 0) { // <0 setGameStatusByTieSuoTempStorage的逻辑在求桃之后 如果我还活着需要立刻结算下一个人的铁锁连环
                         setGameStatusByTieSuoTempStorage(gameStatus);
                     }
                 } else {
-                    moveShandianToNextUser(gameStatus, nextNeedPandingSign)
+                    moveShandianToNextPlayer(gameStatus, nextNeedPandingSign)
                 }
             }
         }

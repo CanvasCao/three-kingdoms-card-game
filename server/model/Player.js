@@ -1,14 +1,14 @@
 const {differenceBy} = require("lodash/array");
 const {v4: uuidv4} = require('uuid');
 
-class User {
-    constructor(user, generateNewRoundQiuTaoResponseStages) {
+class Player {
+    constructor(player, generateNewRoundQiuTaoResponseStages) {
         this.maxBlood = 4;
-        this.currentBlood = 1 || this.maxBlood;
-        this.cardId = user.cardId;
-        this.userId = user.userId;
-        this.name = user.name;
-        this.location = user.location;
+        this.currentBlood = 4 || this.maxBlood;
+        this.cardId = player.cardId;
+        this.playerId = player.playerId;
+        this.name = player.name;
+        this.location = player.location;
 
         // cards
         this.cards = [];
@@ -127,9 +127,10 @@ class User {
         this.judgedShandian = false;
     }
 
+    // 弃牌阶段
     needThrow() {
         return this.cards.length > this.currentBlood
     }
 }
 
-exports.User = User;
+exports.Player = Player;
