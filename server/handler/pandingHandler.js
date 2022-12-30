@@ -1,6 +1,6 @@
 const {generateTieSuoTempStorageByShandian, setGameStatusByTieSuoTempStorage} = require("../utils/tieSuoUtils");
 const {isNil} = require("lodash");
-const {emitPandingPublicCard} = require("../utils/emitUtils");
+const {emitNotifyPandingPlayPublicCard} = require("../utils/emitUtils");
 const {getCurrentPlayer, getNextShandianPlayer} = require("../utils/playerUtils");
 const {getNextNeedExecutePandingSign} = require("../utils/pandingUtils");
 const {DELAY_SCROLL_CARDS_CONFIG} = require("../initCards")
@@ -45,7 +45,7 @@ const pandingHandler = {
         } else if (nextNeedPandingSign.isEffect === true) {
             const pandingResultCard = getCards(gameStatus, 1);
             throwCards(gameStatus, pandingResultCard);
-            emitPandingPublicCard(gameStatus, pandingResultCard, currentPlayer, pandingCard);
+            emitNotifyPandingPlayPublicCard(gameStatus, pandingResultCard, currentPlayer, pandingCard);
 
             if (isPandingLebusishu) {
                 currentPlayer.removePandingSign(nextNeedPandingSign);

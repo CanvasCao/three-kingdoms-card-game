@@ -26,7 +26,11 @@ const generateBehaviorMessage = (behavior, players) => {
         return `${originName}使用`
     }
 
-    const targetName = behavior.targetIds ? behavior.targetIds.map((targetId) => players[targetId].name).join(' ') : players[behavior.targetId].name
+    if (behavior.targetIds) {
+        return `${originName}使用`
+    }
+
+    const targetName = players[behavior.targetId].name
 
     if (targetName == originName) {
         return `${originName}使用`
@@ -35,43 +39,82 @@ const generateBehaviorMessage = (behavior, players) => {
     }
 }
 
-const emitBehaviorPublicPlayCard = (io, behaviour, gameStatus) => {
+const emitNotifyPlayPublicCard = (io, behaviour, gameStatus) => {
+    // behaviour is action/response
     if (!behaviour) {
-        return
+        throw new Error("need behaviour")
     }
 
-    // behaviour is action/response
     if (behaviour.cards?.[0]) {
-        io.emit(emitMap.PLAY_BEHAVIOR_PUBLIC_CARD, {
+        io.emit(emitMap.NOTIFY_ADD_PUBLIC_CARD, {
             behaviour: behaviour,
+            originIndexes: behaviour.selectedIndexes,
             message: generateBehaviorMessage(behaviour, gameStatus.players)
         });
     }
 }
 
-const emitCardBoardPublicPlayCard = (io, data, gameStatus) => {
+const emitNotifyCardBoardPlayPublicCard = (io, data, gameStatus) => {
+    // 顺拆 有originId和targetId 但是为了前端不画箭头 不传originId和targetId
     // type EmitCardBoardData = {
     //     originId: string,
     //     targetId: string,
     //     card: Card,
     //     type: "REMOVE" | "MOVE",
+
+    // selectedIndex: number,
     // }
-    io.emit(emitMap.PLAY_NON_BEHAVIOR_PUBLIC_CARD, {
-        cards: [data.card],
-        message: `${gameStatus.players[data.targetId].name} 被 ${data.type == "REMOVE" ? "拆" : "顺"}`
-    });
+
+    if (data.type == "REMOVE") {
+        // behaviour: EmitActionData | EmitResponseData;
+        // originIndexes: number[],
+        //     message: string;
+        io.emit(emitMap.NOTIFY_ADD_PUBLIC_CARD, {
+            behaviour: {
+                cards: [data.card],
+                originId: data.originId
+            },
+            originIndexes: [data.selectedIndex],
+            message: `${gameStatus.players[data.targetId].name} 被拆`
+        });
+    } else {
+        // fromId: string,
+        //     toId: string,
+        //     cards: Card[],
+        //     originIndexes: number[],
+        //     message: never;
+        io.emit(emitMap.NOTIFY_ADD_OWNER_CHANGE_CARD, {
+            fromId: data.targetId,
+            toId: data.originId,
+            originIndexes: [data.selectedIndex],
+        });
+    }
+
 
 }
-const emitPandingPublicCard = (gameStatus, pandingResultCard, player, pandingCard) => {
-    gameStatus.io.emit(emitMap.PLAY_NON_BEHAVIOR_PUBLIC_CARD, {
-        cards: [pandingResultCard],
+const emitNotifyPandingPlayPublicCard = (gameStatus, pandingResultCard, player, pandingCard) => {
+    gameStatus.io.emit(emitMap.NOTIFY_ADD_PUBLIC_CARD, {
+        behaviour: {
+            cards: [pandingResultCard],
+            originId: '牌堆'
+            // 判定牌打出没有来源
+        },
         message: `${player.name}的${pandingCard.CN}判定结果`
     });
 }
 
-const emitThrowPublicCard = (gameStatus, cards, player) => {
-    gameStatus.io.emit(emitMap.PLAY_NON_BEHAVIOR_PUBLIC_CARD, {
-        cards: cards,
+const emitNotifyThrowPlayPublicCard = (gameStatus, data, player) => {
+    // EmitThrowData = {
+    //     cards: Card[]
+    //
+    //     selectedIndexes: number[],
+    // }
+    gameStatus.io.emit(emitMap.NOTIFY_ADD_PUBLIC_CARD, {
+        behaviour: {
+            cards: data.cards,
+            originId: player.playerId,
+        },
+        originIndexes: data.selectedIndexes,
         message: `${player.name}弃牌`
     });
 }
@@ -90,9 +133,9 @@ const emitInit = (gameStatus) => {
 }
 
 exports.shuffle = shuffle;
-exports.emitBehaviorPublicPlayCard = emitBehaviorPublicPlayCard;
-exports.emitCardBoardPublicPlayCard = emitCardBoardPublicPlayCard;
-exports.emitPandingPublicCard = emitPandingPublicCard;
-exports.emitThrowPublicCard = emitThrowPublicCard;
+exports.emitNotifyPlayPublicCard = emitNotifyPlayPublicCard;
+exports.emitNotifyCardBoardPlayPublicCard = emitNotifyCardBoardPlayPublicCard;
+exports.emitNotifyPandingPlayPublicCard = emitNotifyPandingPlayPublicCard;
+exports.emitNotifyThrowPlayPublicCard = emitNotifyThrowPlayPublicCard;
 exports.emitRefreshStatus = emitRefreshStatus;
 exports.emitInit = emitInit;

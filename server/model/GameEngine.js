@@ -5,11 +5,12 @@ const {
     SCROLL_CARDS_CONFIG,
 } = require("../initCards");
 const {
-    emitBehaviorPublicPlayCard,
     emitRefreshStatus,
     emitInit,
-    emitCardBoardPublicPlayCard,
-    emitThrowPublicCard,
+    emitNotifyPlayPublicCard,
+    emitNotifyCardBoardPlayPublicCard,
+    emitNotifyPandingPlayPublicCard,
+    emitNotifyThrowPlayPublicCard,
 } = require("../utils/emitUtils");
 const {
     getCurrentPlayer,
@@ -70,7 +71,7 @@ class GameEngine {
 
     // socket action
     handleAction(action) {
-        emitBehaviorPublicPlayCard(this.io, action, this.gameStatus);
+        emitNotifyPlayPublicCard(this.io, action, this.gameStatus);
         this.gameStatus.action = action;
         const originPlayer = this.gameStatus.players[action.originId];
 
@@ -129,7 +130,7 @@ class GameEngine {
 
     // response
     handleResponse(response) {
-        emitBehaviorPublicPlayCard(this.io, response, this.gameStatus)
+        emitNotifyPlayPublicCard(this.io, response, this.gameStatus)
         if (this.gameStatus.taoResStages.length > 0 && response?.actualCard?.CN == BASIC_CARDS_CONFIG.SHAN.CN) {
             throw new Error("求桃的时候不能出闪")
         }
@@ -164,12 +165,12 @@ class GameEngine {
 
     // throw action
     handleThrowCards(data) {
-        emitThrowPublicCard(this.gameStatus, data.cards, getCurrentPlayer(this.gameStatus));
+        emitNotifyThrowPlayPublicCard(this.gameStatus, data, getCurrentPlayer(this.gameStatus));
         throwHandler.handleThrowCards(this.gameStatus, data)
     }
 
     handleCardBoardAction(data) {
-        emitCardBoardPublicPlayCard(this.io, data, this.gameStatus)
+        emitNotifyCardBoardPlayPublicCard(this.io, data, this.gameStatus)
         cardBoardHandler.handleCardBoard(this.gameStatus, data)
     }
 
