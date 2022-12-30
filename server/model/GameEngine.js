@@ -8,7 +8,7 @@ const {
     emitRefreshStatus,
     emitInit,
     emitNotifyPlayPublicCard,
-    emitNotifyCardBoardPlayPublicCard,
+    emitNotifyCardBoardAction,
     emitNotifyPandingPlayPublicCard,
     emitNotifyThrowPlayPublicCard,
 } = require("../utils/emitUtils");
@@ -170,7 +170,7 @@ class GameEngine {
     }
 
     handleCardBoardAction(data) {
-        emitNotifyCardBoardPlayPublicCard(this.io, data, this.gameStatus)
+        emitNotifyCardBoardAction(this.io, data, this.gameStatus)
         cardBoardHandler.handleCardBoard(this.gameStatus, data)
     }
 

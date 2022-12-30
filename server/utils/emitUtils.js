@@ -55,12 +55,12 @@ const emitNotifyPlayPublicCard = (io, behaviour, gameStatus) => {
     }
 }
 
-const emitNotifyCardBoardPlayPublicCard = (io, boardActionData, gameStatus) => {
-    // 顺拆 有originId和targetId 但是为了前端不画箭头 不传originId和targetId
+const emitNotifyCardBoardAction = (io, boardActionData, gameStatus) => {
     // type EmitCardBoardData = {
     //     originId: string,
     //     targetId: string,
     //     card: Card,
+    //     cardAreaType: CardAreaType
     //     type: "REMOVE" | "MOVE",
 
     // selectedIndex: number,
@@ -83,12 +83,12 @@ const emitNotifyCardBoardPlayPublicCard = (io, boardActionData, gameStatus) => {
             cards: [boardActionData.card],
             fromId: boardActionData.targetId,
             toId: boardActionData.originId,
+            cardAreaType: boardActionData.cardAreaType,
             originIndexes: [boardActionData.selectedIndex],
         });
     }
-
-
 }
+
 const emitNotifyPandingPlayPublicCard = (gameStatus, pandingResultCard, player, pandingCard) => {
     gameStatus.io.emit(emitMap.NOTIFY_ADD_PUBLIC_CARD, {
         cards: [pandingResultCard],
@@ -125,8 +125,10 @@ const emitInit = (gameStatus) => {
 
 exports.shuffle = shuffle;
 exports.emitNotifyPlayPublicCard = emitNotifyPlayPublicCard;
-exports.emitNotifyCardBoardPlayPublicCard = emitNotifyCardBoardPlayPublicCard;
 exports.emitNotifyPandingPlayPublicCard = emitNotifyPandingPlayPublicCard;
 exports.emitNotifyThrowPlayPublicCard = emitNotifyThrowPlayPublicCard;
+
+exports.emitNotifyCardBoardAction = emitNotifyCardBoardAction;
+
 exports.emitRefreshStatus = emitRefreshStatus;
 exports.emitInit = emitInit;
