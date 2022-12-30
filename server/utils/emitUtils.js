@@ -47,14 +47,15 @@ const emitNotifyPlayPublicCard = (io, behaviour, gameStatus) => {
 
     if (behaviour.cards?.[0]) {
         io.emit(emitMap.NOTIFY_ADD_PUBLIC_CARD, {
-            behaviour: behaviour,
+            fromId: behaviour.originId,
+            cards: behaviour.cards,
             originIndexes: behaviour.selectedIndexes,
             message: generateBehaviorMessage(behaviour, gameStatus.players)
         });
     }
 }
 
-const emitNotifyCardBoardPlayPublicCard = (io, data, gameStatus) => {
+const emitNotifyCardBoardPlayPublicCard = (io, boardActionData, gameStatus) => {
     // 顺拆 有originId和targetId 但是为了前端不画箭头 不传originId和targetId
     // type EmitCardBoardData = {
     //     originId: string,
@@ -65,17 +66,12 @@ const emitNotifyCardBoardPlayPublicCard = (io, data, gameStatus) => {
     // selectedIndex: number,
     // }
 
-    if (data.type == "REMOVE") {
-        // behaviour: EmitActionData | EmitResponseData;
-        // originIndexes: number[],
-        //     message: string;
+    if (boardActionData.type == "REMOVE") {
         io.emit(emitMap.NOTIFY_ADD_PUBLIC_CARD, {
-            behaviour: {
-                cards: [data.card],
-                originId: data.originId
-            },
-            originIndexes: [data.selectedIndex],
-            message: `${gameStatus.players[data.targetId].name} 被拆`
+            cards: [boardActionData.card],
+            fromId: boardActionData.targetId,
+            originIndexes: [boardActionData.selectedIndex],
+            message: `${gameStatus.players[boardActionData.targetId].name} 被拆`
         });
     } else {
         // fromId: string,
@@ -84,9 +80,10 @@ const emitNotifyCardBoardPlayPublicCard = (io, data, gameStatus) => {
         //     originIndexes: number[],
         //     message: never;
         io.emit(emitMap.NOTIFY_ADD_OWNER_CHANGE_CARD, {
-            fromId: data.targetId,
-            toId: data.originId,
-            originIndexes: [data.selectedIndex],
+            cards: [boardActionData.card],
+            fromId: boardActionData.targetId,
+            toId: boardActionData.originId,
+            originIndexes: [boardActionData.selectedIndex],
         });
     }
 
@@ -94,11 +91,8 @@ const emitNotifyCardBoardPlayPublicCard = (io, data, gameStatus) => {
 }
 const emitNotifyPandingPlayPublicCard = (gameStatus, pandingResultCard, player, pandingCard) => {
     gameStatus.io.emit(emitMap.NOTIFY_ADD_PUBLIC_CARD, {
-        behaviour: {
-            cards: [pandingResultCard],
-            originId: '牌堆'
-            // 判定牌打出没有来源
-        },
+        cards: [pandingResultCard],
+        fromId: '牌堆',
         message: `${player.name}的${pandingCard.CN}判定结果`
     });
 }
@@ -106,14 +100,11 @@ const emitNotifyPandingPlayPublicCard = (gameStatus, pandingResultCard, player, 
 const emitNotifyThrowPlayPublicCard = (gameStatus, data, player) => {
     // EmitThrowData = {
     //     cards: Card[]
-    //
     //     selectedIndexes: number[],
     // }
     gameStatus.io.emit(emitMap.NOTIFY_ADD_PUBLIC_CARD, {
-        behaviour: {
-            cards: data.cards,
-            originId: player.playerId,
-        },
+        cards: data.cards,
+        fromId: player.playerId,
         originIndexes: data.selectedIndexes,
         message: `${player.name}弃牌`
     });

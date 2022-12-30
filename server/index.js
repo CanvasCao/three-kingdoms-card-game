@@ -63,7 +63,7 @@ io.on('connection', (socket) => {
         }
         gameEngine.gameStatus.players[newPlayer2.playerId] = newPlayer2;
 
-        for (i = 0; i < 0; i++) {
+        for (i = 0; i < 1; i++) {
             const newPlayer = new Player({
                 cardId: "SHU003",
                 name: "张飞",
