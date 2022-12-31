@@ -54,9 +54,6 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
     if (gameStatus.stage.stageName == "judge") {
         const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus);
         nextNeedPandingSign.isEffect = isScrollEffected;
-
-        // 延迟锦囊生效后 需要判断是不是从判定阶段到出牌阶段 不能放在这里有循环引用
-        // tryGoNextStage(gameStatus);
     }
     // 即时锦囊
     else if (gameStatus.scrollResStages.length > 0) {

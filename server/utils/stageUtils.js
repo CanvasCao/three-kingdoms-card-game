@@ -51,12 +51,14 @@ const tryGoNextStage = (gameStatus) => {
             const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
             if (hasWuxiePlayers.length > 0) {
                 generateWuxieSimultaneousResStageByPandingCard(gameStatus)
+                emitRefreshStatus(gameStatus);
             } else {
                 nextNeedPandingSign.isEffect = true;
                 tryGoNextStage(gameStatus);// nextNeedPandingSign生效之后进入 判定执行
             }
         } else {
             pandingHandler.executeNextOnePanding(gameStatus);
+            emitRefreshStatus(gameStatus); // 闪电之后可能要求桃
             tryGoNextStage(gameStatus);// 如果还有别的判定牌会再一次回到这里
         }
     } else if (gameStatus.stage.stageName == 'draw') {

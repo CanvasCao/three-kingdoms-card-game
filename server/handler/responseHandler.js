@@ -10,7 +10,6 @@ const {
 const {clearNextShanStage, clearNextTaoStage, clearNextScrollStage} = require("../utils/clearStageUtils");
 const {BASIC_CARDS_CONFIG, SCROLL_CARDS_CONFIG} = require("../initCards")
 const {throwCards} = require("../utils/cardUtils")
-const {tryGoNextStage} = require("../utils/stageUtils")
 const {getAllHasWuxiePlayers, getCurrentPlayer} = require("../utils/playerUtils")
 const {dieHandler} = require("../handler/dieHandler")
 
@@ -44,8 +43,6 @@ const responseCardHandler = {
                 setGameStatusByTieSuoTempStorage(gameStatus);
             }
         }
-        // 闪电求桃之后 需要判断是不是从判定阶段到出牌阶段
-        tryGoNextStage(gameStatus);
     },
 
     setStatusByShanResponse: (gameStatus, response) => {
@@ -126,12 +123,6 @@ const responseCardHandler = {
                 // 锦囊开始结算
                 setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, "setStatusByWuxieResponse")
             }
-        }
-
-        // TODO tryGoNextStage能不能放在handler？
-        if (gameStatus.stage.stageName == "judge") {
-            // 延迟锦囊生效后 需要判断是不是从判定阶段到出牌阶段
-            tryGoNextStage(gameStatus);
         }
     },
 
