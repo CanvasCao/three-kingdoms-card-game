@@ -88,7 +88,7 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
     // 桃园结义很特殊
     // 因为clear scrollResStage之后 不用设置isEffect 直接加血 所以需要递归判断下一个用户
     // 无中生有 只有一个目标 可以递归但是没必要
-    if ((gameStatus.scrollResStages.length > 0) && gameStatus.scrollResStages[0].CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
+    if ((gameStatus.scrollResStages.length > 0) && gameStatus.scrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
         const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
         if (hasWuxiePlayers.length > 0) {
             generateWuxieSimultaneousResStageByScroll(gameStatus)

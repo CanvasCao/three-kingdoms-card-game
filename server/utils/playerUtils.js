@@ -22,6 +22,19 @@ const getAllHasWuxiePlayers = (gameStatus) => {
     return Object.values(gameStatus.players).filter((u) => u.cards.map((c) => c.CN).includes(SCROLL_CARDS_CONFIG.WU_XIE_KE_JI.CN));
 }
 
+const getAllPlayersStartFromFirstLocation = (gameStatus, firstLocation) => {
+    const players = []
+    for (let i = firstLocation; i < firstLocation + Object.keys(gameStatus.players).length; i++) {
+        const modLocation = i % Object.keys(gameStatus.players).length;
+        const player = Object.values(gameStatus.players).find((u) => u.location == modLocation);
+        if (!player.isDead) {
+            players.push(player)
+        }
+    }
+    return players;
+}
+
 exports.getCurrentPlayer = getCurrentPlayer;
 exports.getNextShandianPlayer = getNextShandianPlayer;
 exports.getAllHasWuxiePlayers = getAllHasWuxiePlayers;
+exports.getAllPlayersStartFromFirstLocation = getAllPlayersStartFromFirstLocation;

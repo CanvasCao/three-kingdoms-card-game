@@ -1,4 +1,4 @@
-const {getCurrentPlayer} = require("./playerUtils");
+const {getCurrentPlayer, getAllPlayersStartFromFirstLocation} = require("./playerUtils");
 
 const resetTieSuo = (gameStatus) => {
     Object.values(gameStatus.players).forEach((player) => {
@@ -7,12 +7,10 @@ const resetTieSuo = (gameStatus) => {
 }
 
 const generateTieSuoTempStorage = (gameStatus, firstAttributeDamageTargetPlayer, firstAttributeAction, damage) => {
-    const firstLocation = firstAttributeDamageTargetPlayer.location;
-    const tieSuoTempStorage = []
-    for (let i = firstLocation; i < firstLocation + Object.keys(gameStatus.players).length; i++) {
-        const modLocation = i % Object.keys(gameStatus.players).length;
-        const player = Object.values(gameStatus.players).find((u) => u.location == modLocation);
-        if (player.isTieSuo && !player.isDead && firstAttributeDamageTargetPlayer.playerId !== player.playerId) { // 除了第一个命中的 其他人都要进 tieSuoTempStorage
+    const players = getAllPlayersStartFromFirstLocation(gameStatus, getCurrentPlayer(gameStatus).location)
+    gameStatus.tieSuoTempStorage = players
+        .filter(player => player.playerId !== firstAttributeDamageTargetPlayer.playerId && player.isTieSuo)
+        .map((player) => {
             let tempItem = {
                 damage,
                 targetId: player.playerId,
@@ -25,12 +23,9 @@ const generateTieSuoTempStorage = (gameStatus, firstAttributeDamageTargetPlayer,
                     actualCard: firstAttributeAction.actualCard,
                 }
             }
-            tieSuoTempStorage.push(tempItem)
-        }
-    }
-
+            return tempItem
+        })
     resetTieSuo(gameStatus);
-    gameStatus.tieSuoTempStorage = tieSuoTempStorage;
 }
 
 // 属性杀没出闪的时候需要
@@ -41,19 +36,18 @@ const generateTieSuoTempStorageByShaAction = (gameStatus) => {
         return;
     }
 
-    const firstAttributeAction = action.targetIds.find((targetId) => {
+    const firstAttributeTargetId = action.targetIds.find((targetId) => {
         const targetPlayer = gameStatus.players[targetId];
         return targetPlayer.isTieSuo;
     })
 
     // 没有任何人是铁锁状态
-    if (!firstAttributeAction) {
+    if (!firstAttributeTargetId) {
         return
     }
 
-    const firstAttributeActionTargetPlayerId = firstAttributeAction.targetId;
-    const firstAttributeActionTargetPlayer = gameStatus.players[firstAttributeActionTargetPlayerId]
-    generateTieSuoTempStorage(gameStatus, firstAttributeActionTargetPlayer, firstAttributeAction, 1);
+    const firstAttributeActionTargetPlayer = gameStatus.players[firstAttributeTargetId]
+    generateTieSuoTempStorage(gameStatus, firstAttributeActionTargetPlayer, action, 1);
 }
 
 const generateTieSuoTempStorageByShandian = (gameStatus) => {

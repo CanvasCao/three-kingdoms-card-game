@@ -9,6 +9,8 @@ class Card {
         this.CN = card.CN;
         this.EN = card.EN;
         this.type = card.type;
+        this.attribute = card.attribute;
+
         this.equipmentType = card.equipmentType;
         this.horseDistance = card.horseDistance;
         this.distance = card.distance;

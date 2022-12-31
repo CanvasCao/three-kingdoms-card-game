@@ -15,6 +15,7 @@ const {
 } = require("../utils/emitUtils");
 const {
     getCurrentPlayer,
+    getAllPlayersStartFromFirstLocation,
 } = require("../utils/playerUtils");
 const {
     throwCards
@@ -189,22 +190,17 @@ class GameEngine {
             throw new Error("Don't need TAO")
         }
 
-        const taoResStages = [];
+        const currentPlayer = getCurrentPlayer(this.gameStatus);
+        const firstLocation = currentPlayer.location;
+        const players = getAllPlayersStartFromFirstLocation(this.gameStatus, firstLocation)
 
-        for (let i = this.gameStatus.currentLocation; i < this.gameStatus.currentLocation + Object.keys(this.gameStatus.players).length; i++) {
-            const modLocation = i % Object.keys(this.gameStatus.players).length;
-            const player = Object.values(this.gameStatus.players).find((u) => u.location == modLocation);
-            if (player.isDead) {
-
-            } else {
-                taoResStages.push({
-                    originId: player.playerId,
-                    targetId: qiutaoTargetPlayer.playerId,
-                    cardNumber: 1 - qiutaoTargetPlayer.currentBlood,
-                })
+        this.gameStatus.taoResStages = players.map((player) => {
+            return {
+                originId: player.playerId,
+                targetId: qiutaoTargetPlayer.playerId,
+                cardNumber: 1 - qiutaoTargetPlayer.currentBlood,
             }
-        }
-        this.gameStatus.taoResStages = taoResStages
+        })
     }
 }
 
