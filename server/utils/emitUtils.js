@@ -55,6 +55,27 @@ const emitNotifyPlayPublicCard = (io, behaviour, gameStatus) => {
     }
 }
 
+const emitNotifyPandingPlayPublicCard = (gameStatus, pandingResultCard, player, pandingCard) => {
+    gameStatus.io.emit(emitMap.NOTIFY_ADD_PUBLIC_CARD, {
+        cards: [pandingResultCard],
+        fromId: '牌堆',
+        message: `${player.name}的${pandingCard.CN}判定结果`
+    });
+}
+
+const emitNotifyThrowPlayPublicCard = (gameStatus, data, player) => {
+    // EmitThrowData = {
+    //     cards: Card[]
+    //     selectedIndexes: number[],
+    // }
+    gameStatus.io.emit(emitMap.NOTIFY_ADD_PUBLIC_CARD, {
+        cards: data.cards,
+        fromId: player.playerId,
+        originIndexes: data.selectedIndexes,
+        message: `${player.name}弃牌`
+    });
+}
+
 const emitNotifyCardBoardAction = (io, boardActionData, gameStatus) => {
     // type EmitCardBoardData = {
     //     originId: string,
@@ -89,24 +110,12 @@ const emitNotifyCardBoardAction = (io, boardActionData, gameStatus) => {
     }
 }
 
-const emitNotifyPandingPlayPublicCard = (gameStatus, pandingResultCard, player, pandingCard) => {
-    gameStatus.io.emit(emitMap.NOTIFY_ADD_PUBLIC_CARD, {
-        cards: [pandingResultCard],
-        fromId: '牌堆',
-        message: `${player.name}的${pandingCard.CN}判定结果`
-    });
-}
-
-const emitNotifyThrowPlayPublicCard = (gameStatus, data, player) => {
-    // EmitThrowData = {
-    //     cards: Card[]
-    //     selectedIndexes: number[],
-    // }
-    gameStatus.io.emit(emitMap.NOTIFY_ADD_PUBLIC_CARD, {
-        cards: data.cards,
-        fromId: player.playerId,
-        originIndexes: data.selectedIndexes,
-        message: `${player.name}弃牌`
+const emitNotifyAddLines = (io, behavior) => {
+    io.emit(emitMap.NOTIFY_ADD_LINES, {
+        fromId: behavior.originId,
+        toIds: behavior.targetId ? [behavior.targetId] : behavior.targetIds,
+        cards: behavior.cards,
+        actualCard: behavior.actualCard,
     });
 }
 
@@ -132,6 +141,7 @@ exports.emitNotifyPandingPlayPublicCard = emitNotifyPandingPlayPublicCard;
 exports.emitNotifyThrowPlayPublicCard = emitNotifyThrowPlayPublicCard;
 
 exports.emitNotifyCardBoardAction = emitNotifyCardBoardAction;
+exports.emitNotifyAddLines = emitNotifyAddLines;
 
 exports.emitRefreshStatus = emitRefreshStatus;
 exports.emitInit = emitInit;

@@ -10,6 +10,7 @@ const {
     emitNotifyPlayPublicCard,
     emitNotifyCardBoardAction,
     emitNotifyPandingPlayPublicCard,
+    emitNotifyAddLines,
     emitNotifyThrowPlayPublicCard,
 } = require("../utils/emitUtils");
 const {
@@ -72,6 +73,7 @@ class GameEngine {
 
     handleAction(action) {
         emitNotifyPlayPublicCard(this.io, action, this.gameStatus);
+        emitNotifyAddLines(this.io, action);
         this.gameStatus.action = action;
         const originPlayer = this.gameStatus.players[action.originId];
 
@@ -129,7 +131,9 @@ class GameEngine {
     }
 
     handleResponse(response) {
-        emitNotifyPlayPublicCard(this.io, response, this.gameStatus)
+        emitNotifyPlayPublicCard(this.io, response, this.gameStatus);
+        emitNotifyAddLines(this.io, response);
+
         if (this.gameStatus.taoResStages.length > 0 && response?.actualCard?.CN == BASIC_CARDS_CONFIG.SHAN.CN) {
             throw new Error("求桃的时候不能出闪")
         }

@@ -9,5 +9,6 @@
   "CARD_BOARD_ACTION": "card_board_action",
 
   "NOTIFY_ADD_OWNER_CHANGE_CARD": "notify_add_owner_change_card",
-  "NOTIFY_ADD_PUBLIC_CARD": "notify_add_public_card"
+  "NOTIFY_ADD_PUBLIC_CARD": "notify_add_public_card",
+  "NOTIFY_ADD_LINES": "notify_add_lines"
 }

@@ -11,9 +11,6 @@ const actionHandler = {
     setStatusByShaAction: (gameStatus) => {
         const action = gameStatus.action;
 
-        gameStatus = reducer(action.type = sha, gameStatus)
-
-        //reducer
         gameStatus.shanResStages = action.targetIds.map((targetId) => {
             return {
                 originId: targetId,
@@ -21,8 +18,6 @@ const actionHandler = {
                 cardNumber: 1,
             }
         })
-        gameStatus.zhiling = [action];
-
     },
     setStatusByTaoAction: (gameStatus) => {
         const action = gameStatus.action;
