@@ -73,7 +73,6 @@ const tryGoNextStage = (gameStatus) => {
     } else if (gameStatus.stage.stageName == 'end') {
         goToNextStage(gameStatus);
     }
-    emitRefreshStatus(gameStatus)
 }
 
 const canTryGoNextStage = (gameStatus) => {

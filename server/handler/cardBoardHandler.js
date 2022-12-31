@@ -1,4 +1,3 @@
-const {emitRefreshStatus} = require("../utils/emitUtils");
 const {throwCards} = require("../utils/cardUtils")
 const {clearNextScrollStage} = require("../utils/clearStageUtils")
 const cardBoardHandler = {
@@ -11,7 +10,6 @@ const cardBoardHandler = {
             gameStatus.players[originId].addCards(card);
         }
         clearNextScrollStage(gameStatus)
-        emitRefreshStatus(gameStatus);
     }
 }
 

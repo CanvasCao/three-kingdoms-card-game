@@ -111,6 +111,9 @@ const emitNotifyThrowPlayPublicCard = (gameStatus, data, player) => {
 }
 
 const omitGSArray = ['throwedCards', 'initCards', 'currentLocation', 'stageIndex', 'io']
+
+// emitRefreshStatus
+// 只能在goToNextStage调用 和GameEngine的handler之后调用
 const emitRefreshStatus = (gameStatus) => {
     const io = gameStatus.io;
     const omitGS = omit(gameStatus, omitGSArray)

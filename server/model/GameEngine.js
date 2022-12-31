@@ -20,6 +20,7 @@ const {
 } = require("../utils/cardUtils");
 const {
     tryGoNextStage,
+    goToNextStage,
 } = require("../utils/stageUtils");
 const {actionHandler} = require("../handler/actionHandler");
 const {responseCardHandler} = require("../handler/responseHandler");
@@ -69,7 +70,6 @@ class GameEngine {
         tryGoNextStage(this.gameStatus)
     }
 
-    // socket action
     handleAction(action) {
         emitNotifyPlayPublicCard(this.io, action, this.gameStatus);
         this.gameStatus.action = action;
@@ -128,7 +128,6 @@ class GameEngine {
         emitRefreshStatus(this.gameStatus);
     }
 
-    // response
     handleResponse(response) {
         emitNotifyPlayPublicCard(this.io, response, this.gameStatus)
         if (this.gameStatus.taoResStages.length > 0 && response?.actualCard?.CN == BASIC_CARDS_CONFIG.SHAN.CN) {
@@ -163,15 +162,16 @@ class GameEngine {
         emitRefreshStatus(this.gameStatus);
     }
 
-    // throw action
     handleThrowCards(data) {
         emitNotifyThrowPlayPublicCard(this.gameStatus, data, getCurrentPlayer(this.gameStatus));
         throwHandler.handleThrowCards(this.gameStatus, data)
+        goToNextStage(this.gameStatus);
     }
 
     handleCardBoardAction(data) {
         emitNotifyCardBoardAction(this.io, data, this.gameStatus)
         cardBoardHandler.handleCardBoard(this.gameStatus, data)
+        emitRefreshStatus(this.gameStatus);
     }
 
     // 任意角色blood<=0时
