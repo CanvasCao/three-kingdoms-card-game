@@ -95,11 +95,6 @@ const emitNotifyCardBoardAction = (io, boardActionData, gameStatus) => {
             message: `${gameStatus.players[boardActionData.targetId].name} 被拆`
         });
     } else {
-        // fromId: string,
-        //     toId: string,
-        //     cards: Card[],
-        //     originIndexes: number[],
-        //     message: never;
         io.emit(emitMap.NOTIFY_ADD_OWNER_CHANGE_CARD, {
             cards: [boardActionData.card],
             fromId: boardActionData.targetId,
@@ -108,6 +103,16 @@ const emitNotifyCardBoardAction = (io, boardActionData, gameStatus) => {
             originIndexes: [boardActionData.selectedIndex],
         });
     }
+}
+
+const emitNotifyJieDaoWeaponOwnerChange = (io, action, weaponCard) => {
+    io.emit(emitMap.NOTIFY_ADD_OWNER_CHANGE_CARD, {
+        cards: [weaponCard],
+        fromId: action.targetIds[0],
+        toId: action.originId,
+        cardAreaType: 'equipment',
+        originIndexes: action.originIndexes,
+    });
 }
 
 const emitNotifyAddLines = (io, behavior) => {
@@ -141,6 +146,7 @@ exports.emitNotifyPandingPlayPublicCard = emitNotifyPandingPlayPublicCard;
 exports.emitNotifyThrowPlayPublicCard = emitNotifyThrowPlayPublicCard;
 
 exports.emitNotifyCardBoardAction = emitNotifyCardBoardAction;
+exports.emitNotifyJieDaoWeaponOwnerChange = emitNotifyJieDaoWeaponOwnerChange;
 exports.emitNotifyAddLines = emitNotifyAddLines;
 
 exports.emitRefreshStatus = emitRefreshStatus;

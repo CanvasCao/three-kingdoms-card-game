@@ -125,6 +125,9 @@ class GameEngine {
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.CN) {
             actionHandler.setStatusByJieDaoShaRenAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
+        }else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_GU_FENG_DENG.CN) {
+            actionHandler.setStatusByWuGuFengDengAction(this.gameStatus);
+            throwCards(this.gameStatus, action.cards);
         }
 
         originPlayer.removeHandCards(action.cards);

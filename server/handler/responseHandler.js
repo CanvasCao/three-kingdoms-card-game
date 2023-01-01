@@ -12,6 +12,7 @@ const {BASIC_CARDS_CONFIG, SCROLL_CARDS_CONFIG} = require("../initCards")
 const {throwCards} = require("../utils/cardUtils")
 const {getAllHasWuxiePlayers, getCurrentPlayer} = require("../utils/playerUtils")
 const {dieHandler} = require("../handler/dieHandler")
+const {emitNotifyJieDaoWeaponOwnerChange} = require("../utils/emitUtils")
 
 const responseCardHandler = {
     setStatusByTaoResponse: (gameStatus, response) => {
@@ -186,6 +187,7 @@ const responseCardHandler = {
             const weaponCard = cloneDeep(APlayer.weaponCard);
             APlayer.removeCards(weaponCard)
             currentPlayer.addCards(weaponCard)
+            emitNotifyJieDaoWeaponOwnerChange(gameStatus.io, weaponCard);
         }
         clearNextScrollStage(gameStatus);
     }
