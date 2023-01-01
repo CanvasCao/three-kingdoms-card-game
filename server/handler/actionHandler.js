@@ -5,6 +5,9 @@ const {
     getAllPlayersStartFromFirstLocation
 } = require("../utils/playerUtils");
 const {
+    getCards,
+} = require("../utils/cardUtils");
+const {
     generateWuxieSimultaneousResStageByScroll,
     setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect
 } = require("../utils/wuxieUtils");
@@ -176,9 +179,13 @@ const actionHandler = {
                     cards: action.cards,
                     actualCard: action.actualCard,
                     isEffect: false,
+                    stageId: uuidv4(), // 前端刷新Board的依据
                 }
             })
             gameStatus.scrollResStages = scrollResStages
+
+            // 有wugufengdengCards展示WuGuFengDengBoard
+            gameStatus.wugufengdengCards = getCards(gameStatus, players.length)
         }
 
         const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)

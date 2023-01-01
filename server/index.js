@@ -95,6 +95,10 @@ io.on('connection', (socket) => {
         gameEngine.handleCardBoardAction(data);
     });
 
+    socket.on(emitMap.WUGU_BOARD_ACTION, (data) => {
+        gameEngine.handleWuguBoardAction(data);
+    });
+
     socket.on(emitMap.THROW, (data) => {
         gameEngine.handleThrowCards(data);
     });

@@ -12,6 +12,7 @@ const {
     emitNotifyPandingPlayPublicCard,
     emitNotifyAddLines,
     emitNotifyThrowPlayPublicCard,
+    emitNotifyWuGuCardChange,
 } = require("../utils/emitUtils");
 const {
     getCurrentPlayer,
@@ -28,7 +29,7 @@ const {actionHandler} = require("../handler/actionHandler");
 const {responseCardHandler} = require("../handler/responseHandler");
 const {throwHandler} = require("../handler/throwHandler");
 const {cardBoardHandler} = require("../handler/cardBoardHandler");
-
+const {wuguBoardHandler} = require("../handler/wuguBoardHandler");
 const stageConfig = require("../config/stageConfig.json")
 
 class GameEngine {
@@ -51,7 +52,7 @@ class GameEngine {
                 hasWuxiePlayerIds: [],
                 wuxieChain: []// 等待全员无懈可击
             },
-
+            wugufengdengCards: [],
             tieSuoTempStorage: [],
 
             // 不需要传到前端的
@@ -125,7 +126,7 @@ class GameEngine {
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.CN) {
             actionHandler.setStatusByJieDaoShaRenAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
-        }else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_GU_FENG_DENG.CN) {
+        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_GU_FENG_DENG.CN) {
             actionHandler.setStatusByWuGuFengDengAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
         }
@@ -184,6 +185,12 @@ class GameEngine {
     handleCardBoardAction(data) {
         emitNotifyCardBoardAction(this.io, data, this.gameStatus)
         cardBoardHandler.handleCardBoard(this.gameStatus, data)
+        emitRefreshStatus(this.gameStatus);
+    }
+
+    handleWuguBoardAction(data) {
+        emitNotifyWuGuCardChange(this.io, data);
+        wuguBoardHandler.handleWuGuBoard(this.gameStatus, data)
         emitRefreshStatus(this.gameStatus);
     }
 

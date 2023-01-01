@@ -95,6 +95,8 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
                 curScrollResStage.isEffect = true;
             } else if (curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.JUE_DOU.CN) {
                 curScrollResStage.isEffect = true;
+            } else if (curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.WU_GU_FENG_DENG.CN) {
+                curScrollResStage.isEffect = true;
             }
         } else {// 失效
             clearNextScrollStage(gameStatus);

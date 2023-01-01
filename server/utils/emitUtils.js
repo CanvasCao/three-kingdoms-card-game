@@ -115,6 +115,18 @@ const emitNotifyJieDaoWeaponOwnerChange = (io, action, weaponCard) => {
     });
 }
 
+const emitNotifyWuGuCardChange = (io, data) => {
+// export type EmitWugufengdengData = {
+//         card: Card,
+//         playerId: string,
+//     }
+    io.emit(emitMap.NOTIFY_ADD_OWNER_CHANGE_CARD, {
+        cards: [data.card],
+        fromId: '牌堆',
+        toId: data.playerId,
+    });
+}
+
 const emitNotifyAddLines = (io, behavior) => {
     io.emit(emitMap.NOTIFY_ADD_LINES, {
         fromId: behavior.originId,
@@ -147,6 +159,7 @@ exports.emitNotifyThrowPlayPublicCard = emitNotifyThrowPlayPublicCard;
 
 exports.emitNotifyCardBoardAction = emitNotifyCardBoardAction;
 exports.emitNotifyJieDaoWeaponOwnerChange = emitNotifyJieDaoWeaponOwnerChange;
+exports.emitNotifyWuGuCardChange = emitNotifyWuGuCardChange;
 exports.emitNotifyAddLines = emitNotifyAddLines;
 
 exports.emitRefreshStatus = emitRefreshStatus;

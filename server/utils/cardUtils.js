@@ -1,14 +1,15 @@
+const {Card} = require("../model/Card");
 const {getInitCards} = require("../initCards")
 
 const throwCards = (gameStatus, cards) => {
-    if (cards) {
-        gameStatus.throwedCards = gameStatus.throwedCards.concat(cards);
-    }
+    let throwingCards = Array.isArray(cards) ? cards : [cards]
+    throwingCards = throwingCards.map(c => new Card(c))
+    gameStatus.throwedCards = gameStatus.throwedCards.concat(throwingCards);
 }
 
 const getCards = (gameStatus, number = 2) => {
     // TODO hardcode 补牌
-    if (gameStatus.initCards.length < 2) {
+    if (gameStatus.initCards.length < number) {
         // console.log("补牌")
         gameStatus.initCards = getInitCards()
     }

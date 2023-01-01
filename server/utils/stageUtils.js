@@ -8,6 +8,7 @@ const {clearWuxieResStage} = require("./clearStageUtils");
 const {getNextNeedExecutePandingSign} = require("./pandingUtils");
 const {getCards} = require("./cardUtils");
 const stageConfig = require("../config/stageConfig.json")
+const emitMap = require("../config/emitMap.json");
 
 const goToNextStage = (gameStatus) => {
     gameStatus.stageIndex++;
@@ -62,7 +63,17 @@ const tryGoNextStage = (gameStatus) => {
             tryGoNextStage(gameStatus);// 如果还有别的判定牌会再一次回到这里
         }
     } else if (gameStatus.stage.stageName == 'draw') {
-        player.addCards(getCards(gameStatus, 2))
+
+
+        const cards=getCards(gameStatus, 2)
+        player.addCards(cards)
+        // TODO NOTIFY_ADD_OWNER_CHANGE_CARD统一封装在addCards
+        gameStatus.io.emit(emitMap.NOTIFY_ADD_OWNER_CHANGE_CARD, {
+            cards,
+            fromId:'牌堆',
+            toId: player.playerId,
+        });
+
         goToNextStage(gameStatus);
     } else if (gameStatus.stage.stageName == 'play') {
         if (player.skipPlay) {

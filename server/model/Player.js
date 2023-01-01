@@ -1,10 +1,11 @@
+const {Card} = require("./Card");
 const {differenceBy} = require("lodash/array");
 const {v4: uuidv4} = require('uuid');
 
 class Player {
     constructor(player, generateNewRoundQiuTaoResponseStages) {
         this.maxBlood = 4;
-        this.currentBlood = 4 || this.maxBlood;
+        this.currentBlood = 1 || this.maxBlood;
         this.cardId = player.cardId;
         this.playerId = player.playerId;
         this.name = player.name;
@@ -64,12 +65,14 @@ class Player {
     }
 
     addCards(cards) {
-        this.cards = this.cards.concat(cards)
+        let addingCards = Array.isArray(cards) ? cards : [cards]
+        addingCards = addingCards.map(c => new Card(c))
+        this.cards = this.cards.concat(addingCards)
     }
 
     removeHandCards(cards) {
-        const removeCards = Array.isArray(cards) ? cards : [cards]
-        this.cards = differenceBy(this.cards, removeCards, 'cardId');
+        let removingCards = Array.isArray(cards) ? cards : [cards]
+        this.cards = differenceBy(this.cards, removingCards, 'cardId');
     }
 
     removeCards(cards) {
