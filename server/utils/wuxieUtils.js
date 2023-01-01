@@ -5,16 +5,36 @@ const {getCards} = require("./cardUtils");
 const {clearNextScrollStage, clearWuxieResStage} = require("./clearStageUtils");
 
 const generateWuxieSimultaneousResStageByScroll = (gameStatus) => {
+    if (!gameStatus.scrollResStages?.[0]) {
+        throw Error("没有scrollResStages 不能生成wuxieSimultaneousResStage")
+    }
+
     const action = gameStatus.action;
+    const scrollResStage = gameStatus.scrollResStages[0];
     const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus);
     if (hasWuxiePlayers.length <= 0) {
         throw Error("没有人有无懈可击 不需要生成wuxieSimultaneousResStage")
     }
+
+    let nextWuXieTargetId
+    // 无懈action origin
+    if (action.actualCard.CN == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.CN ||
+        action.actualCard.CN == SCROLL_CARDS_CONFIG.GUO_HE_CHAI_QIAO.CN ||
+        action.actualCard.CN == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.CN ||
+        action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.CN ||
+        action.actualCard.CN == SCROLL_CARDS_CONFIG.JUE_DOU.CN
+    ) {
+        nextWuXieTargetId = action.originId
+    } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN ||
+        action.actualCard.CN == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.CN ||
+        action.actualCard.CN == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.CN ||
+        action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_GU_FENG_DENG.CN) {
+        nextWuXieTargetId = scrollResStage.originId
+    }
     gameStatus.wuxieSimultaneousResStage = {
         hasWuxiePlayerIds: hasWuxiePlayers.map((u) => u.playerId),
         wuxieChain: [{
-            originId: action.originId,
-            targetId: action.targetId,
+            nextWuXieTargetId,
             cards: action.cards,
             actualCard: action.actualCard
         }]
@@ -31,8 +51,7 @@ const generateWuxieSimultaneousResStageByPandingCard = (gameStatus) => {
     gameStatus.wuxieSimultaneousResStage = {
         hasWuxiePlayerIds: hasWuxiePlayers.map((u) => u.playerId),
         wuxieChain: [{
-            originId: currentPlayer.playerId, // 判定的来源和目标都是自己
-            targetId: currentPlayer.playerId,
+            nextWuXieTargetId: currentPlayer.playerId,
             cards: [nextPandingSign.card],
             actualCard: nextPandingSign.actualCard
         }]
@@ -46,8 +65,7 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
         throw new Error("还有人出无懈可击 不可以结算锦囊");
     }
 
-    // wuxieChain长度为奇数个 或者直接生效 锦囊生效
-    const isScrollEffected = (gameStatus.wuxieSimultaneousResStage.wuxieChain.length % 2 == 1) ||
+    const isScrollEffected = (gameStatus.wuxieSimultaneousResStage.wuxieChain.length % 2 == 1) || // wuxieChain长度为奇数个 锦囊生效
         gameStatus.wuxieSimultaneousResStage.wuxieChain.length == 0 // 不求无懈直接生效
 
     // 延时锦囊
@@ -63,7 +81,7 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
                 getCurrentPlayer(gameStatus).addCards(getCards(gameStatus, 2));
                 clearNextScrollStage(gameStatus);
             } else if (curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
-                gameStatus.players[curScrollResStage.targetId].addBlood();
+                gameStatus.players[curScrollResStage.originId].addBlood();
                 clearNextScrollStage(gameStatus);
             } else if (curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.CN ||
                 curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.GUO_HE_CHAI_QIAO.CN
@@ -78,7 +96,6 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
             } else if (curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.JUE_DOU.CN) {
                 curScrollResStage.isEffect = true;
             }
-
         } else {// 失效
             clearNextScrollStage(gameStatus);
         }
@@ -99,14 +116,26 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
 }
 
 const resetHasWuxiePlayerIdsAndPushChainAfterValidatedWuxie = (gameStatus, response) => {
+    // response
+    // cards: Card[],
+    // actualCard: Card,
+    // originId: string,
+    // targetId: string,
+    //
+    // // 为了校验无懈可击是否冲突
+    // wuxieTargetCardId?: string,
+
+    // wuxieChain
+    // cards: Card[],
+    // actualCard: Card,
+    // nextWuXieTargetId: string
+    // WuxieChain不需要wuxieTargetCardId 只用来后端校验
     const newHasWuxiePlayers = getAllHasWuxiePlayers(gameStatus);
     gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds = newHasWuxiePlayers.map(u => u.playerId);
     gameStatus.wuxieSimultaneousResStage.wuxieChain.push({
         cards: response.cards,
         actualCard: response.actualCard,
-        originId: response.originId,
-        targetId: response.targetId,
-        wuxieTargetCardId: response.wuxieTargetCardId,
+        nextWuXieTargetId: response.originId,
     });
 }
 

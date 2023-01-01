@@ -90,6 +90,9 @@ const actionHandler = {
 
         actionHandler.setStatusByScrollAction(gameStatus);
     },
+    setStatusByWuGuFengDengAction(gameStatus) {
+        actionHandler.setStatusByScrollAction(gameStatus);
+    },
     setStatusByScrollAction(gameStatus) {
         const action = gameStatus.action;
 
@@ -120,12 +123,13 @@ const actionHandler = {
             if (action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.CN) {
                 gameStatus.scrollResStages = [{
                     originId: action.originId,
-                    targetId: action.targetId,
+                    // targetId: action.targetId,
                     cards: action.cards,
                     actualCard: action.actualCard,
                     isEffect: false,
                 }]
-            } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.JUE_DOU.CN) { // 决斗originId targetId的值相反
+            } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.JUE_DOU.CN) {
+                // 决斗originId targetId的值相反
                 gameStatus.scrollResStages = [{
                     originId: action.targetId,
                     targetId: action.originId,
@@ -138,8 +142,8 @@ const actionHandler = {
             const players = getAllPlayersStartFromFirstLocation(gameStatus, getCurrentPlayer(gameStatus).location)
             gameStatus.scrollResStages = players.filter((p) => p.currentBlood < p.maxBlood).map((player) => {
                 return {
-                    originId: action.originId,
-                    targetId: player.playerId,
+                    originId: player.playerId,
+                    // targetId: player.playerId,
                     cards: action.cards,
                     actualCard: action.actualCard,
                     isEffect: false,
@@ -161,13 +165,27 @@ const actionHandler = {
                 }
             })
             gameStatus.scrollResStages = scrollResStages
+        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_GU_FENG_DENG.CN) {
+            const currentPlayer = getCurrentPlayer(gameStatus);
+            const firstLocation = currentPlayer.location;
+            const players = getAllPlayersStartFromFirstLocation(gameStatus, firstLocation)
+
+            const scrollResStages = players.map((player) => {
+                return {
+                    originId: player.playerId,
+                    cards: action.cards,
+                    actualCard: action.actualCard,
+                    isEffect: false,
+                }
+            })
+            gameStatus.scrollResStages = scrollResStages
         }
 
         const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
         if (hasWuxiePlayers.length > 0) {
             generateWuxieSimultaneousResStageByScroll(gameStatus)
         } else { // 没人有无懈可击直接生效
-            setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus,"setStatusByScrollAction"+action.actualCard.CN);
+            setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, "setStatusByScrollAction" + action.actualCard.CN);
         }
     },
 
