@@ -6,6 +6,7 @@ const {
 } = require("../utils/playerUtils");
 const {
     getCards,
+    throwCards
 } = require("../utils/cardUtils");
 const {
     generateWuxieSimultaneousResStageByScroll,
@@ -17,7 +18,7 @@ const actionHandler = {
     // BASIC
     setStatusByShaAction: (gameStatus) => {
         const action = gameStatus.action;
-
+        getCurrentPlayer(gameStatus).shaTimes++;
         gameStatus.shanResStages = action.targetIds.map((targetId) => {
             return {
                 originId: targetId,
@@ -218,16 +219,28 @@ const actionHandler = {
     setStatusByEquipmentAction: (gameStatus) => {
         const action = gameStatus.action;
         const originPlayer = gameStatus.players[action.originId]
-
-        const equipmentType = action.actualCard.equipmentType;
+        const equipmentCard=action.cards[0]
+        const equipmentType = equipmentCard.equipmentType;
         if (equipmentType == EQUIPMENT_TYPE.PLUS_HORSE) {
-            originPlayer.plusHorseCard = action.actualCard;
+            if(originPlayer.plusHorseCard){
+                throwCards(gameStatus, equipmentCard);
+            }
+            originPlayer.plusHorseCard = equipmentCard;
         } else if (equipmentType == EQUIPMENT_TYPE.MINUS_HORSE) {
-            originPlayer.minusHorseCard = action.actualCard;
+            if(originPlayer.minusHorseCard){
+                throwCards(gameStatus, equipmentCard);
+            }
+            originPlayer.minusHorseCard = equipmentCard;
         } else if (equipmentType == EQUIPMENT_TYPE.WEAPON) {
-            originPlayer.weaponCard = action.actualCard;
+            if(originPlayer.weaponCard){
+                throwCards(gameStatus, equipmentCard);
+            }
+            originPlayer.weaponCard = equipmentCard;
         } else if (equipmentType == EQUIPMENT_TYPE.SHIELD) {
-            originPlayer.shieldCard = action.actualCard;
+            if(originPlayer.shieldCard){
+                throwCards(gameStatus, equipmentCard);
+            }
+            originPlayer.shieldCard = equipmentCard;
         }
     },
 }

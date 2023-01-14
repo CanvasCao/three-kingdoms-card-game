@@ -5,8 +5,9 @@ const {v4: uuidv4} = require('uuid');
 class Player {
     constructor(player, generateNewRoundQiuTaoResponseStages) {
         this.maxBlood = 4;
-        this.currentBlood = 1 || this.maxBlood;
-        this.cardId = player.cardId;
+        this.currentBlood = 3 || this.maxBlood;
+        this.shaLimitTimes = 1;
+        this.imageName = player.imageName;
         this.playerId = player.playerId;
         this.name = player.name;
         this.location = player.location;
@@ -23,11 +24,11 @@ class Player {
             "KEY": "ZHU_GE_LIAN_NU",
             "cardId": uuidv4(),
             "cardNumDesc": "A",
-            "CN": "诸葛连弩",
+            "CN": "方天画戟",
             "EN": "Crossbow",
             "type": "EQUIPMENT",
             "equipmentType": "WEAPON",
-            "distance": 1,
+            "distance": 4,
             "distanceDesc": "一",
             "canClickMySelfAsFirstTarget": false,
             "canClickMySelfAsSecondTarget": false,
@@ -38,20 +39,20 @@ class Player {
             },
             "noNeedSetTargetDueToImDefaultTarget": true
         };
-
-
         this.shieldCard = null;
         this.plusHorseCard = null;
         this.minusHorseCard = null;
+
         // ui tags
         this.isTieSuo = true;
 
-        // tags
+        // delay scroll tags
         this.judgedShandian = false;
-
-        // delay scroll
         this.skipDraw = false;
         this.skipPlay = false;
+
+        // played tags
+        this.shaTimes = 0;
 
         // skills
         this.skills = [
@@ -62,6 +63,8 @@ class Player {
 
         // 耦合 掉血和求桃
         this.generateNewRoundQiuTaoResponseStages = generateNewRoundQiuTaoResponseStages;
+
+        // tun
     }
 
     addCards(cards) {
@@ -118,16 +121,19 @@ class Player {
     }
 
     resetWhenMyTurnStarts() {
-        this.pandingSigns = this.pandingSigns.map((sign) => {
-            sign.isEffect = undefined;
-            return sign
-        })
     }
 
     resetWhenMyTurnEnds() {
         this.skipDraw = false;
         this.skipPlay = false;
         this.judgedShandian = false;
+        this.shaTimes = 0;
+
+        // 可能有判定过但是没有移走的闪电
+        this.pandingSigns = this.pandingSigns.map((sign) => {
+            sign.isEffect = undefined;
+            return sign
+        })
     }
 
     // 弃牌阶段

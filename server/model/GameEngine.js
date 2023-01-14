@@ -93,7 +93,6 @@ class GameEngine {
         // Equipment
         else if (CARD_TYPE.EQUIPMENT == action.actualCard.type) {
             actionHandler.setStatusByEquipmentAction(this.gameStatus);
-            throwCards(this.gameStatus, action.cards);
         }
         // DELAY
         else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.SHAN_DIAN.CN) {
@@ -137,8 +136,6 @@ class GameEngine {
 
     handleResponse(response) {
         emitNotifyPlayPublicCard(this.io, response, this.gameStatus);
-        emitNotifyAddLines(this.io, response);
-
         if (this.gameStatus.taoResStages.length > 0 && response?.actualCard?.CN == BASIC_CARDS_CONFIG.SHAN.CN) {
             throw new Error("求桃的时候不能出闪")
         }
