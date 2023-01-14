@@ -1,3 +1,4 @@
+const constants = require( "../constants/constants");
 const emitMap = require("../config/emitMap.json");
 const {omit} = require("lodash")
 const shuffle = (array) => {
@@ -46,7 +47,7 @@ const emitNotifyPlayPublicCard = (io, behaviour, gameStatus) => {
     }
 
     if (behaviour.cards?.[0]) {
-        io.emit(emitMap.NOTIFY_ADD_PUBLIC_CARD, {
+        io.emit(emitMap.NOTIFY_ADD_TO_PUBLIC_CARD, {
             fromId: behaviour.originId,
             cards: behaviour.cards,
             originIndexes: behaviour.selectedIndexes,
@@ -56,9 +57,9 @@ const emitNotifyPlayPublicCard = (io, behaviour, gameStatus) => {
 }
 
 const emitNotifyPandingPlayPublicCard = (gameStatus, pandingResultCard, player, pandingCard) => {
-    gameStatus.io.emit(emitMap.NOTIFY_ADD_PUBLIC_CARD, {
+    gameStatus.io.emit(emitMap.NOTIFY_ADD_TO_PUBLIC_CARD, {
         cards: [pandingResultCard],
-        fromId: '牌堆',
+        fromId: constants.PAIDUI,
         message: `${player.name}的${pandingCard.CN}判定结果`
     });
 }
@@ -68,7 +69,7 @@ const emitNotifyThrowPlayPublicCard = (gameStatus, data, player) => {
     //     cards: Card[]
     //     selectedIndexes: number[],
     // }
-    gameStatus.io.emit(emitMap.NOTIFY_ADD_PUBLIC_CARD, {
+    gameStatus.io.emit(emitMap.NOTIFY_ADD_TO_PUBLIC_CARD, {
         cards: data.cards,
         fromId: player.playerId,
         originIndexes: data.selectedIndexes,
@@ -88,14 +89,14 @@ const emitNotifyCardBoardAction = (io, boardActionData, gameStatus) => {
     // }
 
     if (boardActionData.type == "REMOVE") {
-        io.emit(emitMap.NOTIFY_ADD_PUBLIC_CARD, {
+        io.emit(emitMap.NOTIFY_ADD_TO_PUBLIC_CARD, {
             cards: [boardActionData.card],
             fromId: boardActionData.targetId,
             originIndexes: [boardActionData.selectedIndex],
             message: `${gameStatus.players[boardActionData.targetId].name} 被拆`
         });
     } else {
-        io.emit(emitMap.NOTIFY_ADD_OWNER_CHANGE_CARD, {
+        io.emit(emitMap.NOTIFY_ADD_TO_PLAYER_CARD, {
             cards: [boardActionData.card],
             fromId: boardActionData.targetId,
             toId: boardActionData.originId,
@@ -106,7 +107,7 @@ const emitNotifyCardBoardAction = (io, boardActionData, gameStatus) => {
 }
 
 const emitNotifyJieDaoWeaponOwnerChange = (io, action, weaponCard) => {
-    io.emit(emitMap.NOTIFY_ADD_OWNER_CHANGE_CARD, {
+    io.emit(emitMap.NOTIFY_ADD_TO_PLAYER_CARD, {
         cards: [weaponCard],
         fromId: action.targetIds[0],
         toId: action.originId,
@@ -120,9 +121,9 @@ const emitNotifyWuGuCardChange = (io, data) => {
 //         card: Card,
 //         playerId: string,
 //     }
-    io.emit(emitMap.NOTIFY_ADD_OWNER_CHANGE_CARD, {
+    io.emit(emitMap.NOTIFY_ADD_TO_PLAYER_CARD, {
         cards: [data.card],
-        fromId: '牌堆',
+        fromId: constants.PAIDUI,
         toId: data.playerId,
     });
 }

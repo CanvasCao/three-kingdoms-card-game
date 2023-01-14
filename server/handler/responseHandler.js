@@ -187,7 +187,7 @@ const responseCardHandler = {
             const weaponCard = cloneDeep(APlayer.weaponCard);
             APlayer.removeCards(weaponCard)
             currentPlayer.addCards(weaponCard)
-            emitNotifyJieDaoWeaponOwnerChange(gameStatus.io, weaponCard);
+            emitNotifyJieDaoWeaponOwnerChange(gameStatus.io,gameStatus.action, weaponCard);
         }
         clearNextScrollStage(gameStatus);
     }

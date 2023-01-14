@@ -1,3 +1,4 @@
+const constants = require("../constants/constants");
 const {isNil} = require("lodash");
 const {pandingHandler} = require("../handler/pandingHandler");
 const {emitRefreshStatus} = require("./emitUtils");
@@ -63,14 +64,12 @@ const tryGoNextStage = (gameStatus) => {
             tryGoNextStage(gameStatus);// 如果还有别的判定牌会再一次回到这里
         }
     } else if (gameStatus.stage.stageName == 'draw') {
-
-
-        const cards=getCards(gameStatus, 2)
+        const cards = getCards(gameStatus, 2)
         player.addCards(cards)
         // TODO NOTIFY_ADD_OWNER_CHANGE_CARD统一封装在addCards
-        gameStatus.io.emit(emitMap.NOTIFY_ADD_OWNER_CHANGE_CARD, {
+        gameStatus.io.emit(emitMap.NOTIFY_ADD_TO_PLAYER_CARD, {
             cards,
-            fromId:'牌堆',
+            fromId: constants.PAIDUI,
             toId: player.playerId,
         });
 
