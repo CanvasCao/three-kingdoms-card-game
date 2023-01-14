@@ -19,9 +19,10 @@ const actionHandler = {
     setStatusByShaAction: (gameStatus) => {
         const action = gameStatus.action;
         getCurrentPlayer(gameStatus).shaTimes++;
-        gameStatus.shanResStages = action.targetIds.map((targetId) => {
+        const players = getAllPlayersStartFromFirstLocation(gameStatus, getCurrentPlayer(gameStatus).location)
+        gameStatus.shanResStages = players.filter(p => action.targetIds.includes(p.playerId)).map((player) => {
             return {
-                originId: targetId,
+                originId: player.playerId,
                 targetId: action.originId,
                 cardNumber: 1,
             }
@@ -219,25 +220,25 @@ const actionHandler = {
     setStatusByEquipmentAction: (gameStatus) => {
         const action = gameStatus.action;
         const originPlayer = gameStatus.players[action.originId]
-        const equipmentCard=action.cards[0]
+        const equipmentCard = action.cards[0]
         const equipmentType = equipmentCard.equipmentType;
         if (equipmentType == EQUIPMENT_TYPE.PLUS_HORSE) {
-            if(originPlayer.plusHorseCard){
+            if (originPlayer.plusHorseCard) {
                 throwCards(gameStatus, equipmentCard);
             }
             originPlayer.plusHorseCard = equipmentCard;
         } else if (equipmentType == EQUIPMENT_TYPE.MINUS_HORSE) {
-            if(originPlayer.minusHorseCard){
+            if (originPlayer.minusHorseCard) {
                 throwCards(gameStatus, equipmentCard);
             }
             originPlayer.minusHorseCard = equipmentCard;
         } else if (equipmentType == EQUIPMENT_TYPE.WEAPON) {
-            if(originPlayer.weaponCard){
+            if (originPlayer.weaponCard) {
                 throwCards(gameStatus, equipmentCard);
             }
             originPlayer.weaponCard = equipmentCard;
         } else if (equipmentType == EQUIPMENT_TYPE.SHIELD) {
-            if(originPlayer.shieldCard){
+            if (originPlayer.shieldCard) {
                 throwCards(gameStatus, equipmentCard);
             }
             originPlayer.shieldCard = equipmentCard;
