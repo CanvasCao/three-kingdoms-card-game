@@ -1,3 +1,4 @@
+const {EQUIPMENT_TYPE} = require("../initCards");
 const {Card} = require("./Card");
 const {differenceBy} = require("lodash/array");
 const {v4: uuidv4} = require('uuid');
@@ -24,24 +25,55 @@ class Player {
             "KEY": "ZHU_GE_LIAN_NU",
             "cardId": uuidv4(),
             "cardNumDesc": "A",
-            "CN": "方天画戟",
+            "CN": "青龙偃月刀",
             "EN": "Crossbow",
             "type": "EQUIPMENT",
-            "equipmentType": "WEAPON",
-            "distance": 4,
-            "distanceDesc": "一",
-            "canClickMySelfAsFirstTarget": false,
-            "canClickMySelfAsSecondTarget": false,
-            "canPlayInMyTurn": true,
-            "targetMinMax": {
-                "min": 0,
-                "max": 0
-            },
-            "noNeedSetTargetDueToImDefaultTarget": true
+            "equipmentType": EQUIPMENT_TYPE.WEAPON,
+            "distance": 3,
+            "distanceDesc": "三",
         };
-        this.shieldCard = null;
-        this.plusHorseCard = null;
-        this.minusHorseCard = null;
+        this.shieldCard = {
+            "huase": "♣️",
+            "number": 1,
+            "key": "ZHU_GE_LIAN_NU",
+            "KEY": "ZHU_GE_LIAN_NU",
+            "cardId": uuidv4(),
+            "cardNumDesc": "A",
+            "CN": "青龙偃月刀",
+            "EN": "Crossbow",
+            "type": "EQUIPMENT",
+            "equipmentType": EQUIPMENT_TYPE.SHIELD,
+            "distance": 3,
+            "distanceDesc": "三",
+        };
+        this.plusHorseCard = {
+            "huase": "♣️",
+            "number": 1,
+            "key": "ZHU_GE_LIAN_NU",
+            "KEY": "ZHU_GE_LIAN_NU",
+            "cardId": uuidv4(),
+            "cardNumDesc": "A",
+            "CN": "青龙偃月刀",
+            "EN": "Crossbow",
+            "type": "EQUIPMENT",
+            "equipmentType": EQUIPMENT_TYPE.PLUS_HORSE,
+            "distance": 3,
+            "distanceDesc": "三",
+        };
+        this.minusHorseCard = {
+            "huase": "♣️",
+            "number": 1,
+            "key": "ZHU_GE_LIAN_NU",
+            "KEY": "ZHU_GE_LIAN_NU",
+            "cardId": uuidv4(),
+            "cardNumDesc": "A",
+            "CN": "青龙偃月刀",
+            "EN": "Crossbow",
+            "type": "EQUIPMENT",
+            "equipmentType": EQUIPMENT_TYPE.MINUS_HORSE,
+            "distance": 3,
+            "distanceDesc": "三",
+        };
 
         // ui tags
         this.isTieSuo = true;
