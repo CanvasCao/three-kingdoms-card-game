@@ -1,3 +1,5 @@
+const {CARD_CONFIG} = require("../initCards");
+const {setStatusWhenPlayerDie} = require("../utils/dieUtils");
 const {cloneDeep} = require("lodash");
 const {
     setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect,
@@ -7,11 +9,15 @@ const {
     generateTieSuoTempStorageByShaAction,
     setGameStatusByTieSuoTempStorage
 } = require("../utils/tieSuoUtils");
-const {clearNextShanStage, clearNextTaoStage, clearNextScrollStage} = require("../utils/clearStageUtils");
+const {
+    clearNextShanStage,
+    clearNextTaoStage,
+    clearNextScrollStage,
+    clearNextWeaponStage
+} = require("../utils/clearStageUtils");
 const {BASIC_CARDS_CONFIG, SCROLL_CARDS_CONFIG} = require("../initCards")
 const {throwCards} = require("../utils/cardUtils")
 const {getAllHasWuxiePlayers, getCurrentPlayer} = require("../utils/playerUtils")
-const {dieHandler} = require("../handler/dieHandler")
 const {emitNotifyJieDaoWeaponOwnerChange} = require("../utils/emitUtils")
 
 const responseCardHandler = {
@@ -19,11 +25,10 @@ const responseCardHandler = {
         const curTaoResStage = gameStatus.taoResStages[0];
         const originPlayer = gameStatus.players[curTaoResStage.originId];
         const targetPlayer = gameStatus.players[curTaoResStage.targetId];
+        originPlayer.removeHandCards(response.cards);
+        throwCards(gameStatus, response.cards);
 
         if (response?.actualCard?.CN == BASIC_CARDS_CONFIG.TAO.CN) { // 出桃了
-            originPlayer.removeHandCards(response.cards);
-            throwCards(gameStatus, response.cards);
-
             targetPlayer.addBlood();
 
             if (targetPlayer.currentBlood > 0) { // 出桃复活 不需要任何人再出桃
@@ -40,7 +45,7 @@ const responseCardHandler = {
 
             // 没有任何人出桃 当前角色死亡
             if (gameStatus.taoResStages.length == 0) {
-                dieHandler.setStatusWhenPlayerDie(gameStatus, targetPlayer);
+                setStatusWhenPlayerDie(gameStatus, targetPlayer);
                 setGameStatusByTieSuoTempStorage(gameStatus);
             }
         }
@@ -49,22 +54,27 @@ const responseCardHandler = {
     setStatusByShanResponse: (gameStatus, response) => {
         const curShanResStage = gameStatus.shanResStages[0];
         const originPlayer = gameStatus.players[curShanResStage.originId];
+        originPlayer.removeHandCards(response.cards);
+        throwCards(gameStatus, response.cards);
 
         if (response?.actualCard?.CN == BASIC_CARDS_CONFIG.SHAN.CN) { // 出闪了
-            originPlayer.removeHandCards(response.cards);
-            throwCards(gameStatus, response.cards);
-
             curShanResStage.cardNumber--; // 吕布需要两个杀
             if (curShanResStage.cardNumber == 0) {
                 clearNextShanStage(gameStatus);
+                gameStatus.weaponResStages = [
+                    {
+                        originId: curShanResStage.targetId,
+                        targetId: curShanResStage.originId,
+                        weaponCardName: CARD_CONFIG.QING_LONG_YAN_YUE_DAO.CN,
+                    }
+                ];
             } else {
                 // do nothing
             }
         } else { // 没出闪
             clearNextShanStage(gameStatus);
-
             originPlayer.reduceBlood();
-            generateTieSuoTempStorageByShaAction(gameStatus); // 只有第一个中铁锁连环且不出闪的 会运行
+            generateTieSuoTempStorageByShaAction(gameStatus);
 
             // <0 setGameStatusByTieSuoTempStorage的逻辑在求桃之后
             // 如果我还活着需要立刻结算下一个人的铁锁连环
@@ -187,9 +197,25 @@ const responseCardHandler = {
             const weaponCard = cloneDeep(APlayer.weaponCard);
             APlayer.removeCards(weaponCard)
             currentPlayer.addCards(weaponCard)
-            emitNotifyJieDaoWeaponOwnerChange(gameStatus.io,gameStatus.action, weaponCard);
+            emitNotifyJieDaoWeaponOwnerChange(gameStatus.io, gameStatus.action, weaponCard);
         }
         clearNextScrollStage(gameStatus);
+    },
+
+    // 武器
+    setStatusByQingLongYanYueDaoResponse: (gameStatus, response) => {
+        if (response?.actualCard) {
+            const action = gameStatus.action;
+            clearNextWeaponStage(gameStatus);
+            gameStatus.shanResStages = [{
+                originId: action.targetIds[0],
+                targetId: action.originId,
+                cardNumber: 1,
+            }]
+        } else {
+            clearNextWeaponStage(gameStatus);
+            clearNextShanStage(gameStatus)
+        }
     }
 }
 

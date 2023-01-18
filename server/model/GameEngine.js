@@ -54,6 +54,7 @@ class GameEngine {
             },
             wugufengdengCards: [],
             tieSuoTempStorage: [],
+            weaponResStages: [],
 
             // 不需要传到前端的
             io: io,
@@ -151,6 +152,7 @@ class GameEngine {
 
         // 只是响应是否出杀
         const needResponseJieDao = this.gameStatus.scrollResStages.length > 0 && curScrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.CN;
+        const needResponseQingLongYanYueDao = this.gameStatus.weaponResStages.length > 0;
 
         if (needResponseWuxie) {
             responseCardHandler.setStatusByWuxieResponse(this.gameStatus, response);
@@ -164,6 +166,11 @@ class GameEngine {
             responseCardHandler.setStatusByJueDouResponse(this.gameStatus, response);
         } else if (needResponseJieDao) {
             responseCardHandler.setStatusByJieDaoResponse(this.gameStatus, response);
+        }
+
+        // 武器
+        else if (needResponseQingLongYanYueDao) {
+            responseCardHandler.setStatusByQingLongYanYueDaoResponse(this.gameStatus, response);
         }
 
         emitRefreshStatus(this.gameStatus);

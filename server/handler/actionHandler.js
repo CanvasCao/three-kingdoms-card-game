@@ -28,6 +28,7 @@ const actionHandler = {
             }
         })
     },
+
     setStatusByTaoAction: (gameStatus) => {
         const action = gameStatus.action;
         const originPlayer = gameStatus.players[action.originId]

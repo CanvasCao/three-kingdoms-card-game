@@ -100,17 +100,26 @@ class Player {
     }
 
     addCards(cards) {
+        if (!cards) {
+            return
+        }
         let addingCards = Array.isArray(cards) ? cards : [cards]
         addingCards = addingCards.map(c => new Card(c))
         this.cards = this.cards.concat(addingCards)
     }
 
     removeHandCards(cards) {
+        if (!cards) {
+            return
+        }
         let removingCards = Array.isArray(cards) ? cards : [cards]
         this.cards = differenceBy(this.cards, removingCards, 'cardId');
     }
 
     removeCards(cards) {
+        if (!cards) {
+            return
+        }
         this.removeHandCards(cards)
         const removeCards = Array.isArray(cards) ? cards : [cards]
         const removeCardIds = removeCards.map(c => c.cardId);

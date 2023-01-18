@@ -35,6 +35,7 @@ const pandingHandler = {
         const isPandingLebusishu = pandingActualCard.CN == DELAY_SCROLL_CARDS_CONFIG.LE_BU_SI_SHU.CN;
         const isPandingShandian = pandingActualCard.CN == DELAY_SCROLL_CARDS_CONFIG.SHAN_DIAN.CN;
 
+        // 判定未生效 需要跳过
         if (nextNeedPandingSign.isEffect === false) {
             if (isPandingLebusishu) {
                 currentPlayer.removePandingSign(nextNeedPandingSign);
@@ -42,7 +43,9 @@ const pandingHandler = {
             } else if (isPandingShandian) {
                 moveShandianToNextPlayer(gameStatus, nextNeedPandingSign)
             }
-        } else if (nextNeedPandingSign.isEffect === true) {
+        }
+        // 判定生效 开始判定
+        else if (nextNeedPandingSign.isEffect === true) {
             const pandingResultCard = getCards(gameStatus, 1);
             throwCards(gameStatus, pandingResultCard);
             emitNotifyPandingPlayPublicCard(gameStatus, pandingResultCard, currentPlayer, pandingCard);

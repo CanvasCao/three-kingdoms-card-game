@@ -71,8 +71,9 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
     // 延时锦囊
     if (gameStatus.stage.stageName == "judge") {
         const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus);
-        nextNeedPandingSign.isEffect = isScrollEffected;
+        nextNeedPandingSign.isEffect = isScrollEffected; // 延时锦囊生效开始判定 未生效需要跳过判定
     }
+
     // 即时锦囊
     else if (gameStatus.scrollResStages.length > 0) {
         const curScrollResStage = gameStatus.scrollResStages[0]

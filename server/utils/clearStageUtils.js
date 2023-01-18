@@ -10,6 +10,10 @@ const clearNextScrollStage = (gameStatus) => {
     gameStatus.scrollResStages.shift();
 }
 
+const clearNextWeaponStage = (gameStatus) => {
+    gameStatus.weaponResStages.shift();
+}
+
 const clearWuxieResStage = (gameStatus) => {
     gameStatus.wuxieSimultaneousResStage = {
         hasWuxiePlayerIds: [],
@@ -20,4 +24,5 @@ const clearWuxieResStage = (gameStatus) => {
 exports.clearNextTaoStage = clearNextTaoStage;
 exports.clearNextShanStage = clearNextShanStage;
 exports.clearNextScrollStage = clearNextScrollStage;
+exports.clearNextWeaponStage = clearNextWeaponStage;
 exports.clearWuxieResStage = clearWuxieResStage;

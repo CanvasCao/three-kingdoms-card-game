@@ -2,6 +2,9 @@ const {Card} = require("../model/Card");
 const {getInitCards} = require("../initCards")
 
 const throwCards = (gameStatus, cards) => {
+    if (!cards) {
+        return
+    }
     let throwingCards = Array.isArray(cards) ? cards : [cards]
     throwingCards = throwingCards.map(c => new Card(c))
     gameStatus.throwedCards = gameStatus.throwedCards.concat(throwingCards);
