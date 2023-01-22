@@ -1,4 +1,4 @@
-const {CARD_CONFIG, EQUIPMENT_CARDS_CONFIG} = require("../initCards");
+const {CARD_CONFIG, EQUIPMENT_CARDS_CONFIG} = require("../config/cardConfig");
 const {setStatusWhenPlayerDie} = require("../utils/dieUtils");
 const {cloneDeep} = require("lodash");
 const {
@@ -15,7 +15,7 @@ const {
     clearNextScrollStage,
     clearNextWeaponStage
 } = require("../utils/clearStageUtils");
-const {BASIC_CARDS_CONFIG, SCROLL_CARDS_CONFIG} = require("../initCards")
+const {BASIC_CARDS_CONFIG, SCROLL_CARDS_CONFIG} = require("../config/cardConfig")
 const {throwCards} = require("../utils/cardUtils")
 const {getAllHasWuxiePlayers, getCurrentPlayer} = require("../utils/playerUtils")
 const {emitNotifyJieDaoWeaponOwnerChange} = require("../utils/emitUtils")

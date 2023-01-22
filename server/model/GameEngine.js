@@ -1,9 +1,11 @@
 const {
     getInitCards,
+} = require("../initCards");
+const {
     CARD_TYPE,
     BASIC_CARDS_CONFIG,
     SCROLL_CARDS_CONFIG,
-} = require("../initCards");
+} = require("../config/cardConfig")
 const {
     emitRefreshStatus,
     emitInit,

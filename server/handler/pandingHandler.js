@@ -3,7 +3,7 @@ const {isNil} = require("lodash");
 const {emitNotifyPandingPlayPublicCard} = require("../utils/emitUtils");
 const {getCurrentPlayer, getNextShandianPlayer} = require("../utils/playerUtils");
 const {getNextNeedExecutePandingSign} = require("../utils/pandingUtils");
-const {DELAY_SCROLL_CARDS_CONFIG} = require("../initCards")
+const {DELAY_SCROLL_CARDS_CONFIG, CARD_HUASE} = require("../config/cardConfig")
 const {getCards, throwCards} = require("../utils/cardUtils")
 
 const moveShandianToNextPlayer = (gameStatus, sign) => {
@@ -53,12 +53,12 @@ const pandingHandler = {
             if (isPandingLebusishu) {
                 currentPlayer.removePandingSign(nextNeedPandingSign);
                 throwCards(gameStatus, pandingActualCard);
-                if (pandingResultCard.huase !== "♥️") {
+                if (pandingResultCard.huase !== CARD_HUASE.HONGTAO) {
                     currentPlayer.skipPlay = true;
                 }
             } else if (isPandingShandian) {
                 currentPlayer.judgedShandian = true;
-                if (pandingResultCard.huase == "♠️️" && pandingResultCard.number >= 2 && pandingResultCard.number <= 9) {
+                if (pandingResultCard.huase == CARD_HUASE.HEITAO && pandingResultCard.number >= 2 && pandingResultCard.number <= 9) {
                     currentPlayer.removePandingSign(nextNeedPandingSign);
                     throwCards(gameStatus, pandingActualCard);
 

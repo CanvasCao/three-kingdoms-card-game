@@ -1,4 +1,4 @@
-const {EQUIPMENT_TYPE, EQUIPMENT_CARDS_CONFIG} = require("../initCards");
+const {EQUIPMENT_CARDS_CONFIG, EQUIPMENT_TYPE, CARD_HUASE} = require("../config/cardConfig");
 const {Card} = require("./Card");
 const {differenceBy} = require("lodash/array");
 const {v4: uuidv4} = require('uuid');
@@ -19,7 +19,7 @@ class Player {
         // pandingSigns
         this.pandingSigns = [];
         this.weaponCard = {
-            "huase": "♣️",
+            "huase": CARD_HUASE.CAOHUA,
             "number": 1,
             "key": "ZHU_GE_LIAN_NU",
             "KEY": "ZHU_GE_LIAN_NU",
@@ -33,21 +33,19 @@ class Player {
             "distanceDesc": "三",
         };
         this.shieldCard = {
-            "huase": "♣️",
-            "number": 1,
-            "key": "ZHU_GE_LIAN_NU",
-            "KEY": "ZHU_GE_LIAN_NU",
+            "huase": CARD_HUASE.CAOHUA,
+            "number": 2,
+            "key": "BA_GUA_ZHEN",
+            "KEY": "BA_GUA_ZHEN",
             "cardId": uuidv4(),
-            "cardNumDesc": "A",
-            "CN": "青龙偃月刀",
-            "EN": "Crossbow",
+            "cardNumDesc": 2,
+            "CN": EQUIPMENT_CARDS_CONFIG.REN_WANG_DUN.CN,
+            "EN": "Eight Diagrams",
             "type": "EQUIPMENT",
-            "equipmentType": EQUIPMENT_TYPE.SHIELD,
-            "distance": 3,
-            "distanceDesc": "三",
+            "equipmentType": "SHIELD"
         };
         this.plusHorseCard = {
-            "huase": "♣️",
+            "huase": CARD_HUASE.CAOHUA,
             "number": 1,
             "key": "ZHU_GE_LIAN_NU",
             "KEY": "ZHU_GE_LIAN_NU",
@@ -61,7 +59,7 @@ class Player {
             "distanceDesc": "三",
         };
         this.minusHorseCard = {
-            "huase": "♣️",
+            "huase": CARD_HUASE.CAOHUA,
             "number": 1,
             "key": "ZHU_GE_LIAN_NU",
             "KEY": "ZHU_GE_LIAN_NU",

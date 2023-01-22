@@ -1,4 +1,4 @@
-const {DELAY_SCROLL_CARDS_CONFIG, SCROLL_CARDS_CONFIG} = require("../initCards")
+const {DELAY_SCROLL_CARDS_CONFIG, SCROLL_CARDS_CONFIG} = require("../config/cardConfig")
 
 const getCurrentPlayer = (gameStatus) => {
     return Object.values(gameStatus.players).find((u) => u.location == gameStatus.currentLocation)

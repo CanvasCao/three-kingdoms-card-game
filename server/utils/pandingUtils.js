@@ -1,4 +1,4 @@
-const {DELAY_SCROLL_CARDS_CONFIG} = require("../initCards");
+const {DELAY_SCROLL_CARDS_CONFIG} = require("../config/cardConfig");
 const {getCurrentPlayer} = require("./playerUtils");
 
 const getNextNeedExecutePandingSign = (gameStatus) => {
