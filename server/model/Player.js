@@ -1,4 +1,4 @@
-const {EQUIPMENT_TYPE} = require("../initCards");
+const {EQUIPMENT_TYPE, EQUIPMENT_CARDS_CONFIG} = require("../initCards");
 const {Card} = require("./Card");
 const {differenceBy} = require("lodash/array");
 const {v4: uuidv4} = require('uuid');
@@ -25,7 +25,7 @@ class Player {
             "KEY": "ZHU_GE_LIAN_NU",
             "cardId": uuidv4(),
             "cardNumDesc": "A",
-            "CN": "青龙偃月刀",
+            "CN": EQUIPMENT_CARDS_CONFIG.ZHANG_BA_SHE_MAO.CN,
             "EN": "Crossbow",
             "type": "EQUIPMENT",
             "equipmentType": EQUIPMENT_TYPE.WEAPON,

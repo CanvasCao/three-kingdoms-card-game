@@ -1,4 +1,4 @@
-const {CARD_CONFIG} = require("../initCards");
+const {CARD_CONFIG, EQUIPMENT_CARDS_CONFIG} = require("../initCards");
 const {setStatusWhenPlayerDie} = require("../utils/dieUtils");
 const {cloneDeep} = require("lodash");
 const {
@@ -61,13 +61,16 @@ const responseCardHandler = {
             curShanResStage.cardNumber--; // 吕布需要两个杀
             if (curShanResStage.cardNumber == 0) {
                 clearNextShanStage(gameStatus);
-                gameStatus.weaponResStages = [
-                    {
-                        originId: curShanResStage.targetId,
-                        targetId: curShanResStage.originId,
-                        weaponCardName: CARD_CONFIG.QING_LONG_YAN_YUE_DAO.CN,
-                    }
-                ];
+
+                if (originPlayer.weaponCard.CN == EQUIPMENT_CARDS_CONFIG.QING_LONG_YAN_YUE_DAO.CN) {
+                    gameStatus.weaponResStages = [
+                        {
+                            originId: curShanResStage.targetId,
+                            targetId: curShanResStage.originId,
+                            weaponCardName: CARD_CONFIG.QING_LONG_YAN_YUE_DAO.CN,
+                        }
+                    ];
+                }
             } else {
                 // do nothing
             }

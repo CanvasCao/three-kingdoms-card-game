@@ -45,7 +45,7 @@ io.on('connection', (socket) => {
 
         // hardcode 只有两个角色
         const newPlayer = new Player({
-            cardId: "SHU001",
+            imageName: "SHU001",
             name: "刘备",
             playerId: data.playerId,
             location: location++
@@ -53,7 +53,7 @@ io.on('connection', (socket) => {
         gameEngine.gameStatus.players[newPlayer.playerId] = newPlayer;
 
         const newPlayer2 = new Player({
-            cardId: "SHU002",
+            imageName: "SHU002",
             name: "关羽",
             playerId: 'player2',
             location: location++
@@ -63,9 +63,9 @@ io.on('connection', (socket) => {
         }
         gameEngine.gameStatus.players[newPlayer2.playerId] = newPlayer2;
 
-        for (i = 0; i < 1; i++) {
+        for (i = 0; i < 0; i++) {
             const newPlayer = new Player({
-                cardId: "SHU003",
+                imageName: "SHU003",
                 name: "张飞",
                 playerId: 'player' + (i + 3),
                 location: location++
