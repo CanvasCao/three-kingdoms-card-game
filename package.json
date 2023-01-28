@@ -12,6 +12,7 @@
     "uuid": "^9.0.0"
   },
   "scripts": {
-    "start": "node server/index.js"
+    "local_start": "node server/index.js",
+    "prod_start": "NODE_ENV=production node server/index.js"
   }
 }

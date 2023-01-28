@@ -18,7 +18,7 @@ class Player {
 
         // pandingSigns
         this.pandingSigns = [];
-        this.weaponCard = {
+        this.weaponCard = process.env.NODE_ENV == 'production' ? null : {
             "huase": CARD_HUASE.CAOHUA,
             "number": 1,
             "key": "ZHU_GE_LIAN_NU",
@@ -32,7 +32,7 @@ class Player {
             "distance": 3,
             "distanceDesc": "三",
         };
-        this.shieldCard = {
+        this.shieldCard = process.env.NODE_ENV == 'production' ? null : {
             "huase": CARD_HUASE.CAOHUA,
             "number": 2,
             "key": "BA_GUA_ZHEN",
@@ -44,34 +44,8 @@ class Player {
             "type": "EQUIPMENT",
             "equipmentType": "SHIELD"
         };
-        this.plusHorseCard = {
-            "huase": CARD_HUASE.CAOHUA,
-            "number": 1,
-            "key": "ZHU_GE_LIAN_NU",
-            "KEY": "ZHU_GE_LIAN_NU",
-            "cardId": uuidv4(),
-            "cardNumDesc": "A",
-            "CN": "青龙偃月刀",
-            "EN": "Crossbow",
-            "type": "EQUIPMENT",
-            "equipmentType": EQUIPMENT_TYPE.PLUS_HORSE,
-            "distance": 3,
-            "distanceDesc": "三",
-        };
-        this.minusHorseCard = {
-            "huase": CARD_HUASE.CAOHUA,
-            "number": 1,
-            "key": "ZHU_GE_LIAN_NU",
-            "KEY": "ZHU_GE_LIAN_NU",
-            "cardId": uuidv4(),
-            "cardNumDesc": "A",
-            "CN": "青龙偃月刀",
-            "EN": "Crossbow",
-            "type": "EQUIPMENT",
-            "equipmentType": EQUIPMENT_TYPE.MINUS_HORSE,
-            "distance": 3,
-            "distanceDesc": "三",
-        };
+        this.plusHorseCard = null;
+        this.minusHorseCard = null;
 
         // ui tags
         this.isTieSuo = true;

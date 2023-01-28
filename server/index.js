@@ -32,7 +32,6 @@ io.on('connection', (socket) => {
     let location = 0;
 
     socket.on(emitMap.INIT, (data) => {
-        // data { playerId: '22c3d181-5d60-4283-a4ce-6f2b14d772bc' }
         if (Object.keys(gameEngine.gameStatus.players).length >= 2) {
             emitInit(gameEngine.gameStatus)
             return;
