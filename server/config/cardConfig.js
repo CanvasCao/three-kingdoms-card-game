@@ -1,14 +1,14 @@
 const CARD_HUASE = {
-    HEITAO: "heitao",
-    CAOHUA:'caohua',
-    FANGKUAI:'fangkuai',
-    HONGTAO:'hongtao',
+    HEITAO: "♠",
+    CAOHUA: '♣',
+    FANGKUAI: '♦',
+    HONGTAO: '♥',
 }
 
 const CARD_COLOR = {
     BLACK: "black",
-    NO:'no',
-    RED:'red'
+    NO: 'no',
+    RED: 'red'
 }
 
 const CARD_NUM_DESC = {
