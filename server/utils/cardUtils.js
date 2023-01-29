@@ -29,6 +29,12 @@ const getCards = (gameStatus, number = 2) => {
     }
 }
 
+const everyoneGetInitialCards = (gameStatus) => {
+    Object.keys(gameStatus.players).forEach((playerId) => {
+        gameStatus.players[playerId].cards = getCards(gameStatus,4);
+    })
+}
+
 const getActualCardColor = (actualCard) => {
     let count = 0;
     const map = {
@@ -49,4 +55,5 @@ const getActualCardColor = (actualCard) => {
 
 exports.throwCards = throwCards;
 exports.getCards = getCards;
+exports.everyoneGetInitialCards = everyoneGetInitialCards;
 exports.getActualCardColor = getActualCardColor;

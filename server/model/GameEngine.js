@@ -21,7 +21,7 @@ const {
     getAllPlayersStartFromFirstLocation,
 } = require("../utils/playerUtils");
 const {
-    throwCards
+    throwCards, everyoneGetInitialCards
 } = require("../utils/cardUtils");
 const {
     tryGoNextStage,
@@ -72,8 +72,13 @@ class GameEngine {
             playerId: getCurrentPlayer(this.gameStatus).playerId,
             stageName: stageConfig.stageNamesEN[this.gameStatus.stageIndex]
         }
+
+        everyoneGetInitialCards(this.gameStatus)
         emitInit(this.gameStatus);
-        tryGoNextStage(this.gameStatus)
+
+        setTimeout(() => {
+            tryGoNextStage(this.gameStatus)
+        }, 1000)
     }
 
     handleAction(action) {
