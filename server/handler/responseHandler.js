@@ -54,6 +54,7 @@ const responseCardHandler = {
     setStatusByShanResponse: (gameStatus, response) => {
         const curShanResStage = gameStatus.shanResStages[0];
         const originPlayer = gameStatus.players[curShanResStage.originId];
+        const targetPlayer = gameStatus.players[curShanResStage.targetId];
         originPlayer.removeHandCards(response.cards);
         throwCards(gameStatus, response.cards);
 
@@ -62,7 +63,7 @@ const responseCardHandler = {
             if (curShanResStage.cardNumber == 0) {
                 clearNextShanStage(gameStatus);
 
-                if (originPlayer.weaponCard.CN == EQUIPMENT_CARDS_CONFIG.QING_LONG_YAN_YUE_DAO.CN) {
+                if (targetPlayer?.weaponCard?.CN == EQUIPMENT_CARDS_CONFIG.QING_LONG_YAN_YUE_DAO.CN) {
                     gameStatus.weaponResStages = [
                         {
                             originId: curShanResStage.targetId,
