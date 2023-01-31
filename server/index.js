@@ -1,5 +1,6 @@
 // Setup basic express server
-const {emitInit} = require("./utils/emitUtils");
+const {differenceBy} = require("lodash/array");
+const {shuffle} = require("lodash/collection");
 const {goToNextStage} = require("./utils/stageUtils");
 const {GameEngine} = require("./model/GameEngine");
 const emitMap = require("./config/emitMap.json");
@@ -25,54 +26,35 @@ server.listen(port, () => {
 // Routing
 app.use(express.static(path.join(__dirname, '../client')));
 
+let roomPlayers = [];
 const gameEngine = new GameEngine(io);
 
 io.on('connection', (socket) => {
-    let addedPlayer = false;
-    let location = 0;
+    let playerId;
+    socket.on(emitMap.REFRESH_ROOM_PLAYERS, (data) => {
+        playerId = data.playerId
+        roomPlayers.push({playerId: data.playerId, playerName: data.playerName})
+        io.emit(emitMap.REFRESH_ROOM_PLAYERS, roomPlayers);
+    })
 
-    socket.on(emitMap.INIT, (data) => {
-        if (Object.keys(gameEngine.gameStatus.players).length >= 2) {
-            emitInit(gameEngine.gameStatus)
-            return;
+    socket.on(emitMap.DISCONNECT, () => {
+        if (playerId) {
+            roomPlayers = differenceBy(roomPlayers, [{playerId}], 'playerId');
         }
+        io.emit(emitMap.REFRESH_ROOM_PLAYERS, roomPlayers);
+    });
 
-        if (addedPlayer) {
-            emitInit(gameEngine.gameStatus)
-            return;
-        }
-
-        // hardcode 只有两个角色
-        const newPlayer = new Player({
-            imageName: "SHU001",
-            name: "刘备",
-            playerId: data.playerId,
-            location: location++
-        }, gameEngine.generateNewRoundQiuTaoResponseStages.bind(gameEngine));
-        gameEngine.gameStatus.players[newPlayer.playerId] = newPlayer;
-
-        const newPlayer2 = new Player({
-            imageName: "SHU002",
-            name: "关羽",
-            playerId: 'player2',
-            location: location++
-        }, gameEngine.generateNewRoundQiuTaoResponseStages.bind(gameEngine));
-        if (gameEngine.gameStatus.players[newPlayer2.playerId]) {
-            throw new Error("player2 id already exist")
-        }
-        gameEngine.gameStatus.players[newPlayer2.playerId] = newPlayer2;
-
-        for (i = 0; i < 0; i++) {
+    socket.on(emitMap.INIT, () => {
+        let locations = shuffle([0, 1, 2, 3, 4, 5, 6, 7].slice(0, roomPlayers.length));
+        roomPlayers.forEach((p, i) => {
             const newPlayer = new Player({
-                imageName: "SHU003",
-                name: "张飞",
-                playerId: 'player' + (i + 3),
-                location: location++
+                imageName: "SHU001",
+                name: p.playerName,
+                playerId: p.playerId,
+                location: locations[i]
             }, gameEngine.generateNewRoundQiuTaoResponseStages.bind(gameEngine));
             gameEngine.gameStatus.players[newPlayer.playerId] = newPlayer;
-        }
-
-        addedPlayer = true;
+        })
 
         // startEngine
         gameEngine.startEngine();

@@ -1,23 +1,6 @@
 const constants = require( "../constants/constants");
 const emitMap = require("../config/emitMap.json");
 const {omit} = require("lodash")
-const shuffle = (array) => {
-    let currentIndex = array.length, randomIndex;
-
-    // While there remain elements to shuffle.
-    while (currentIndex != 0) {
-
-        // Pick a remaining element.
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
-
-        // And swap it with the current element.
-        [array[currentIndex], array[randomIndex]] = [
-            array[randomIndex], array[currentIndex]];
-    }
-
-    return array;
-}
 
 const generateBehaviorMessage = (behavior, players) => {
     // behaviour is action/response
@@ -153,7 +136,6 @@ const emitInit = (gameStatus) => {
     io.emit(emitMap.INIT, omitGS);
 }
 
-exports.shuffle = shuffle;
 exports.emitNotifyPlayPublicCard = emitNotifyPlayPublicCard;
 exports.emitNotifyPandingPlayPublicCard = emitNotifyPandingPlayPublicCard;
 exports.emitNotifyThrowPlayPublicCard = emitNotifyThrowPlayPublicCard;

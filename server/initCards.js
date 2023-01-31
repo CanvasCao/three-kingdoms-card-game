@@ -1,7 +1,8 @@
 const {CARD_NUM_DESC, CARD_CONFIG, CARD_HUASE} = require("./config/cardConfig");
 const {Card} = require("./model/Card");
 const {v4: uuidv4} = require('uuid');
-const {shuffle} = require('./utils/emitUtils');
+const {shuffle} = require("lodash/collection");
+
 
 let standardCardMetaList = [
     {'huase': CARD_HUASE.HEITAO, number: 1, key: CARD_CONFIG.SHAN_DIAN.KEY},

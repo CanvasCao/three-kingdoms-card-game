@@ -11,7 +11,6 @@ const {
     emitInit,
     emitNotifyPlayPublicCard,
     emitNotifyCardBoardAction,
-    emitNotifyPandingPlayPublicCard,
     emitNotifyAddLines,
     emitNotifyThrowPlayPublicCard,
     emitNotifyWuGuCardChange,
@@ -70,7 +69,8 @@ class GameEngine {
     startEngine() {
         this.gameStatus.stage = {
             playerId: getCurrentPlayer(this.gameStatus).playerId,
-            stageName: stageConfig.stageNamesEN[this.gameStatus.stageIndex]
+            stageName: stageConfig.stageNamesEN[this.gameStatus.stageIndex],
+            stageNameCN: stageConfig.stageNamesCN[this.gameStatus.stageIndex]
         }
 
         everyoneGetInitialCards(this.gameStatus)
