@@ -1,4 +1,4 @@
-const constants = require( "../constants/constants");
+const {CARD_LOCATION} = require( "../config/cardConfig");
 const emitMap = require("../config/emitMap.json");
 const {omit} = require("lodash")
 
@@ -23,14 +23,16 @@ const generateBehaviorMessage = (behavior, players) => {
     }
 }
 
-const emitNotifyPlayPublicCard = (io, behaviour, gameStatus) => {
+const emitNotifyPlayPublicCard = (gameStatus, behaviour) => {
     // behaviour is action/response
     if (!behaviour) {
         throw new Error("need behaviour")
     }
 
+    const io = gameStatus.io;
+    const roomId = gameStatus.roomId;
     if (behaviour.cards?.[0]) {
-        io.emit(emitMap.NOTIFY_ADD_TO_PUBLIC_CARD, {
+        io.to(roomId).emit(emitMap.NOTIFY_ADD_TO_PUBLIC_CARD, {
             fromId: behaviour.originId,
             cards: behaviour.cards,
             originIndexes: behaviour.selectedIndexes,
@@ -40,9 +42,11 @@ const emitNotifyPlayPublicCard = (io, behaviour, gameStatus) => {
 }
 
 const emitNotifyPandingPlayPublicCard = (gameStatus, pandingResultCard, player, pandingCard) => {
-    gameStatus.io.emit(emitMap.NOTIFY_ADD_TO_PUBLIC_CARD, {
+    const io = gameStatus.io;
+    const roomId = gameStatus.roomId;
+    io.to(roomId).emit(emitMap.NOTIFY_ADD_TO_PUBLIC_CARD, {
         cards: [pandingResultCard],
-        fromId: constants.PAIDUI,
+        fromId: CARD_LOCATION.PAIDUI,
         message: `${player.name}的${pandingCard.CN}判定结果`
     });
 }
@@ -52,7 +56,9 @@ const emitNotifyThrowPlayPublicCard = (gameStatus, data, player) => {
     //     cards: Card[]
     //     selectedIndexes: number[],
     // }
-    gameStatus.io.emit(emitMap.NOTIFY_ADD_TO_PUBLIC_CARD, {
+    const io = gameStatus.io;
+    const roomId = gameStatus.roomId;
+    io.to(roomId).emit(emitMap.NOTIFY_ADD_TO_PUBLIC_CARD, {
         cards: data.cards,
         fromId: player.playerId,
         originIndexes: data.selectedIndexes,
@@ -60,7 +66,7 @@ const emitNotifyThrowPlayPublicCard = (gameStatus, data, player) => {
     });
 }
 
-const emitNotifyCardBoardAction = (io, boardActionData, gameStatus) => {
+const emitNotifyCardBoardAction = (gameStatus, boardActionData) => {
     // type EmitCardBoardData = {
     //     originId: string,
     //     targetId: string,
@@ -70,16 +76,17 @@ const emitNotifyCardBoardAction = (io, boardActionData, gameStatus) => {
 
     // selectedIndex: number,
     // }
-
+    const io = gameStatus.io;
+    const roomId = gameStatus.roomId;
     if (boardActionData.type == "REMOVE") {
-        io.emit(emitMap.NOTIFY_ADD_TO_PUBLIC_CARD, {
+        io.to(roomId).emit(emitMap.NOTIFY_ADD_TO_PUBLIC_CARD, {
             cards: [boardActionData.card],
             fromId: boardActionData.targetId,
             originIndexes: [boardActionData.selectedIndex],
             message: `${gameStatus.players[boardActionData.targetId].name} 被拆`
         });
     } else {
-        io.emit(emitMap.NOTIFY_ADD_TO_PLAYER_CARD, {
+        io.to(roomId).emit(emitMap.NOTIFY_ADD_TO_PLAYER_CARD, {
             cards: [boardActionData.card],
             fromId: boardActionData.targetId,
             toId: boardActionData.originId,
@@ -89,8 +96,10 @@ const emitNotifyCardBoardAction = (io, boardActionData, gameStatus) => {
     }
 }
 
-const emitNotifyJieDaoWeaponOwnerChange = (io, action, weaponCard) => {
-    io.emit(emitMap.NOTIFY_ADD_TO_PLAYER_CARD, {
+const emitNotifyJieDaoWeaponOwnerChange = (gameStatus, action, weaponCard) => {
+    const io = gameStatus.io;
+    const roomId = gameStatus.roomId;
+    io.to(roomId).emit(emitMap.NOTIFY_ADD_TO_PLAYER_CARD, {
         cards: [weaponCard],
         fromId: action.targetIds[0],
         toId: action.originId,
@@ -99,20 +108,24 @@ const emitNotifyJieDaoWeaponOwnerChange = (io, action, weaponCard) => {
     });
 }
 
-const emitNotifyWuGuCardChange = (io, data) => {
+const emitNotifyWuGuCardChange = (gameStatus, data) => {
 // export type EmitWugufengdengData = {
 //         card: Card,
 //         playerId: string,
 //     }
-    io.emit(emitMap.NOTIFY_ADD_TO_PLAYER_CARD, {
+    const io = gameStatus.io;
+    const roomId = gameStatus.roomId;
+    io.to(roomId).emit(emitMap.NOTIFY_ADD_TO_PLAYER_CARD, {
         cards: [data.card],
-        fromId: constants.PAIDUI,
+        fromId: CARD_LOCATION.PAIDUI,
         toId: data.playerId,
     });
 }
 
-const emitNotifyAddLines = (io, behavior) => {
-    io.emit(emitMap.NOTIFY_ADD_LINES, {
+const emitNotifyAddLines = (gameStatus, behavior) => {
+    const io = gameStatus.io;
+    const roomId = gameStatus.roomId;
+    io.to(roomId).emit(emitMap.NOTIFY_ADD_LINES, {
         fromId: behavior.originId,
         toIds: behavior.targetId ? [behavior.targetId] : behavior.targetIds,
         cards: behavior.cards,
@@ -126,14 +139,16 @@ const omitGSArray = ['throwedCards', 'initCards', 'currentLocation', 'stageIndex
 // 只能在goToNextStage调用 和GameEngine的handler之后调用
 const emitRefreshStatus = (gameStatus) => {
     const io = gameStatus.io;
+    const roomId = gameStatus.roomId;
     const omitGS = omit(gameStatus, omitGSArray)
-    io.emit(emitMap.REFRESH_STATUS, omitGS); // 为了refresh页面所有元素
+    io.to(roomId).emit(emitMap.REFRESH_STATUS, omitGS); // 为了refresh页面所有元素
 }
 
 const emitInit = (gameStatus) => {
     const io = gameStatus.io;
+    const roomId = gameStatus.roomId;
     const omitGS = omit(gameStatus, omitGSArray)
-    io.emit(emitMap.INIT, omitGS);
+    io.to(roomId).emit(emitMap.INIT, omitGS);
 }
 
 exports.emitNotifyPlayPublicCard = emitNotifyPlayPublicCard;

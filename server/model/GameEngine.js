@@ -36,9 +36,8 @@ const stageConfig = require("../config/stageConfig.json")
 class GameEngine {
     constructor(io) {
         // TODO let logs = [];
-        this.io = io;
-
         this.gameStatus = {
+            roomId: '',
             players: {},
             stage: {},
             action: {},
@@ -66,12 +65,14 @@ class GameEngine {
         }
     }
 
-    startEngine() {
+    startEngine(roomId) {
+        // this.gameStatus.status=''
         this.gameStatus.stage = {
             playerId: getCurrentPlayer(this.gameStatus).playerId,
             stageName: stageConfig.stageNamesEN[this.gameStatus.stageIndex],
             stageNameCN: stageConfig.stageNamesCN[this.gameStatus.stageIndex]
         }
+        this.gameStatus.roomId = roomId;
 
         everyoneGetInitialCards(this.gameStatus)
         emitInit(this.gameStatus);
@@ -82,8 +83,8 @@ class GameEngine {
     }
 
     handleAction(action) {
-        emitNotifyPlayPublicCard(this.io, action, this.gameStatus);
-        emitNotifyAddLines(this.io, action);
+        emitNotifyPlayPublicCard(this.gameStatus, action);
+        emitNotifyAddLines(this.gameStatus, action);
         this.gameStatus.action = action;
         const originPlayer = this.gameStatus.players[action.originId];
 
@@ -143,7 +144,7 @@ class GameEngine {
     }
 
     handleResponse(response) {
-        emitNotifyPlayPublicCard(this.io, response, this.gameStatus);
+        emitNotifyPlayPublicCard(this.gameStatus, response);
         if (this.gameStatus.taoResStages.length > 0 && response?.actualCard?.CN == BASIC_CARDS_CONFIG.SHAN.CN) {
             throw new Error("求桃的时候不能出闪")
         }
@@ -194,13 +195,13 @@ class GameEngine {
     }
 
     handleCardBoardAction(data) {
-        emitNotifyCardBoardAction(this.io, data, this.gameStatus)
+        emitNotifyCardBoardAction(this.gameStatus, data)
         cardBoardHandler.handleCardBoard(this.gameStatus, data)
         emitRefreshStatus(this.gameStatus);
     }
 
     handleWuguBoardAction(data) {
-        emitNotifyWuGuCardChange(this.io, data);
+        emitNotifyWuGuCardChange(this.gameStatus, data);
         wuguBoardHandler.handleWuGuBoard(this.gameStatus, data)
         emitRefreshStatus(this.gameStatus);
     }

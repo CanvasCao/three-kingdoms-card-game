@@ -1,3 +1,7 @@
+const CARD_LOCATION={
+    PAIDUI:"PAIDUI"
+}
+
 const CARD_HUASE = {
     HEITAO: "♠",
     CAOHUA: '♣',
@@ -376,6 +380,7 @@ const CARD_CONFIG = {
     ...EQUIPMENT_CARDS_CONFIG,
 }
 
+exports.CARD_LOCATION = CARD_LOCATION;
 exports.CARD_HUASE = CARD_HUASE;
 exports.CARD_COLOR = CARD_COLOR;
 exports.CARD_NUM_DESC = CARD_NUM_DESC;

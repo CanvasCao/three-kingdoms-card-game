@@ -1,6 +1,9 @@
 {
-  "REFRESH_ROOM_PLAYERS": "refresh_room_players",
+  "REFRESH_ROOMS": "refresh_rooms",
+  "JOIN_ROOM": "join_room",
+  "REFRESH_ROOM": "refresh_room",
   "DISCONNECT": "disconnect",
+
   "INIT": "init",
   "GO_NEXT_STAGE": "go_next_stage",
   "REFRESH_STATUS": "refresh_status",

@@ -1,2 +1,0 @@
-const PAIDUI="PAIDUI"
-exports.PAIDUI = PAIDUI;

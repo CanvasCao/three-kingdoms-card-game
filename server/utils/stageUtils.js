@@ -1,4 +1,3 @@
-const constants = require("../constants/constants");
 const {isNil} = require("lodash");
 const {pandingHandler} = require("../handler/pandingHandler");
 const {emitRefreshStatus} = require("./emitUtils");
@@ -10,6 +9,7 @@ const {getNextNeedExecutePandingSign} = require("./pandingUtils");
 const {getCards} = require("./cardUtils");
 const stageConfig = require("../config/stageConfig.json")
 const emitMap = require("../config/emitMap.json");
+const {CARD_LOCATION} = require( "../config/cardConfig");
 
 const goToNextStage = (gameStatus) => {
     gameStatus.stageIndex++;
@@ -69,7 +69,7 @@ const tryGoNextStage = (gameStatus) => {
         // TODO NOTIFY_ADD_OWNER_CHANGE_CARD统一封装在addCards
         gameStatus.io.emit(emitMap.NOTIFY_ADD_TO_PLAYER_CARD, {
             cards,
-            fromId: constants.PAIDUI,
+            fromId: CARD_LOCATION.PAIDUI,
             toId: player.playerId,
         });
 

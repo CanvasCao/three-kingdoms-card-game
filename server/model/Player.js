@@ -48,7 +48,7 @@ class Player {
         this.minusHorseCard = null;
 
         // ui tags
-        this.isTieSuo = true;
+        this.isTieSuo = false;
 
         // delay scroll tags
         this.judgedShandian = false;
