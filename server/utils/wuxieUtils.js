@@ -1,3 +1,4 @@
+const {emitNotifyDrawCards} = require("./emitUtils");
 const {getNextNeedExecutePandingSign} = require("./pandingUtils");
 const {SCROLL_CARDS_CONFIG} = require("../config/cardConfig");
 const {getAllHasWuxiePlayers, getCurrentPlayer} = require("./playerUtils");
@@ -79,7 +80,10 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
         const curScrollResStage = gameStatus.scrollResStages[0]
         if (isScrollEffected) {// 生效
             if (curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.CN) {
-                getCurrentPlayer(gameStatus).addCards(getCards(gameStatus, 2));
+                const cards = getCards(gameStatus, 2)
+                const player = getCurrentPlayer(gameStatus)
+                player.addCards(cards);
+                emitNotifyDrawCards(gameStatus, cards, player)
                 clearNextScrollStage(gameStatus);
             } else if (curScrollResStage.actualCard.CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
                 gameStatus.players[curScrollResStage.originId].addBlood();

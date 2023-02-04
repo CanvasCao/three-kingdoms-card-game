@@ -1,7 +1,7 @@
 {
   "REFRESH_ROOMS": "refresh_rooms",
   "JOIN_ROOM": "join_room",
-  "REFRESH_ROOM": "refresh_room",
+  "REFRESH_ROOM_PLAYERS": "refresh_room_players",
   "DISCONNECT": "disconnect",
 
   "INIT": "init",

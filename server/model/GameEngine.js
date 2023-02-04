@@ -1,3 +1,5 @@
+const {GAME_STATUS} = require("../config/gameConfig");
+const {STAGE_NAMES} = require("../config/gameConfig");
 const {
     getInitCards,
 } = require("../initCards");
@@ -13,7 +15,7 @@ const {
     emitNotifyCardBoardAction,
     emitNotifyAddLines,
     emitNotifyThrowPlayPublicCard,
-    emitNotifyWuGuCardChange,
+    emitNotifyPickWuGuCard,
 } = require("../utils/emitUtils");
 const {
     getCurrentPlayer,
@@ -31,13 +33,13 @@ const {responseCardHandler} = require("../handler/responseHandler");
 const {throwHandler} = require("../handler/throwHandler");
 const {cardBoardHandler} = require("../handler/cardBoardHandler");
 const {wuguBoardHandler} = require("../handler/wuguBoardHandler");
-const stageConfig = require("../config/stageConfig.json")
 
 class GameEngine {
     constructor(io) {
-        // TODO let logs = [];
         this.gameStatus = {
             roomId: '',
+            status: GAME_STATUS.IDLE,
+
             players: {},
             stage: {},
             action: {},
@@ -66,13 +68,12 @@ class GameEngine {
     }
 
     startEngine(roomId) {
-        // this.gameStatus.status=''
         this.gameStatus.stage = {
             playerId: getCurrentPlayer(this.gameStatus).playerId,
-            stageName: stageConfig.stageNamesEN[this.gameStatus.stageIndex],
-            stageNameCN: stageConfig.stageNamesCN[this.gameStatus.stageIndex]
+            stageName: STAGE_NAMES[this.gameStatus.stageIndex],
         }
         this.gameStatus.roomId = roomId;
+        this.gameStatus.status = GAME_STATUS.PLAYING;
 
         everyoneGetInitialCards(this.gameStatus)
         emitInit(this.gameStatus);
@@ -201,7 +202,7 @@ class GameEngine {
     }
 
     handleWuguBoardAction(data) {
-        emitNotifyWuGuCardChange(this.gameStatus, data);
+        emitNotifyPickWuGuCard(this.gameStatus, data);
         wuguBoardHandler.handleWuGuBoard(this.gameStatus, data)
         emitRefreshStatus(this.gameStatus);
     }

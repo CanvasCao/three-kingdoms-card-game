@@ -1,19 +1,17 @@
+const {STAGE_NAMES} = require("../config/gameConfig");
 const {isNil} = require("lodash");
 const {pandingHandler} = require("../handler/pandingHandler");
-const {emitRefreshStatus} = require("./emitUtils");
+const {emitRefreshStatus,emitNotifyDrawCards} = require("./emitUtils");
 const {getCurrentPlayer, getAllHasWuxiePlayers} = require("./playerUtils");
 const {setCurrentLocationToNextLocation} = require("./locationUtils");
 const {generateWuxieSimultaneousResStageByPandingCard} = require("./wuxieUtils");
 const {clearWuxieResStage} = require("./clearStageUtils");
 const {getNextNeedExecutePandingSign} = require("./pandingUtils");
 const {getCards} = require("./cardUtils");
-const stageConfig = require("../config/stageConfig.json")
-const emitMap = require("../config/emitMap.json");
-const {CARD_LOCATION} = require( "../config/cardConfig");
 
 const goToNextStage = (gameStatus) => {
     gameStatus.stageIndex++;
-    if (gameStatus.stageIndex >= stageConfig.stageNamesEN.length) {
+    if (gameStatus.stageIndex >= STAGE_NAMES.length) {
         // 当前用户结束
         getCurrentPlayer(gameStatus).resetWhenMyTurnEnds();
 
@@ -24,8 +22,7 @@ const goToNextStage = (gameStatus) => {
     }
     gameStatus.stage = {
         playerId: getCurrentPlayer(gameStatus).playerId,
-        stageName: stageConfig.stageNamesEN[gameStatus.stageIndex],
-        stageNameCN: stageConfig.stageNamesCN[gameStatus.stageIndex]
+        stageName: STAGE_NAMES[gameStatus.stageIndex],
     }
 
     clearWuxieResStage(gameStatus);
@@ -66,13 +63,7 @@ const tryGoNextStage = (gameStatus) => {
     } else if (gameStatus.stage.stageName == 'draw') {
         const cards = getCards(gameStatus, 2)
         player.addCards(cards)
-        // TODO NOTIFY_ADD_OWNER_CHANGE_CARD统一封装在addCards
-        gameStatus.io.emit(emitMap.NOTIFY_ADD_TO_PLAYER_CARD, {
-            cards,
-            fromId: CARD_LOCATION.PAIDUI,
-            toId: player.playerId,
-        });
-
+        emitNotifyDrawCards(gameStatus,cards,player)
         goToNextStage(gameStatus);
     } else if (gameStatus.stage.stageName == 'play') {
         if (player.skipPlay) {

@@ -1,4 +1,5 @@
 // Setup basic express server
+const {emitRefreshRooms, emitRefreshRoomPlayers} = require("./utils/emitUtils");
 const {differenceBy} = require("lodash/array");
 const {shuffle} = require("lodash/collection");
 const {goToNextStage} = require("./utils/stageUtils");
@@ -36,29 +37,20 @@ io.on('connection', (socket) => {
     let playerId;
     let playerName;
     let roomId;
-    let gameEngine;
+
     socket.on(emitMap.REFRESH_ROOMS, () => {
-        io.emit(emitMap.REFRESH_ROOMS, [
-                {roomId: 1, players: rooms[1].players},
-                {roomId: 2, players: rooms[2].players}
-            ]
-        );
+        emitRefreshRooms(io, rooms)
     })
 
     socket.on(emitMap.JOIN_ROOM, (data) => {
         playerId = data.playerId
         playerName = data.playerName
         roomId = data.roomId
-        if (playerId && playerName && roomId && rooms[roomId]) {
+        if (playerId && playerName && roomId && rooms[roomId] && (rooms[roomId].gameEngine == null)) {
             rooms[roomId].players.push({playerId, playerName})
             socket.join(roomId);
-            io.to(roomId).emit(emitMap.REFRESH_ROOM, rooms[roomId]);
-
-            io.emit(emitMap.REFRESH_ROOMS, [
-                    {roomId: 1, players: rooms[1].players},
-                    {roomId: 2, players: rooms[2].players}
-                ]
-            );
+            emitRefreshRooms(io, rooms)
+            emitRefreshRoomPlayers(io, rooms, roomId)
         }
     })
 
@@ -66,10 +58,19 @@ io.on('connection', (socket) => {
         if (playerId && roomId) {
             rooms[roomId].players = differenceBy(rooms[roomId].players, [{playerId}], 'playerId');
             socket.leave(roomId);
+            emitRefreshRooms(io, rooms)
+            emitRefreshRoomPlayers(io, rooms, roomId)
         }
     });
 
     socket.on(emitMap.INIT, () => {
+        if (!playerId || !roomId) {
+            return
+        }
+        // startEngine
+        const gameEngine = new GameEngine(io);
+        rooms[roomId].gameEngine = gameEngine;
+
         const roomPlayers = rooms[roomId].players
         let locations = shuffle([0, 1, 2, 3, 4, 5, 6, 7].slice(0, roomPlayers.length));
         roomPlayers.forEach((p, i) => {
@@ -82,33 +83,30 @@ io.on('connection', (socket) => {
             gameEngine.gameStatus.players[newPlayer.playerId] = newPlayer;
         })
 
-        // startEngine
-        const gameEngine = new GameEngine(io)
-        rooms[roomId].gameEngine = gameEngine;
         gameEngine.startEngine(roomId);
     });
 
     socket.on(emitMap.GO_NEXT_STAGE, () => {
-        goToNextStage(gameEngine.gameStatus);
+        rooms?.[roomId]?.gameEngine && goToNextStage(rooms[roomId].gameEngine.gameStatus);
     });
 
     socket.on(emitMap.ACTION, (action) => {
-        gameEngine.handleAction(action);
+        rooms?.[roomId]?.gameEngine?.handleAction(action);
     });
 
     socket.on(emitMap.RESPONSE, (response) => {
-        gameEngine.handleResponse(response);
+        rooms?.[roomId]?.gameEngine?.handleResponse(response);
     });
 
     socket.on(emitMap.CARD_BOARD_ACTION, (data) => {
-        gameEngine.handleCardBoardAction(data);
+        rooms?.[roomId]?.gameEngine?.handleCardBoardAction(data);
     });
 
     socket.on(emitMap.WUGU_BOARD_ACTION, (data) => {
-        gameEngine.handleWuguBoardAction(data);
+        rooms?.[roomId]?.gameEngine?.handleWuguBoardAction(data);
     });
 
     socket.on(emitMap.THROW, (data) => {
-        gameEngine.handleThrowCards(data);
+        rooms?.[roomId]?.gameEngine?.handleThrowCards(data);
     });
 });

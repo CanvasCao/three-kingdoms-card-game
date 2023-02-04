@@ -1,4 +1,5 @@
-const {CARD_LOCATION} = require( "../config/cardConfig");
+const {GAME_STATUS} = require("../config/gameConfig");
+const {CARD_LOCATION} = require("../config/cardConfig");
 const emitMap = require("../config/emitMap.json");
 const {omit} = require("lodash")
 
@@ -23,6 +24,7 @@ const generateBehaviorMessage = (behavior, players) => {
     }
 }
 
+// TO PUBLIC EMIT
 const emitNotifyPlayPublicCard = (gameStatus, behaviour) => {
     // behaviour is action/response
     if (!behaviour) {
@@ -63,6 +65,17 @@ const emitNotifyThrowPlayPublicCard = (gameStatus, data, player) => {
         fromId: player.playerId,
         originIndexes: data.selectedIndexes,
         message: `${player.name}弃牌`
+    });
+}
+
+// TO PLAYER EMIT
+const emitNotifyDrawCards = (gameStatus, cards, player) => {
+    const io = gameStatus.io;
+    const roomId = gameStatus.roomId;
+    io.to(roomId).emit(emitMap.NOTIFY_ADD_TO_PLAYER_CARD, {
+        cards,
+        fromId: CARD_LOCATION.PAIDUI,
+        toId: player.playerId,
     });
 }
 
@@ -108,7 +121,7 @@ const emitNotifyJieDaoWeaponOwnerChange = (gameStatus, action, weaponCard) => {
     });
 }
 
-const emitNotifyWuGuCardChange = (gameStatus, data) => {
+const emitNotifyPickWuGuCard = (gameStatus, data) => {
 // export type EmitWugufengdengData = {
 //         card: Card,
 //         playerId: string,
@@ -122,6 +135,7 @@ const emitNotifyWuGuCardChange = (gameStatus, data) => {
     });
 }
 
+// LINES
 const emitNotifyAddLines = (gameStatus, behavior) => {
     const io = gameStatus.io;
     const roomId = gameStatus.roomId;
@@ -135,13 +149,13 @@ const emitNotifyAddLines = (gameStatus, behavior) => {
 
 const omitGSArray = ['throwedCards', 'initCards', 'currentLocation', 'stageIndex', 'io']
 
-// emitRefreshStatus
+// WHOLE STATUS
 // 只能在goToNextStage调用 和GameEngine的handler之后调用
 const emitRefreshStatus = (gameStatus) => {
     const io = gameStatus.io;
     const roomId = gameStatus.roomId;
     const omitGS = omit(gameStatus, omitGSArray)
-    io.to(roomId).emit(emitMap.REFRESH_STATUS, omitGS); // 为了refresh页面所有元素
+    io.to(roomId).emit(emitMap.REFRESH_STATUS, omitGS);
 }
 
 const emitInit = (gameStatus) => {
@@ -151,14 +165,34 @@ const emitInit = (gameStatus) => {
     io.to(roomId).emit(emitMap.INIT, omitGS);
 }
 
+// room
+const emitRefreshRooms = (io, rooms) => {
+    io.emit(emitMap.REFRESH_ROOMS, [
+            {roomId: 1, players: rooms[1].players, status: rooms[1].status},
+            {roomId: 2, players: rooms[2].players, status: rooms[2].status}
+        ]
+    );
+}
+
+const emitRefreshRoomPlayers = (io, rooms, roomId) => {
+    if (!rooms[roomId].gameEngine) {
+        io.to(roomId).emit(emitMap.REFRESH_ROOM_PLAYERS, rooms[roomId].players);
+    }
+}
+
 exports.emitNotifyPlayPublicCard = emitNotifyPlayPublicCard;
 exports.emitNotifyPandingPlayPublicCard = emitNotifyPandingPlayPublicCard;
 exports.emitNotifyThrowPlayPublicCard = emitNotifyThrowPlayPublicCard;
 
+exports.emitNotifyDrawCards = emitNotifyDrawCards;
 exports.emitNotifyCardBoardAction = emitNotifyCardBoardAction;
 exports.emitNotifyJieDaoWeaponOwnerChange = emitNotifyJieDaoWeaponOwnerChange;
-exports.emitNotifyWuGuCardChange = emitNotifyWuGuCardChange;
+exports.emitNotifyPickWuGuCard = emitNotifyPickWuGuCard;
+
 exports.emitNotifyAddLines = emitNotifyAddLines;
 
 exports.emitRefreshStatus = emitRefreshStatus;
 exports.emitInit = emitInit;
+
+exports.emitRefreshRooms = emitRefreshRooms;
+exports.emitRefreshRoomPlayers = emitRefreshRoomPlayers;
