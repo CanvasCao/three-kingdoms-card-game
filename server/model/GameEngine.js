@@ -54,9 +54,9 @@ class GameEngine {
                 hasWuxiePlayerIds: [],
                 wuxieChain: []// 等待全员无懈可击
             },
+            weaponResStages: [],
             wugufengdengCards: [],
             tieSuoTempStorage: [],
-            weaponResStages: [],
 
             // 不需要传到前端的
             io: io,
@@ -104,7 +104,7 @@ class GameEngine {
         else if (CARD_TYPE.EQUIPMENT == action.actualCard.type) {
             actionHandler.setStatusByEquipmentAction(this.gameStatus);
         }
-        // DELAY
+        // DELAY SCROLL
         else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.SHAN_DIAN.CN) {
             actionHandler.setStatusByShanDianAction(this.gameStatus, this.gameStatus);
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.LE_BU_SI_SHU.CN) {

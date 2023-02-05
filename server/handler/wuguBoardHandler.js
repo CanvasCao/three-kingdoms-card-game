@@ -1,4 +1,4 @@
-const {clearNextScrollStage} = require("../utils/clearStageUtils")
+const {clearNextScrollStage} = require("../utils/clearResStageUtils")
 const wuguBoardHandler = {
     handleWuGuBoard(gameStatus, data) {
         const wuguPlayer = gameStatus.players[data.playerId]

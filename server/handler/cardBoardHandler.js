@@ -1,5 +1,5 @@
 const {throwCards} = require("../utils/cardUtils")
-const {clearNextScrollStage} = require("../utils/clearStageUtils")
+const {clearNextScrollStage} = require("../utils/clearResStageUtils")
 const cardBoardHandler = {
     handleCardBoard(gameStatus, data) {
         const {card, originId, targetId, type} = data;

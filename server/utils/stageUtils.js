@@ -1,48 +1,60 @@
-const {STAGE_NAMES} = require("../config/gameConfig");
+const {STAGE_NAMES, GAME_STAGE} = require("../config/gameConfig");
 const {isNil} = require("lodash");
 const {pandingHandler} = require("../handler/pandingHandler");
-const {emitRefreshStatus,emitNotifyDrawCards} = require("./emitUtils");
+const {emitRefreshStatus, emitNotifyDrawCards} = require("./emitUtils");
 const {getCurrentPlayer, getAllHasWuxiePlayers} = require("./playerUtils");
 const {setCurrentLocationToNextLocation} = require("./locationUtils");
 const {generateWuxieSimultaneousResStageByPandingCard} = require("./wuxieUtils");
-const {clearWuxieResStage} = require("./clearStageUtils");
+const {clearAllResStages} = require("./clearResStageUtils");
 const {getNextNeedExecutePandingSign} = require("./pandingUtils");
 const {getCards} = require("./cardUtils");
 
-const goToNextStage = (gameStatus) => {
-    gameStatus.stageIndex++;
-    if (gameStatus.stageIndex >= STAGE_NAMES.length) {
-        // 当前用户结束
-        getCurrentPlayer(gameStatus).resetWhenMyTurnEnds();
-
-        // 下一个用户开始
-        gameStatus.stageIndex = 0;
-        setCurrentLocationToNextLocation(gameStatus);
-        getCurrentPlayer(gameStatus).resetWhenMyTurnStarts();
-    }
+const setGameStatusStage = (gameStatus) => {
     gameStatus.stage = {
         playerId: getCurrentPlayer(gameStatus).playerId,
         stageName: STAGE_NAMES[gameStatus.stageIndex],
     }
+}
 
-    clearWuxieResStage(gameStatus);
-    gameStatus.shanResStages = [];
-    gameStatus.taoResStages = [];
-    gameStatus.scrollResStages = [];
+const goNextPlayerStartStage = (gameStatus) => {
+    // 当前用户结束
+    getCurrentPlayer(gameStatus).resetWhenMyTurnEnds();
+
+    // 下一个用户开始
+    gameStatus.stageIndex = 0;
+    setCurrentLocationToNextLocation(gameStatus);
+    setGameStatusStage(gameStatus);
+    getCurrentPlayer(gameStatus).resetWhenMyTurnStarts();
+}
+
+const goToNextStage = (gameStatus) => {
+    gameStatus.stageIndex++;
+    if (gameStatus.stageIndex >= STAGE_NAMES.length) {
+        goNextPlayerStartStage(gameStatus)
+    } else {
+        setGameStatusStage(gameStatus);
+    }
+
+    clearAllResStages(gameStatus)
 
     emitRefreshStatus(gameStatus);
     tryGoNextStage(gameStatus);
 }
 
+// const
 const tryGoNextStage = (gameStatus) => {
     if (!canTryGoNextStage(gameStatus)) {
         return
     }
 
     const player = getCurrentPlayer(gameStatus);
-    if (gameStatus.stage.stageName == 'start') {
+    if (player.isDead) { // 自己的回合死亡后 需要直接移动到下一个人（闪电 决斗）
+        goNextPlayerStartStage(gameStatus)
+    }
+
+    if (gameStatus.stage.stageName == GAME_STAGE.START) {
         goToNextStage(gameStatus);
-    } else if (gameStatus.stage.stageName == 'judge') {
+    } else if (gameStatus.stage.stageName == GAME_STAGE.JUDGE) {
         const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus)
         if (!nextNeedPandingSign) {
             goToNextStage(gameStatus);
@@ -53,27 +65,27 @@ const tryGoNextStage = (gameStatus) => {
                 emitRefreshStatus(gameStatus);
             } else {
                 nextNeedPandingSign.isEffect = true;
-                tryGoNextStage(gameStatus);// nextNeedPandingSign生效之后进入 判定执行
+                tryGoNextStage(gameStatus); // nextNeedPandingSign生效之后进入 判定执行
             }
         } else {
             pandingHandler.executeNextOnePanding(gameStatus);
             emitRefreshStatus(gameStatus); // 闪电之后可能要求桃
-            tryGoNextStage(gameStatus);// 如果还有别的判定牌会再一次回到这里
+            tryGoNextStage(gameStatus); // 如果还有别的判定牌会再一次回到这里
         }
-    } else if (gameStatus.stage.stageName == 'draw') {
+    } else if (gameStatus.stage.stageName == GAME_STAGE.DRAW) {
         const cards = getCards(gameStatus, 2)
         player.addCards(cards)
-        emitNotifyDrawCards(gameStatus,cards,player)
+        emitNotifyDrawCards(gameStatus, cards, player)
         goToNextStage(gameStatus);
-    } else if (gameStatus.stage.stageName == 'play') {
+    } else if (gameStatus.stage.stageName == GAME_STAGE.PLAY) {
         if (player.skipPlay) {
             goToNextStage(gameStatus);
         }
-    } else if (gameStatus.stage.stageName == 'throw') {
+    } else if (gameStatus.stage.stageName == GAME_STAGE.THROW) {
         if (!player.needThrow()) {
             goToNextStage(gameStatus);
         }
-    } else if (gameStatus.stage.stageName == 'end') {
+    } else if (gameStatus.stage.stageName == GAME_STAGE.END) {
         goToNextStage(gameStatus);
     }
 }
@@ -82,6 +94,7 @@ const canTryGoNextStage = (gameStatus) => {
     if (gameStatus.shanResStages.length > 0 ||
         gameStatus.taoResStages.length > 0 ||
         gameStatus.scrollResStages.length > 0 ||
+        gameStatus.weaponResStages.length > 0 ||
         gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds.length > 0
     ) {
         return false

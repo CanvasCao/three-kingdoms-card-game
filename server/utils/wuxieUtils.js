@@ -3,7 +3,7 @@ const {getNextNeedExecutePandingSign} = require("./pandingUtils");
 const {SCROLL_CARDS_CONFIG} = require("../config/cardConfig");
 const {getAllHasWuxiePlayers, getCurrentPlayer} = require("./playerUtils");
 const {getCards} = require("./cardUtils");
-const {clearNextScrollStage, clearWuxieResStage} = require("./clearStageUtils");
+const {clearNextScrollStage, clearWuxieResStage} = require("./clearResStageUtils");
 
 const generateWuxieSimultaneousResStageByScroll = (gameStatus) => {
     if (!gameStatus.scrollResStages?.[0]) {

@@ -21,8 +21,17 @@ const clearWuxieResStage = (gameStatus) => {
     }
 }
 
+const clearAllResStages = (gameStatus) => {
+    clearWuxieResStage(gameStatus);
+    gameStatus.shanResStages = [];
+    gameStatus.taoResStages = [];
+    gameStatus.scrollResStages = [];
+    gameStatus.weaponResStages = [];
+}
+
 exports.clearNextTaoStage = clearNextTaoStage;
 exports.clearNextShanStage = clearNextShanStage;
 exports.clearNextScrollStage = clearNextScrollStage;
 exports.clearNextWeaponStage = clearNextWeaponStage;
 exports.clearWuxieResStage = clearWuxieResStage;
+exports.clearAllResStages = clearAllResStages;

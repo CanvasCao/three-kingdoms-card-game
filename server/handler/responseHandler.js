@@ -14,7 +14,7 @@ const {
     clearNextTaoStage,
     clearNextScrollStage,
     clearNextWeaponStage
-} = require("../utils/clearStageUtils");
+} = require("../utils/clearResStageUtils");
 const {BASIC_CARDS_CONFIG, SCROLL_CARDS_CONFIG} = require("../config/cardConfig")
 const {throwCards} = require("../utils/cardUtils")
 const {getAllHasWuxiePlayers, getCurrentPlayer} = require("../utils/playerUtils")
