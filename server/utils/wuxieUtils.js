@@ -11,31 +11,14 @@ const generateWuxieSimultaneousResStageByScroll = (gameStatus) => {
     }
 
     const action = gameStatus.action;
-    const scrollResStage = gameStatus.scrollResStages[0];
     const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus);
     if (hasWuxiePlayers.length <= 0) {
         throw Error("没有人有无懈可击 不需要生成wuxieSimultaneousResStage")
     }
 
-    let nextWuXieTargetId
-    // 无懈action origin
-    if (action.actualCard.CN == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.CN ||
-        action.actualCard.CN == SCROLL_CARDS_CONFIG.GUO_HE_CHAI_QIAO.CN ||
-        action.actualCard.CN == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.CN ||
-        action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.CN ||
-        action.actualCard.CN == SCROLL_CARDS_CONFIG.JUE_DOU.CN
-    ) {
-        nextWuXieTargetId = action.originId
-    } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN ||
-        action.actualCard.CN == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.CN ||
-        action.actualCard.CN == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.CN ||
-        action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_GU_FENG_DENG.CN) {
-        nextWuXieTargetId = scrollResStage.originId
-    }
     gameStatus.wuxieSimultaneousResStage = {
         hasWuxiePlayerIds: hasWuxiePlayers.map((u) => u.playerId),
         wuxieChain: [{
-            nextWuXieTargetId,
             cards: action.cards,
             actualCard: action.actualCard
         }]
@@ -43,7 +26,6 @@ const generateWuxieSimultaneousResStageByScroll = (gameStatus) => {
 }
 
 const generateWuxieSimultaneousResStageByPandingCard = (gameStatus) => {
-    const currentPlayer = getCurrentPlayer(gameStatus);
     const nextPandingSign = getNextNeedExecutePandingSign(gameStatus);
     const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus);
     if (hasWuxiePlayers.length <= 0) {
@@ -52,7 +34,6 @@ const generateWuxieSimultaneousResStageByPandingCard = (gameStatus) => {
     gameStatus.wuxieSimultaneousResStage = {
         hasWuxiePlayerIds: hasWuxiePlayers.map((u) => u.playerId),
         wuxieChain: [{
-            nextWuXieTargetId: currentPlayer.playerId,
             cards: [nextPandingSign.card],
             actualCard: nextPandingSign.actualCard
         }]
@@ -60,6 +41,8 @@ const generateWuxieSimultaneousResStageByPandingCard = (gameStatus) => {
 }
 
 
+// 延时锦囊生效之后 set pandingSigns isEffect true/false 给executeNextOnePanding执行
+// 即时锦囊生效 set scrollResStages isEffect true 或 clear scrollResStages
 const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (gameStatus, from) => {
     // console.log(from)
     if (gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds.length != 0) {
@@ -127,22 +110,17 @@ const resetHasWuxiePlayerIdsAndPushChainAfterValidatedWuxie = (gameStatus, respo
     // cards: Card[],
     // actualCard: Card,
     // originId: string,
-    // targetId: string,
-    //
-    // // 为了校验无懈可击是否冲突
-    // wuxieTargetCardId?: string,
 
     // wuxieChain
     // cards: Card[],
     // actualCard: Card,
-    // nextWuXieTargetId: string
-    // WuxieChain不需要wuxieTargetCardId 只用来后端校验
+
     const newHasWuxiePlayers = getAllHasWuxiePlayers(gameStatus);
     gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds = newHasWuxiePlayers.map(u => u.playerId);
     gameStatus.wuxieSimultaneousResStage.wuxieChain.push({
         cards: response.cards,
         actualCard: response.actualCard,
-        nextWuXieTargetId: response.originId,
+        cardFromPlayerId: response.originId,
     });
 }
 

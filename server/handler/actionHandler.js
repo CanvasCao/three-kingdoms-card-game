@@ -128,6 +128,7 @@ const actionHandler = {
                     return {
                         originId: action.originId,
                         targetId: targetId,
+                        cardTakeEffectOnPlayerId: targetId,
                         cards: action.cards,
                         actualCard: action.actualCard,
                         isEffect: false,
@@ -138,6 +139,7 @@ const actionHandler = {
                 gameStatus.scrollResStages = [{
                     originId: action.targetIds[0],
                     targetId: action.targetIds[1],
+                    cardTakeEffectOnPlayerId: action.targetIds[0],
                     cards: action.cards,
                     actualCard: action.actualCard,
                     isEffect: false,
@@ -147,7 +149,8 @@ const actionHandler = {
             if (action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.CN) {
                 gameStatus.scrollResStages = [{
                     originId: action.originId,
-                    // targetId: action.targetId,
+                    targetId: action.targetId,
+                    cardTakeEffectOnPlayerId: action.originId,
                     cards: action.cards,
                     actualCard: action.actualCard,
                     isEffect: false,
@@ -157,6 +160,7 @@ const actionHandler = {
                 gameStatus.scrollResStages = [{
                     originId: action.targetId,
                     targetId: action.originId,
+                    cardTakeEffectOnPlayerId: action.targetId,
                     cards: action.cards,
                     actualCard: action.actualCard,
                     isEffect: false,
@@ -167,7 +171,7 @@ const actionHandler = {
             gameStatus.scrollResStages = players.filter((p) => p.currentBlood < p.maxBlood).map((player) => {
                 return {
                     originId: player.playerId,
-                    // targetId: player.playerId,
+                    cardTakeEffectOnPlayerId: player.playerId,
                     cards: action.cards,
                     actualCard: action.actualCard,
                     isEffect: false,
@@ -183,6 +187,7 @@ const actionHandler = {
                 return {
                     originId: player.playerId,
                     targetId: action.originId,
+                    cardTakeEffectOnPlayerId: player.playerId,
                     cards: action.cards,
                     actualCard: action.actualCard,
                     isEffect: false,
@@ -198,6 +203,7 @@ const actionHandler = {
                 return {
                     originId: player.playerId,
                     cards: action.cards,
+                    cardTakeEffectOnPlayerId: player.playerId,
                     actualCard: action.actualCard,
                     isEffect: false,
                     stageId: uuidv4(), // 前端刷新Board的依据

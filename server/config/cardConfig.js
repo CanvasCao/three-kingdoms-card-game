@@ -72,6 +72,12 @@ const BASIC_CARDS_CONFIG = {
         "EN": "Peach",
         type: CARD_TYPE.BASIC,
     },
+    "JIU": {
+        KEY: "JIU",
+        "CN": "酒",
+        "EN": "Wine",
+        type: CARD_TYPE.BASIC
+    },
 }
 
 const IMMEDIATE_SCROLL_CARDS_CONFIG = {

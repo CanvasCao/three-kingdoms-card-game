@@ -97,7 +97,6 @@ const responseCardHandler = {
         //     cards: Card[],
         //     actualCard: Card,
         //     originId: string,
-        //     targetId: string,
         //     wuxieTargetCardId?: string,
         // }
 
@@ -106,15 +105,12 @@ const responseCardHandler = {
         // 1 校验chain 如果已通过 用户打出 更新hasWuxiePlayerIds/wuxieChain
         // 1.1 如果没人有无懈 清空wuxieResStage 锦囊生效
         // 1.2 如果还有人有无懈 前端强制等待三秒
-        // 2 如果不通过 用户不会打出
+        // 2 如果校验response.wuxieTargetCardId不通过 后端不会removeHandCards
 
         // 不出无懈可击
         // 从hasWuxiePlayerIds移除
         // 如果 如果没人有无懈 清空wuxieResStage 锦囊生效
         // 否则 如果还有人有无懈 继续等待
-
-        // 延时锦囊生效之后 set pandingSigns isEffect true/false 给executeNextOnePanding执行
-        // 即时锦囊生效 set scrollResStages isEffect true 或 clear scrollResStages
 
         if (response?.actualCard?.CN == SCROLL_CARDS_CONFIG.WU_XIE_KE_JI.CN) { // 出无懈可击了
             const lastWuxieChainItem = wuxieChain[wuxieChain.length - 1];
@@ -128,7 +124,7 @@ const responseCardHandler = {
                     // 锦囊开始结算
                     setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, "setStatusByWuxieResponse");
                 } else {
-                    // EMIT.FORCEWAIT()
+                    // 前端强制等待三秒
                 }
             }
         } else { // 没出无懈可击
