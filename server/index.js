@@ -1,5 +1,6 @@
 // Setup basic express server
 const {emitRefreshRooms, emitRefreshRoomPlayers} = require("./utils/emitUtils");
+const {v4: uuidv4} = require('uuid');
 const {differenceBy} = require("lodash/array");
 const {shuffle} = require("lodash/collection");
 const {goToNextStage} = require("./utils/stageUtils");
@@ -72,6 +73,10 @@ io.on('connection', (socket) => {
         rooms[roomId].gameEngine = gameEngine;
 
         const roomPlayers = rooms[roomId].players
+        // for (let i = 0; i < 7; i++) {
+        //     roomPlayers.push({name: uuidv4(), playerId: uuidv4()})
+        // }
+        // let locations = ([0, 1, 2, 3, 4, 5, 6, 7].slice(0, roomPlayers.length));
         let locations = shuffle([0, 1, 2, 3, 4, 5, 6, 7].slice(0, roomPlayers.length));
         roomPlayers.forEach((p, i) => {
             const newPlayer = new Player({

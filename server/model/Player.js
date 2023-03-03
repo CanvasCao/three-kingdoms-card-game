@@ -26,7 +26,7 @@ class Player {
             "cardId": uuidv4(),
             "cardNumDesc": "A",
             "CN": EQUIPMENT_CARDS_CONFIG.ZHANG_BA_SHE_MAO.CN,
-            "EN": "Crossbow",
+            "EN": "Green Steel Sword",
             "type": "EQUIPMENT",
             "equipmentType": EQUIPMENT_TYPE.WEAPON,
             "distance": 3,

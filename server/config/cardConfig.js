@@ -15,18 +15,12 @@ const CARD_COLOR = {
     RED: 'red'
 }
 
-const CARD_NUM_DESC = {
-    1: "A",
-    11: "J",
-    12: "Q",
-    13: "K",
-}
-
 const CARD_TYPE = {
     EQUIPMENT: "EQUIPMENT",
     SCROLL: "SCROLL",
     BASIC: "BASIC",
 }
+
 const CARD_ATTRIBUTE = {
     LIGHTNING: "LIGHTNING",
     FIRE: "FIRE",
@@ -389,7 +383,6 @@ const CARD_CONFIG = {
 exports.CARD_LOCATION = CARD_LOCATION;
 exports.CARD_HUASE = CARD_HUASE;
 exports.CARD_COLOR = CARD_COLOR;
-exports.CARD_NUM_DESC = CARD_NUM_DESC;
 exports.CARD_CONFIG = CARD_CONFIG;
 exports.CARD_TYPE = CARD_TYPE;
 exports.BASIC_CARDS_CONFIG = BASIC_CARDS_CONFIG;
