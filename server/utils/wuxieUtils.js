@@ -44,7 +44,7 @@ const generateWuxieSimultaneousResStageByPandingCard = (gameStatus) => {
 // 延时锦囊生效之后 set pandingSigns isEffect true/false 给executeNextOnePanding执行
 // 即时锦囊生效 set scrollResStages isEffect true 或 clear scrollResStages
 const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (gameStatus, from) => {
-    // console.log(from)
+    // console.log("from", from)
     if (gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds.length != 0) {
         throw new Error("还有人出无懈可击 不可以结算锦囊");
     }
@@ -92,15 +92,16 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
     }
     clearWuxieResStage(gameStatus); // 生效后清空WuxieResStage
 
-    // 桃园结义很特殊
-    // 因为clear scrollResStage之后 不用设置isEffect 直接加血 所以需要递归判断下一个用户
-    // 无中生有 只有一个目标 可以递归但是没必要
-    if ((gameStatus.scrollResStages.length > 0) && gameStatus.scrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
+
+    // 无懈可击失效以后 下一个人的锦囊需要继续求无懈可击
+    if ((gameStatus.scrollResStages.length > 0) &&
+        !gameStatus.scrollResStages[0].isEffect
+    ) {
         const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
         if (hasWuxiePlayers.length > 0) {
             generateWuxieSimultaneousResStageByScroll(gameStatus)
         } else { // 没人有无懈可击直接生效
-            setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, "TAO_YUAN_JIE_YI");
+            setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, gameStatus.scrollResStages[0].actualCard.CN);
         }
     }
 }

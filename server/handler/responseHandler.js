@@ -122,7 +122,7 @@ const responseCardHandler = {
                 const newHasWuxiePlayers = getAllHasWuxiePlayers(gameStatus);
                 if (newHasWuxiePlayers.length == 0) {
                     // 锦囊开始结算
-                    setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, "setStatusByWuxieResponse");
+                    setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, "setStatusByWuxieResponse 出了无懈可击");
                 } else {
                     // 前端强制等待三秒
                 }
@@ -132,7 +132,7 @@ const responseCardHandler = {
             gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds = newHasWuxiePlayersIds;
             if (newHasWuxiePlayersIds.length == 0) {
                 // 锦囊开始结算
-                setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, "setStatusByWuxieResponse")
+                setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, "setStatusByWuxieResponse 没出无懈可击")
             }
         }
     },

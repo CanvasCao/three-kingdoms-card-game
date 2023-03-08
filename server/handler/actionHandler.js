@@ -131,7 +131,7 @@ const actionHandler = {
                         cardTakeEffectOnPlayerId: targetId,
                         cards: action.cards,
                         actualCard: action.actualCard,
-                        isEffect: false,
+                        isEffect: undefined,
                         stageId: uuidv4(), // 前端刷新Board的依据
                     }
                 })
@@ -142,7 +142,7 @@ const actionHandler = {
                     cardTakeEffectOnPlayerId: action.targetIds[0],
                     cards: action.cards,
                     actualCard: action.actualCard,
-                    isEffect: false,
+                    isEffect: undefined,
                 }]
             }
         } else if (action.targetId) {
@@ -153,7 +153,7 @@ const actionHandler = {
                     cardTakeEffectOnPlayerId: action.originId,
                     cards: action.cards,
                     actualCard: action.actualCard,
-                    isEffect: false,
+                    isEffect: undefined,
                 }]
             } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.JUE_DOU.CN) {
                 // 决斗originId targetId的值相反
@@ -163,7 +163,7 @@ const actionHandler = {
                     cardTakeEffectOnPlayerId: action.targetId,
                     cards: action.cards,
                     actualCard: action.actualCard,
-                    isEffect: false,
+                    isEffect: undefined,
                 }]
             }
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
@@ -174,7 +174,7 @@ const actionHandler = {
                     cardTakeEffectOnPlayerId: player.playerId,
                     cards: action.cards,
                     actualCard: action.actualCard,
-                    isEffect: false,
+                    isEffect: undefined,
                 }
             })
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.CN ||
@@ -190,7 +190,7 @@ const actionHandler = {
                     cardTakeEffectOnPlayerId: player.playerId,
                     cards: action.cards,
                     actualCard: action.actualCard,
-                    isEffect: false,
+                    isEffect: undefined,
                 }
             })
             gameStatus.scrollResStages = scrollResStages
@@ -205,7 +205,7 @@ const actionHandler = {
                     cards: action.cards,
                     cardTakeEffectOnPlayerId: player.playerId,
                     actualCard: action.actualCard,
-                    isEffect: false,
+                    isEffect: undefined,
                     stageId: uuidv4(), // 前端刷新Board的依据
                 }
             })
