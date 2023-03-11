@@ -148,8 +148,6 @@ const emitNotifyAddLines = (gameStatus, behavior) => {
 }
 
 const omitGSArray = ['throwedCards', 'initCards', 'currentLocation', 'stageIndex', 'io']
-
-// WHOLE STATUS
 // 只能在goToNextStage调用 和GameEngine的handler之后调用
 const emitRefreshStatus = (gameStatus) => {
     const io = gameStatus.io;
@@ -167,11 +165,15 @@ const emitInit = (gameStatus) => {
 
 // room
 const emitRefreshRooms = (io, rooms) => {
-    io.emit(emitMap.REFRESH_ROOMS, [
-            {roomId: 1, players: rooms[1].players, status: rooms[1].status},
-            {roomId: 2, players: rooms[2].players, status: rooms[2].status}
-        ]
-    );
+    const emitRooms = []
+    for (var roomId in rooms) {
+        emitRooms.push({
+            roomId,
+            players: rooms[roomId].players,
+            status: rooms[roomId].gameEngine ? GAME_STATUS.PLAYING : GAME_STATUS.IDLE,
+        })
+    }
+    io.emit(emitMap.REFRESH_ROOMS, emitRooms);
 }
 
 const emitRefreshRoomPlayers = (io, rooms, roomId) => {

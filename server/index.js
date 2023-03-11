@@ -59,6 +59,9 @@ io.on('connection', (socket) => {
         if (playerId && roomId) {
             rooms[roomId].players = differenceBy(rooms[roomId].players, [{playerId}], 'playerId');
             socket.leave(roomId);
+            if (rooms[roomId].players.length <= 0) {
+                rooms[roomId].gameEngine = null
+            }
             emitRefreshRooms(io, rooms)
             emitRefreshRoomPlayers(io, rooms, roomId)
         }
@@ -89,6 +92,7 @@ io.on('connection', (socket) => {
         })
 
         gameEngine.startEngine(roomId);
+        emitRefreshRooms(io, rooms)
     });
 
     socket.on(emitMap.GO_NEXT_STAGE, () => {

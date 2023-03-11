@@ -38,8 +38,6 @@ class GameEngine {
     constructor(io) {
         this.gameStatus = {
             roomId: '',
-            status: GAME_STATUS.IDLE,
-
             players: {},
             stage: {},
             action: {},
@@ -54,6 +52,8 @@ class GameEngine {
                 hasWuxiePlayerIds: [],
                 wuxieChain: []// 等待全员无懈可击
             },
+
+            // 其他
             weaponResStages: [],
             wugufengdengCards: [],
             tieSuoTempStorage: [],
@@ -73,8 +73,6 @@ class GameEngine {
             stageName: STAGE_NAMES[this.gameStatus.stageIndex],
         }
         this.gameStatus.roomId = roomId;
-        this.gameStatus.status = GAME_STATUS.PLAYING;
-
         everyoneGetInitialCards(this.gameStatus)
         emitInit(this.gameStatus);
 
