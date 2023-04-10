@@ -70,7 +70,7 @@ class GameEngine {
     startEngine(roomId) {
         this.gameStatus.stage = {
             playerId: getCurrentPlayer(this.gameStatus).playerId,
-            stageName: STAGE_NAMES[this.gameStatus.stageIndex],
+            stageIndex: this.gameStatus.stageIndex,
         }
         this.gameStatus.roomId = roomId;
         everyoneGetInitialCards(this.gameStatus)

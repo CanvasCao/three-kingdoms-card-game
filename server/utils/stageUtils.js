@@ -12,7 +12,7 @@ const {getCards} = require("./cardUtils");
 const setGameStatusStage = (gameStatus) => {
     gameStatus.stage = {
         playerId: getCurrentPlayer(gameStatus).playerId,
-        stageName: STAGE_NAMES[gameStatus.stageIndex],
+        stageIndex: gameStatus.stageIndex,
     }
 }
 
@@ -52,9 +52,10 @@ const tryGoNextStage = (gameStatus) => {
         goNextPlayerStartStage(gameStatus)
     }
 
-    if (gameStatus.stage.stageName == GAME_STAGE.START) {
+    const currentStageName = STAGE_NAMES[gameStatus.stage.stageIndex]
+    if (STAGE_NAMES[gameStatus.stage.stageIndex] == GAME_STAGE.START) {
         goToNextStage(gameStatus);
-    } else if (gameStatus.stage.stageName == GAME_STAGE.JUDGE) {
+    } else if (currentStageName == GAME_STAGE.JUDGE) {
         const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus)
         if (!nextNeedPandingSign) {
             goToNextStage(gameStatus);
@@ -72,20 +73,20 @@ const tryGoNextStage = (gameStatus) => {
             emitRefreshStatus(gameStatus); // 闪电之后可能要求桃
             tryGoNextStage(gameStatus); // 如果还有别的判定牌会再一次回到这里
         }
-    } else if (gameStatus.stage.stageName == GAME_STAGE.DRAW) {
+    } else if (currentStageName == GAME_STAGE.DRAW) {
         const cards = getCards(gameStatus, 2)
         player.addCards(cards)
         emitNotifyDrawCards(gameStatus, cards, player)
         goToNextStage(gameStatus);
-    } else if (gameStatus.stage.stageName == GAME_STAGE.PLAY) {
+    } else if (currentStageName == GAME_STAGE.PLAY) {
         if (player.skipPlay) {
             goToNextStage(gameStatus);
         }
-    } else if (gameStatus.stage.stageName == GAME_STAGE.THROW) {
+    } else if (currentStageName == GAME_STAGE.THROW) {
         if (!player.needThrow()) {
             goToNextStage(gameStatus);
         }
-    } else if (gameStatus.stage.stageName == GAME_STAGE.END) {
+    } else if (currentStageName == GAME_STAGE.END) {
         goToNextStage(gameStatus);
     }
 }

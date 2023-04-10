@@ -4,20 +4,21 @@ const GAME_STATUS = {
 }
 
 const GAME_STAGE = {
-    "START": "start",
-    "JUDGE": "judge",
-    "DRAW": "draw",
-    "PLAY": "play",
-    "THROW": "throw",
-    "END": "end",
+    "START": "START",
+    "JUDGE": "JUDGE",
+    "DRAW": "DRAW",
+    "PLAY": "PLAY",
+    "THROW": "THROW",
+    "END": "END",
 }
+
 const STAGE_NAMES = [
-    "start",
-    "judge",
-    "draw",
-    "play",
-    "throw",
-    "end"
+    "START",
+    "JUDGE",
+    "DRAW",
+    "PLAY",
+    "THROW",
+    "END"
 ]
 
 exports.GAME_STATUS = GAME_STATUS;
