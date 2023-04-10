@@ -1,4 +1,5 @@
 {
+  "REJOIN_ROOM": "rejoin_room",
   "REFRESH_ROOMS": "refresh_rooms",
   "JOIN_ROOM": "join_room",
   "REFRESH_ROOM_PLAYERS": "refresh_room_players",

@@ -163,6 +163,13 @@ const emitInit = (gameStatus) => {
     io.to(roomId).emit(emitMap.INIT, omitGS);
 }
 
+const emitRejoinInit = (gameStatus) => {
+    const io = gameStatus.io;
+    const roomId = gameStatus.roomId;
+    const omitGS = omit(gameStatus, omitGSArray)
+    io.to(roomId).emit(emitMap.INIT, omitGS);
+}
+
 // room
 const emitRefreshRooms = (io, rooms) => {
     const emitRooms = []
@@ -195,6 +202,7 @@ exports.emitNotifyAddLines = emitNotifyAddLines;
 
 exports.emitRefreshStatus = emitRefreshStatus;
 exports.emitInit = emitInit;
+exports.emitRejoinInit = emitRejoinInit;
 
 exports.emitRefreshRooms = emitRefreshRooms;
 exports.emitRefreshRoomPlayers = emitRefreshRoomPlayers;

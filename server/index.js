@@ -1,5 +1,5 @@
 // Setup basic express server
-const {emitRefreshRooms, emitRefreshRoomPlayers} = require("./utils/emitUtils");
+const {emitRefreshRooms, emitRefreshRoomPlayers, emitRejoinInit, emitInit} = require("./utils/emitUtils");
 const {v4: uuidv4} = require('uuid');
 const {differenceBy} = require("lodash/array");
 const {shuffle} = require("lodash/collection");
@@ -30,14 +30,30 @@ app.use(express.static(path.join(__dirname, '../client')));
 
 
 const rooms = {
-    1: {gameEngine: null, players: []},
-    2: {gameEngine: null, players: []},
+    '1': {gameEngine: null, players: []},
+    '2': {gameEngine: null, players: []},
 }
 
 io.on('connection', (socket) => {
     let playerId;
     let playerName;
     let roomId;
+
+    socket.on(emitMap.REJOIN_ROOM, (data) => {
+        const room = rooms[data.roomId]
+        if (!room || !room.gameEngine || !room.gameEngine?.gameStatus?.players) {
+            return
+        }
+        const player = room.gameEngine?.gameStatus?.players[data.playerId];
+        if (player) {
+            playerId = player.playerId
+            playerName = player.name
+            roomId = data.roomId
+            rooms[roomId].players.push({playerId: player.playerId, playerName: player.name})
+            socket.join(roomId);
+            emitRejoinInit(room.gameEngine.gameStatus, socket)
+        }
+    })
 
     socket.on(emitMap.REFRESH_ROOMS, () => {
         emitRefreshRooms(io, rooms)
