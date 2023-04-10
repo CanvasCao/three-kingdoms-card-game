@@ -1,4 +1,4 @@
-const {STAGE_NAMES} = require( "../config/gameConfig");
+const {STAGE_NAMES, GAME_STAGE} = require( "../config/gameConfig");
 const {emitNotifyDrawCards} = require("./emitUtils");
 const {getNextNeedExecutePandingSign} = require("./pandingUtils");
 const {SCROLL_CARDS_CONFIG} = require("../config/cardConfig");

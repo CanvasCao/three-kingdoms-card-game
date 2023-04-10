@@ -92,7 +92,7 @@ io.on('connection', (socket) => {
         rooms[roomId].gameEngine = gameEngine;
 
         const roomPlayers = rooms[roomId].players
-        // for (let i = 0; i < 7; i++) {
+        // for (let i = 0; i < 6; i++) {
         //     roomPlayers.push({name: uuidv4(), playerId: uuidv4()})
         // }
         // let locations = ([0, 1, 2, 3, 4, 5, 6, 7].slice(0, roomPlayers.length));
