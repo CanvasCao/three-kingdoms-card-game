@@ -3,27 +3,6 @@ const {CARD_LOCATION} = require("../config/cardConfig");
 const emitMap = require("../config/emitMap.json");
 const {omit} = require("lodash")
 
-const generateBehaviorMessage = (behavior, players) => {
-    // behaviour is action/response
-    const originName = players[behavior.originId].name;
-
-    if (!behavior.targetIds && !behavior.targetId) {
-        return `${originName}使用`
-    }
-
-    if (behavior.targetIds) {
-        return `${originName}使用`
-    }
-
-    const targetName = players[behavior.targetId].name
-
-    if (targetName == originName) {
-        return `${originName}使用`
-    } else {
-        return `${originName}对${targetName}`//使用了${behavior.actualCard.CN}`
-    }
-}
-
 // TO PUBLIC EMIT
 const emitNotifyPlayPublicCard = (gameStatus, behaviour) => {
     // behaviour is action/response
@@ -36,9 +15,11 @@ const emitNotifyPlayPublicCard = (gameStatus, behaviour) => {
     if (behaviour.cards?.[0]) {
         io.to(roomId).emit(emitMap.NOTIFY_ADD_TO_PUBLIC_CARD, {
             fromId: behaviour.originId,
+            originId: behaviour.originId,
+            targetId: behaviour.targetId,
             cards: behaviour.cards,
             originIndexes: behaviour.selectedIndexes,
-            message: generateBehaviorMessage(behaviour, gameStatus.players)
+            type: "play"
         });
     }
 }
@@ -49,7 +30,9 @@ const emitNotifyPandingPlayPublicCard = (gameStatus, pandingResultCard, player, 
     io.to(roomId).emit(emitMap.NOTIFY_ADD_TO_PUBLIC_CARD, {
         cards: [pandingResultCard],
         fromId: CARD_LOCATION.PAIDUI,
-        message: `${player.name}的${pandingCard.CN}判定结果`
+        pandingPlayerId:player.playerId,
+        pandingCard,
+        type: "panding"
     });
 }
 
@@ -64,7 +47,8 @@ const emitNotifyThrowPlayPublicCard = (gameStatus, data, player) => {
         cards: data.cards,
         fromId: player.playerId,
         originIndexes: data.selectedIndexes,
-        message: `${player.name}弃牌`
+        throwPlayerId:player.playerId,
+        type: "throw"
     });
 }
 
@@ -86,8 +70,7 @@ const emitNotifyCardBoardAction = (gameStatus, boardActionData) => {
     //     card: Card,
     //     cardAreaType: CardAreaType
     //     type: "REMOVE" | "MOVE",
-
-    // selectedIndex: number,
+    //     selectedIndex: number,
     // }
     const io = gameStatus.io;
     const roomId = gameStatus.roomId;
@@ -96,7 +79,7 @@ const emitNotifyCardBoardAction = (gameStatus, boardActionData) => {
             cards: [boardActionData.card],
             fromId: boardActionData.targetId,
             originIndexes: [boardActionData.selectedIndex],
-            message: `${gameStatus.players[boardActionData.targetId].name} 被拆`
+            type: "chai"
         });
     } else {
         io.to(roomId).emit(emitMap.NOTIFY_ADD_TO_PLAYER_CARD, {
@@ -189,12 +172,16 @@ const emitRefreshRoomPlayers = (io, rooms, roomId) => {
     }
 }
 
+// TO PUBLIC
 exports.emitNotifyPlayPublicCard = emitNotifyPlayPublicCard;
 exports.emitNotifyPandingPlayPublicCard = emitNotifyPandingPlayPublicCard;
 exports.emitNotifyThrowPlayPublicCard = emitNotifyThrowPlayPublicCard;
 
-exports.emitNotifyDrawCards = emitNotifyDrawCards;
+// TO PUBLIC OR TO PLAYER
 exports.emitNotifyCardBoardAction = emitNotifyCardBoardAction;
+
+// TO PLAYER
+exports.emitNotifyDrawCards = emitNotifyDrawCards;
 exports.emitNotifyJieDaoWeaponOwnerChange = emitNotifyJieDaoWeaponOwnerChange;
 exports.emitNotifyPickWuGuCard = emitNotifyPickWuGuCard;
 
