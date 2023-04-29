@@ -12,9 +12,6 @@ const setStatusWhenPlayerDie = (gameStatus, player) => {
     needThrowCards = needThrowCards.filter(x => !!x)
     throwCards(gameStatus, needThrowCards);
     player.resetWhenDie();
-
-    // 之后如果还需要出闪也不用出了
-    gameStatus.shanResStages = gameStatus.shanResStages.filter((rs) => rs.originId !== player.playerId)
 }
 
 exports.setStatusWhenPlayerDie = setStatusWhenPlayerDie;

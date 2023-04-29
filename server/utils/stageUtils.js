@@ -1,12 +1,11 @@
 const {STAGE_NAMES, GAME_STAGE} = require("../config/gameConfig");
 const {isNil} = require("lodash");
-const {pandingHandler} = require("../handler/pandingHandler");
 const {emitRefreshStatus, emitNotifyDrawCards} = require("./emitUtils");
 const {getCurrentPlayer, getAllHasWuxiePlayers} = require("./playerUtils");
 const {setCurrentLocationToNextLocation} = require("./locationUtils");
 const {generateWuxieSimultaneousResStageByPandingCard} = require("./wuxieUtils");
 const {clearAllResStages} = require("./clearResStageUtils");
-const {getNextNeedExecutePandingSign} = require("./pandingUtils");
+const {getNextNeedExecutePandingSign, executeNextOnePanding} = require("./pandingUtils");
 const {getCards} = require("./cardUtils");
 
 const setGameStatusStage = (gameStatus) => {
@@ -41,7 +40,6 @@ const goToNextStage = (gameStatus) => {
     tryGoNextStage(gameStatus);
 }
 
-// const
 const tryGoNextStage = (gameStatus) => {
     if (!canTryGoNextStage(gameStatus)) {
         return
@@ -69,7 +67,7 @@ const tryGoNextStage = (gameStatus) => {
                 tryGoNextStage(gameStatus); // nextNeedPandingSign生效之后进入 判定执行
             }
         } else {
-            pandingHandler.executeNextOnePanding(gameStatus);
+            executeNextOnePanding(gameStatus);
             emitRefreshStatus(gameStatus); // 闪电之后可能要求桃
             tryGoNextStage(gameStatus); // 如果还有别的判定牌会再一次回到这里
         }
@@ -92,7 +90,7 @@ const tryGoNextStage = (gameStatus) => {
 }
 
 const canTryGoNextStage = (gameStatus) => {
-    if (gameStatus.shanResStages.length > 0 ||
+    if (gameStatus.shanResponse ||
         gameStatus.taoResStages.length > 0 ||
         gameStatus.scrollResStages.length > 0 ||
         gameStatus.weaponResStages.length > 0 ||

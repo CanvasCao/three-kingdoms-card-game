@@ -1,9 +1,9 @@
-const clearNextTaoStage = (gameStatus) => {
-    gameStatus.taoResStages.shift();
+const clearShanResponse = (gameStatus) => {
+    gameStatus.shanResponse = undefined;
 }
 
-const clearNextShanStage = (gameStatus) => {
-    gameStatus.shanResStages.shift();
+const clearNextTaoStage = (gameStatus) => {
+    gameStatus.taoResStages.shift();
 }
 
 const clearNextScrollStage = (gameStatus) => {
@@ -23,14 +23,14 @@ const clearWuxieResStage = (gameStatus) => {
 
 const clearAllResStages = (gameStatus) => {
     clearWuxieResStage(gameStatus);
-    gameStatus.shanResStages = [];
+    gameStatus.shanResponse = undefined;
     gameStatus.taoResStages = [];
     gameStatus.scrollResStages = [];
     gameStatus.weaponResStages = [];
 }
 
 exports.clearNextTaoStage = clearNextTaoStage;
-exports.clearNextShanStage = clearNextShanStage;
+exports.clearShanResponse = clearShanResponse;
 exports.clearNextScrollStage = clearNextScrollStage;
 exports.clearNextWeaponStage = clearNextWeaponStage;
 exports.clearWuxieResStage = clearWuxieResStage;

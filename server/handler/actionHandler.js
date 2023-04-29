@@ -21,32 +21,6 @@ const {
 const {v4: uuidv4} = require('uuid');
 
 const actionHandler = {
-    // BASIC
-    setStatusByShaAction: (gameStatus) => {
-        const action = gameStatus.action;
-        const originPlayer = gameStatus.players[action.originId]
-        originPlayer.shaTimes++;
-
-        const cardColor = getActualCardColor(action.actualCard);
-
-        const players = getAllPlayersStartFromFirstLocation(gameStatus, getCurrentPlayer(gameStatus).location)
-        gameStatus.shanResStages = players.filter(p => action.targetIds.includes(p.playerId)).map((player) => {
-            const targetPlayer = gameStatus.players[player.playerId]
-            if (cardColor == CARD_COLOR.BLACK &&
-                targetPlayer.shieldCard?.CN == EQUIPMENT_CARDS_CONFIG.REN_WANG_DUN.CN &&
-                (originPlayer.weaponCard && originPlayer.weaponCard.CN != EQUIPMENT_CARDS_CONFIG.QIN_GANG_JIAN.CN)) {
-                return
-            }
-
-            return {
-                originId: player.playerId,
-                targetId: action.originId,
-                cardNumber: 1,
-            }
-        })
-        gameStatus.shanResStages = gameStatus.shanResStages.filter(Boolean);
-    },
-
     setStatusByTaoAction: (gameStatus) => {
         const action = gameStatus.action;
         const originPlayer = gameStatus.players[action.originId]
@@ -101,11 +75,11 @@ const actionHandler = {
         //
         // 2.1 出杀
         // scrollResStages=[]
-        // shanResStages = [{
+        // shanResponse = {
         //     originId: B,
         //     targetId: A,
         //     cardNumber: 1,
-        // }]
+        // }
         //
         // 2.2 不出杀
         // scrollResStages=[]

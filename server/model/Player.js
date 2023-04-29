@@ -7,7 +7,6 @@ class Player {
     constructor(player, generateNewRoundQiuTaoResponseStages) {
         this.maxBlood = 4;
         this.currentBlood = 3 || this.maxBlood;
-        this.shaLimitTimes = 1;
         this.imageName = player.imageName;
         this.playerId = player.playerId;
         this.name = player.name;
@@ -58,17 +57,14 @@ class Player {
         // played tags
         this.shaTimes = 0;
 
-        // skills
-        this.skills = [
-            {triggerStage: '', name: ''},
-        ]
-
         this.isDead = false
+
+        // TODO
+        this.heroId = this.imageName;
 
         // 耦合 掉血和求桃
         this.generateNewRoundQiuTaoResponseStages = generateNewRoundQiuTaoResponseStages;
 
-        // tun
     }
 
     addCards(cards) {

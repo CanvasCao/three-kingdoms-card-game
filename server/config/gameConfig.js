@@ -13,12 +13,12 @@ const GAME_STAGE = {
 }
 
 const STAGE_NAMES = [
-    "START",
-    "JUDGE",
-    "DRAW",
-    "PLAY",
-    "THROW",
-    "END"
+    GAME_STAGE.START,
+    GAME_STAGE.JUDGE,
+    GAME_STAGE.DRAW,
+    GAME_STAGE.PLAY,
+    GAME_STAGE.THROW,
+    GAME_STAGE.END
 ]
 
 exports.GAME_STATUS = GAME_STATUS;

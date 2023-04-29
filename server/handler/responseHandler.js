@@ -1,3 +1,5 @@
+const strikeEvent = require("../event/strikeEvent");
+const {generateWuxieSimultaneousResStageByScroll} = require("../utils/wuxieUtils");
 const {CARD_CONFIG, EQUIPMENT_CARDS_CONFIG} = require("../config/cardConfig");
 const {setStatusWhenPlayerDie} = require("../utils/dieUtils");
 const {cloneDeep} = require("lodash");
@@ -10,7 +12,7 @@ const {
     setGameStatusByTieSuoTempStorage
 } = require("../utils/tieSuoUtils");
 const {
-    clearNextShanStage,
+    clearShanResponse,
     clearNextTaoStage,
     clearNextScrollStage,
     clearNextWeaponStage
@@ -52,22 +54,22 @@ const responseCardHandler = {
     },
 
     setStatusByShanResponse: (gameStatus, response) => {
-        const curShanResStage = gameStatus.shanResStages[0];
-        const originPlayer = gameStatus.players[curShanResStage.originId];
-        const targetPlayer = gameStatus.players[curShanResStage.targetId];
+        const shanResponse = gameStatus.shanResponse;
+        const originPlayer = gameStatus.players[shanResponse.originId];
+        const targetPlayer = gameStatus.players[shanResponse.targetId];
         originPlayer.removeHandCards(response.cards);
         throwCards(gameStatus, response.cards);
 
         if (response?.actualCard?.CN == BASIC_CARDS_CONFIG.SHAN.CN) { // 出闪了
-            curShanResStage.cardNumber--; // 吕布需要两个杀
-            if (curShanResStage.cardNumber == 0) {
-                clearNextShanStage(gameStatus);
+            shanResponse.cardNumber--; // 吕布需要两个杀
+            if (shanResponse.cardNumber == 0) {
+                clearShanResponse(gameStatus);
 
                 if (targetPlayer?.weaponCard?.CN == EQUIPMENT_CARDS_CONFIG.QING_LONG_YAN_YUE_DAO.CN) {
                     gameStatus.weaponResStages = [
                         {
-                            originId: curShanResStage.targetId,
-                            targetId: curShanResStage.originId,
+                            originId: shanResponse.targetId,
+                            targetId: shanResponse.originId,
                             weaponCardName: CARD_CONFIG.QING_LONG_YAN_YUE_DAO.CN,
                         }
                     ];
@@ -76,7 +78,7 @@ const responseCardHandler = {
                 // do nothing
             }
         } else { // 没出闪
-            clearNextShanStage(gameStatus);
+            clearShanResponse(gameStatus);
             originPlayer.reduceBlood();
             generateTieSuoTempStorageByShaAction(gameStatus);
 
@@ -182,11 +184,7 @@ const responseCardHandler = {
             const APlayer = gameStatus.players[curScrollResStage.originId]
             const BPlayer = gameStatus.players[curScrollResStage.targetId]
             gameStatus.players[APlayer.playerId].removeHandCards(response.cards);
-            gameStatus.shanResStages = [{
-                originId: BPlayer.playerId,
-                targetId: APlayer.playerId,
-                cardNumber: 1,
-            }]
+            strikeEvent.generateUseStrikeEvents(gameStatus, APlayer.playerId, [BPlayer.playerId]);
         } else {
             // TODO 如果没有杀 自动不出
             // 不出杀 A=>B A不出 A把刀给当前用户
@@ -207,14 +205,14 @@ const responseCardHandler = {
         if (response?.actualCard) {
             const action = gameStatus.action;
             clearNextWeaponStage(gameStatus);
-            gameStatus.shanResStages = [{
+            gameStatus.shanResponse = {
                 originId: action.targetIds[0],
                 targetId: action.originId,
                 cardNumber: 1,
-            }]
+            }
         } else {
             clearNextWeaponStage(gameStatus);
-            clearNextShanStage(gameStatus)
+            clearShanResponse(gameStatus)
         }
     }
 }
