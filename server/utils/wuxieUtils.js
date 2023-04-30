@@ -1,4 +1,4 @@
-const {STAGE_NAMES, GAME_STAGE} = require( "../config/gameConfig");
+const {STAGE_NAMES, STAGE_NAME} = require( "../config/gameConfig");
 const {emitNotifyDrawCards} = require("./emitUtils");
 const {getNextNeedExecutePandingSign} = require("./pandingUtils");
 const {SCROLL_CARDS_CONFIG} = require("../config/cardConfig");
@@ -54,7 +54,7 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
         gameStatus.wuxieSimultaneousResStage.wuxieChain.length == 0 // 不求无懈直接生效
 
     // 延时锦囊
-    if (STAGE_NAMES[gameStatus.stage.stageIndex] == GAME_STAGE.JUDGE) {
+    if (STAGE_NAMES[gameStatus.stage.stageIndex] == STAGE_NAME.JUDGE) {
         const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus);
         nextNeedPandingSign.isEffect = isScrollEffected; // 延时锦囊生效开始判定 未生效需要跳过判定
     }

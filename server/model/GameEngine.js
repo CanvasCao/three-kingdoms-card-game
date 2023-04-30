@@ -24,7 +24,7 @@ const {
     throwCards, everyoneGetInitialCards
 } = require("../utils/cardUtils");
 const {
-    tryGoNextStage,
+    tryGoToNextPlayOrResponseOrThrowTurn,
     goToNextStage,
 } = require("../utils/stageUtils");
 const {actionHandler} = require("../handler/actionHandler");
@@ -76,7 +76,7 @@ class GameEngine {
         emitInit(this.gameStatus);
 
         setTimeout(() => {
-            tryGoNextStage(this.gameStatus)
+            tryGoToNextPlayOrResponseOrThrowTurn(this.gameStatus)
         }, 1000)
     }
 
@@ -143,9 +143,10 @@ class GameEngine {
             throw new Error("求桃的时候不能出闪")
         }
 
-        const needResponseWuxie = this.gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds.length > 0;
-        const needResponseTao = this.gameStatus.taoResStages.length > 0;
         const needResponseShan = this.gameStatus.shanResponse;
+        const needResponseSkill = this.gameStatus.skillResponse;
+        const needResponseTao = this.gameStatus.taoResStages.length > 0;
+        const needResponseWuxie = this.gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds.length > 0;
 
         const curScrollResStages = this.gameStatus.scrollResStages;
         const needResponseNanMan = this.gameStatus.scrollResStages.length > 0 && curScrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.CN;
@@ -156,12 +157,14 @@ class GameEngine {
         const needResponseJieDao = this.gameStatus.scrollResStages.length > 0 && curScrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.CN;
         const needResponseQingLongYanYueDao = this.gameStatus.weaponResStages.length > 0;
 
-        if (needResponseWuxie) {
+        if (needResponseShan) {
+            responseCardHandler.setStatusByShanResponse(this.gameStatus, response);
+        } else if (needResponseSkill) {
+            responseCardHandler.setStatusBySkillResponse(this.gameStatus, response);
+        } else if (needResponseWuxie) {
             responseCardHandler.setStatusByWuxieResponse(this.gameStatus, response);
         } else if (needResponseTao) {
             responseCardHandler.setStatusByTaoResponse(this.gameStatus, response);
-        } else if (needResponseShan) {
-            responseCardHandler.setStatusByShanResponse(this.gameStatus, response);
         } else if (needResponseNanMan || needResponseWanJian) {
             responseCardHandler.setStatusByNanManOrWanJianResponse(this.gameStatus, response);
         } else if (needResponseJueDou) {
@@ -179,7 +182,7 @@ class GameEngine {
 
         // 打无懈可击延迟锦囊生效后 需要判断是不是从判定阶段到出牌阶段
         // 闪电求桃之后 需要判断是不是从判定阶段到出牌阶段
-        tryGoNextStage(this.gameStatus);
+        tryGoToNextPlayOrResponseOrThrowTurn(this.gameStatus);
     }
 
     handleThrowCards(data) {

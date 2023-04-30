@@ -1,4 +1,4 @@
-const {STAGE_NAMES, GAME_STAGE} = require("../config/gameConfig");
+const {STAGE_NAMES, STAGE_NAME} = require("../config/gameConfig");
 const {isNil} = require("lodash");
 const {emitRefreshStatus, emitNotifyDrawCards} = require("./emitUtils");
 const {getCurrentPlayer, getAllHasWuxiePlayers} = require("./playerUtils");
@@ -37,11 +37,11 @@ const goToNextStage = (gameStatus) => {
     clearAllResStages(gameStatus)
 
     emitRefreshStatus(gameStatus);
-    tryGoNextStage(gameStatus);
+    tryGoToNextPlayOrResponseOrThrowTurn(gameStatus);
 }
 
-const tryGoNextStage = (gameStatus) => {
-    if (!canTryGoNextStage(gameStatus)) {
+const tryGoToNextPlayOrResponseOrThrowTurn = (gameStatus) => {
+    if (ifAnyPlayerNeedToResponse(gameStatus)) {
         return
     }
 
@@ -51,9 +51,9 @@ const tryGoNextStage = (gameStatus) => {
     }
 
     const currentStageName = STAGE_NAMES[gameStatus.stage.stageIndex]
-    if (STAGE_NAMES[gameStatus.stage.stageIndex] == GAME_STAGE.START) {
+    if (STAGE_NAMES[gameStatus.stage.stageIndex] == STAGE_NAME.START) {
         goToNextStage(gameStatus);
-    } else if (currentStageName == GAME_STAGE.JUDGE) {
+    } else if (currentStageName == STAGE_NAME.JUDGE) {
         const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus)
         if (!nextNeedPandingSign) {
             goToNextStage(gameStatus);
@@ -64,43 +64,46 @@ const tryGoNextStage = (gameStatus) => {
                 emitRefreshStatus(gameStatus);
             } else {
                 nextNeedPandingSign.isEffect = true;
-                tryGoNextStage(gameStatus); // nextNeedPandingSign生效之后进入 判定执行
+                tryGoToNextPlayOrResponseOrThrowTurn(gameStatus); // nextNeedPandingSign生效之后进入 判定执行
             }
         } else {
             executeNextOnePanding(gameStatus);
             emitRefreshStatus(gameStatus); // 闪电之后可能要求桃
-            tryGoNextStage(gameStatus); // 如果还有别的判定牌会再一次回到这里
+            tryGoToNextPlayOrResponseOrThrowTurn(gameStatus); // 如果还有别的判定牌会再一次回到这里
         }
-    } else if (currentStageName == GAME_STAGE.DRAW) {
+    } else if (currentStageName == STAGE_NAME.DRAW) {
         const cards = getCards(gameStatus, 2)
         player.addCards(cards)
         emitNotifyDrawCards(gameStatus, cards, player)
         goToNextStage(gameStatus);
-    } else if (currentStageName == GAME_STAGE.PLAY) {
+    } else if (currentStageName == STAGE_NAME.PLAY) {
         if (player.skipPlay) {
             goToNextStage(gameStatus);
+        } else {
+
         }
-    } else if (currentStageName == GAME_STAGE.THROW) {
+    } else if (currentStageName == STAGE_NAME.THROW) {
         if (!player.needThrow()) {
             goToNextStage(gameStatus);
         }
-    } else if (currentStageName == GAME_STAGE.END) {
+    } else if (currentStageName == STAGE_NAME.END) {
         goToNextStage(gameStatus);
     }
 }
 
-const canTryGoNextStage = (gameStatus) => {
+const ifAnyPlayerNeedToResponse = (gameStatus) => {
     if (gameStatus.shanResponse ||
+        gameStatus.skillResponse ||
         gameStatus.taoResStages.length > 0 ||
         gameStatus.scrollResStages.length > 0 ||
         gameStatus.weaponResStages.length > 0 ||
         gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds.length > 0
     ) {
-        return false
+        return true
     }
-    return true
+    return false
 }
 
 exports.goToNextStage = goToNextStage;
-exports.canTryGoNextStage = canTryGoNextStage;
-exports.tryGoNextStage = tryGoNextStage;
+exports.ifAnyPlayerNeedToResponse = ifAnyPlayerNeedToResponse;
+exports.tryGoToNextPlayOrResponseOrThrowTurn = tryGoToNextPlayOrResponseOrThrowTurn;

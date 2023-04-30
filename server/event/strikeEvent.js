@@ -59,9 +59,9 @@ const findNextSkillToReleaseInStrikeEvent = (gameStatus) => {
     }
 
     if (last(useStrikeEventTimings).name == USE_EVENT_TIMING.WHEN_BECOMING_TARGET) {
-        const name = USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET
+        const name = USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET;
         const eventSkills = findAllEventSkillsByTimingName(gameStatus, {name, originId, targetId})
-        useStrikeEvent.timings.push({name, skills: eventSkills})
+        useStrikeEventTimings.push({name, skills: eventSkills})
 
         if (eventSkills.length > 0) {
             gameStatus.skillResponse = eventSkills[0]
@@ -71,7 +71,7 @@ const findNextSkillToReleaseInStrikeEvent = (gameStatus) => {
 
     if (last(useStrikeEventTimings).name == USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET) {
         const name = USE_EVENT_TIMING.WHEN_SETTLEMENT_BEGINS
-        useStrikeEvent.timings.push({name, skills: []})
+        useStrikeEventTimings.push({name, skills: []})
 
         // 杀会取消的情况
         // 1. A是黑杀&没有【青釭剑】&& B仁王盾

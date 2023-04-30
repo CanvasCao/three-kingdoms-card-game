@@ -1,14 +1,14 @@
 // Setup basic express server
-const {emitRefreshRooms, emitRefreshRoomPlayers, emitRejoinInit, emitInit} = require("./utils/emitUtils");
+const {emitRefreshRooms, emitRefreshRoomPlayers, emitRejoinInit} = require("./utils/emitUtils");
 const {v4: uuidv4} = require('uuid');
 const {differenceBy} = require("lodash/array");
 const {shuffle} = require("lodash/collection");
 const {goToNextStage} = require("./utils/stageUtils");
 const {GameEngine} = require("./model/GameEngine");
-const emitMap = require("./config/emitMap.json");
 const express = require('express');
 const app = express();
 const path = require('path');
+const {EMIT_TYPE} = require("./config/emitConfig");
 const server = require('http').createServer(app);
 const io = require('socket.io')(server, {
     cors: {
@@ -39,7 +39,7 @@ io.on('connection', (socket) => {
     let playerName;
     let roomId;
 
-    socket.on(emitMap.REJOIN_ROOM, (data) => {
+    socket.on(EMIT_TYPE.REJOIN_ROOM, (data) => {
         const room = rooms[data.roomId]
         if (!room || !room.gameEngine || !room.gameEngine?.gameStatus?.players) {
             return
@@ -55,11 +55,11 @@ io.on('connection', (socket) => {
         }
     })
 
-    socket.on(emitMap.REFRESH_ROOMS, () => {
+    socket.on(EMIT_TYPE.REFRESH_ROOMS, () => {
         emitRefreshRooms(io, rooms)
     })
 
-    socket.on(emitMap.JOIN_ROOM, (data) => {
+    socket.on(EMIT_TYPE.JOIN_ROOM, (data) => {
         playerId = data.playerId
         playerName = data.playerName
         roomId = data.roomId
@@ -71,7 +71,7 @@ io.on('connection', (socket) => {
         }
     })
 
-    socket.on(emitMap.DISCONNECT, () => {
+    socket.on(EMIT_TYPE.DISCONNECT, () => {
         if (playerId && roomId) {
             rooms[roomId].players = differenceBy(rooms[roomId].players, [{playerId}], 'playerId');
             socket.leave(roomId);
@@ -83,7 +83,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on(emitMap.INIT, () => {
+    socket.on(EMIT_TYPE.INIT, () => {
         if (!playerId || !roomId) {
             return
         }
@@ -111,27 +111,27 @@ io.on('connection', (socket) => {
         emitRefreshRooms(io, rooms)
     });
 
-    socket.on(emitMap.GO_NEXT_STAGE, () => {
+    socket.on(EMIT_TYPE.GO_NEXT_STAGE, () => {
         rooms?.[roomId]?.gameEngine && goToNextStage(rooms[roomId].gameEngine.gameStatus);
     });
 
-    socket.on(emitMap.ACTION, (action) => {
+    socket.on(EMIT_TYPE.ACTION, (action) => {
         rooms?.[roomId]?.gameEngine?.handleAction(action);
     });
 
-    socket.on(emitMap.RESPONSE, (response) => {
+    socket.on(EMIT_TYPE.RESPONSE, (response) => {
         rooms?.[roomId]?.gameEngine?.handleResponse(response);
     });
 
-    socket.on(emitMap.CARD_BOARD_ACTION, (data) => {
+    socket.on(EMIT_TYPE.CARD_BOARD_ACTION, (data) => {
         rooms?.[roomId]?.gameEngine?.handleCardBoardAction(data);
     });
 
-    socket.on(emitMap.WUGU_BOARD_ACTION, (data) => {
+    socket.on(EMIT_TYPE.WUGU_BOARD_ACTION, (data) => {
         rooms?.[roomId]?.gameEngine?.handleWuguBoardAction(data);
     });
 
-    socket.on(emitMap.THROW, (data) => {
+    socket.on(EMIT_TYPE.THROW, (data) => {
         rooms?.[roomId]?.gameEngine?.handleThrowCards(data);
     });
 });

@@ -45,7 +45,6 @@ const findAllEventSkillsByTimingName = (gameStatus, {name, originId, targetId}) 
 
     // 杀 相关技能
     else if (name == USE_EVENT_TIMING.WHEN_BECOMING_TARGET) {
-        console.log("targetHeroId",targetHeroId)
         const eventSkillsForPlayer = SKILLS[targetHeroId]
             .filter((skill) => skill.triggerTiming == name && skill.triggerCard == CARD_CONFIG.SHA.CN)
             .map((skill) => configSkillToEventSkill(skill, targetPlayerId))
