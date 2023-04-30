@@ -3,7 +3,7 @@ const GAME_STATUS = {
     "IDLE": "IDLE" // 默认值 未开始的游戏gamestatus为null idle只存在很短暂的时间
 }
 
-const GAME_STAGE = {
+const STAGE_NAME = {
     "START": "START",
     "JUDGE": "JUDGE",
     "DRAW": "DRAW",
@@ -13,14 +13,14 @@ const GAME_STAGE = {
 }
 
 const STAGE_NAMES = [
-    GAME_STAGE.START,
-    GAME_STAGE.JUDGE,
-    GAME_STAGE.DRAW,
-    GAME_STAGE.PLAY,
-    GAME_STAGE.THROW,
-    GAME_STAGE.END
+    STAGE_NAME.START,
+    STAGE_NAME.JUDGE,
+    STAGE_NAME.DRAW,
+    STAGE_NAME.PLAY,
+    STAGE_NAME.THROW,
+    STAGE_NAME.END
 ]
 
 exports.GAME_STATUS = GAME_STATUS;
-exports.GAME_STAGE = GAME_STAGE;
+exports.STAGE_NAME = STAGE_NAME;
 exports.STAGE_NAMES = STAGE_NAMES;
