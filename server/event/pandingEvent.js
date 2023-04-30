@@ -1,0 +1,42 @@
+const {findAllEventSkillsByTimingName} = require("./utils");
+const {PANDING_EVENT_TIMING} = require("../config/eventConfig");
+const {last} = require("lodash");
+
+const generatePandingEvent = (gameStatus, originId) => {
+    gameStatus.pandingEvent = {
+        originId,
+        timings: [],
+        done: false
+    }
+    findNextSkillToReleaseInPandingEvent(gameStatus, originId);
+}
+
+const findNextSkillToReleaseInPandingEvent = (gameStatus, originId) => {
+    const pandingEvent = gameStatus.pandingEvent;
+    const pandingEventTimings = pandingEvent.timings
+    if (pandingEventTimings.length == 0) {
+        const name = PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT
+        const eventSkills = findAllEventSkillsByTimingName(gameStatus, {name, originId})
+        pandingEvent.timings.push({name, skills: eventSkills})
+
+        if (eventSkills.length > 0) {
+            gameStatus.skillResponseponse = eventSkills[0]
+            return;
+        }
+    }
+
+    if (last(pandingEventTimings).name == PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT) {
+        const name = PANDING_EVENT_TIMING.AFTER_PANDING_TAKE_EFFECT
+        const eventSkills = findAllEventSkillsByTimingName(gameStatus, {name, originId})
+        pandingEvent.timings.push({name, skills: eventSkills})
+
+        if (eventSkills.length > 0) {
+            gameStatus.skillResponseponse = eventSkills[0]
+            return;
+        } else { // 判定结束
+            pandingEvent.done = true;
+        }
+    }
+}
+
+exports.generatePandingEvent = generatePandingEvent;
