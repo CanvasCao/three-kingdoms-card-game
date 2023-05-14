@@ -1,3 +1,6 @@
+const {setEventSkillResponse} = require("./utils");
+const {findOnGoingUseStrikeEvent} = require("./utils");
+const {throwCards} = require("../utils/cardUtils");
 const {findAllEventSkillsByTimingName} = require("./utils");
 const {EQUIPMENT_CARDS_CONFIG} = require("../config/cardConfig");
 const {CARD_COLOR} = require("../config/cardConfig");
@@ -15,7 +18,8 @@ const generateUseStrikeEvents = (gameStatus, originId, targetIds) => {
     gameStatus.useStrikeEvents = [];
     const targetPlayers = getAllPlayersStartFromFirstLocation(gameStatus, getCurrentPlayer(gameStatus).location)
         .filter(p => targetIds.includes(p.playerId))
-    const originPlayer = gameStatus.players[originId]
+    const originPlayer = gameStatus.players[originId];
+
     if (gameStatus.stage.playerId == originPlayer.playerId) {
         originPlayer.shaTimes++;
     }
@@ -25,7 +29,8 @@ const generateUseStrikeEvents = (gameStatus, originId, targetIds) => {
         return {
             originId,
             targetId: targetPlayer.playerId,
-            timings: [],
+            cantShan: false,
+            eventTimingWithSkills: [],
             done: false
         }
     })
@@ -35,59 +40,71 @@ const generateUseStrikeEvents = (gameStatus, originId, targetIds) => {
 
 const findNextSkillToReleaseInStrikeEvent = (gameStatus) => {
     const action = gameStatus.action;
-    const useStrikeEvents = gameStatus.useStrikeEvents;
-    const useStrikeEvent = useStrikeEvents.find((event) => !event.done)
+    const useStrikeEvent = findOnGoingUseStrikeEvent(gameStatus)
 
     if (!useStrikeEvent) {
         return
     }
 
-    const useStrikeEventTimings = useStrikeEvent.timings
+    const eventTimingWithSkills = useStrikeEvent.eventTimingWithSkills;
     const originId = useStrikeEvent.originId
     const targetId = useStrikeEvent.targetId;
     const originPlayer = gameStatus.players[originId];
     const targetPlayer = gameStatus.players[targetId];
-    if (useStrikeEventTimings.length == 0) {
-        const name = USE_EVENT_TIMING.WHEN_BECOMING_TARGET
-        const eventSkills = findAllEventSkillsByTimingName(gameStatus, {name, originId, targetId})
-        useStrikeEvent.timings.push({name, skills: eventSkills})
+    if (eventTimingWithSkills.length == 0) {
+        const eventTimingName = USE_EVENT_TIMING.WHEN_BECOMING_TARGET
+        const eventTimingSkills = findAllEventSkillsByTimingName(gameStatus, {eventTimingName, originId, targetId})
+        eventTimingWithSkills.push({eventTimingName, eventTimingSkills})
 
-        if (eventSkills.length > 0) {
-            gameStatus.skillResponse = eventSkills[0]
+        if (eventTimingSkills.length > 0) {
+            setEventSkillResponse(gameStatus, eventTimingSkills[0])
             return;
         }
     }
 
-    if (last(useStrikeEventTimings).name == USE_EVENT_TIMING.WHEN_BECOMING_TARGET) {
-        const name = USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET;
-        const eventSkills = findAllEventSkillsByTimingName(gameStatus, {name, originId, targetId})
-        useStrikeEventTimings.push({name, skills: eventSkills})
+    if (last(eventTimingWithSkills).eventTimingName == USE_EVENT_TIMING.WHEN_BECOMING_TARGET) {
+        const unChooseToReleaseSkill = last(eventTimingWithSkills).eventTimingSkills
+            .find((eventTimingSkill) => eventTimingSkill.chooseToRelease == undefined)
 
-        if (eventSkills.length > 0) {
-            gameStatus.skillResponse = eventSkills[0]
+        if (unChooseToReleaseSkill) {
+            setEventSkillResponse(gameStatus, unChooseToReleaseSkill)
             return;
+        } else {
+            const eventTimingName = USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET
+            const eventTimingSkills = findAllEventSkillsByTimingName(gameStatus, {eventTimingName, originId, targetId})
+            eventTimingWithSkills.push({eventTimingName, eventTimingSkills})
+
+            if (eventTimingSkills.length > 0) {
+                setEventSkillResponse(gameStatus, eventTimingSkills[0])
+                return;
+            }
         }
     }
 
-    if (last(useStrikeEventTimings).name == USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET) {
-        const name = USE_EVENT_TIMING.WHEN_SETTLEMENT_BEGINS
-        useStrikeEventTimings.push({name, skills: []})
+    if (last(eventTimingWithSkills).eventTimingName == USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET) {
+        const unChooseToReleaseSkill = last(eventTimingWithSkills).eventTimingSkills
+            .find((eventTimingSkill) => eventTimingSkill.chooseToRelease == undefined)
 
-        // 杀会取消的情况
-        // 1. A是黑杀&没有【青釭剑】&& B仁王盾
-        if (getActualCardColor(action.actualCard) == CARD_COLOR.BLACK &&
-            targetPlayer.shieldCard?.CN == EQUIPMENT_CARDS_CONFIG.REN_WANG_DUN.CN &&
-            (originPlayer.weaponCard?.CN != EQUIPMENT_CARDS_CONFIG.QIN_GANG_JIAN.CN)) {
+        if (unChooseToReleaseSkill) {
+            setEventSkillResponse(gameStatus, unChooseToReleaseSkill)
+            return;
+        } else {
+            // 杀会取消的情况
+            if (getActualCardColor(action.actualCard) == CARD_COLOR.BLACK &&
+                targetPlayer.shieldCard?.CN == EQUIPMENT_CARDS_CONFIG.REN_WANG_DUN.CN &&
+                originPlayer.weaponCard?.CN != EQUIPMENT_CARDS_CONFIG.QIN_GANG_JIAN.CN) {
+            } else if (useStrikeEvent.cantShan) {
+
+            } else {
+                gameStatus.shanResponse = {
+                    originId: targetId,
+                    targetId: originId,
+                    cardNumber: 1,
+                }
+            }
+            throwCards(gameStatus, action.cards);
             useStrikeEvent.done = true;
         }
-
-        // 需要出闪
-        gameStatus.shanResponse = {
-            originId: targetId,
-            targetId: originId,
-            cardNumber: 1,
-        }
-        return;
     }
 }
 

@@ -12,51 +12,74 @@ const configSkillToEventSkill = (configSkill, playerId) => {
     }
 }
 
-const findAllEventSkillsByTimingName = (gameStatus, {name, originId, targetId}) => {
+const setEventSkillResponse = (gameStatus, skill) => {
+    gameStatus.skillResponse = skill;
+}
+
+const findOnGoingUseStrikeEvent = (gameStatus) => {
+    const useStrikeEvent = gameStatus?.useStrikeEvents.find((event) => !event.done)
+    if (useStrikeEvent) {
+        return useStrikeEvent
+    }
+}
+
+const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, targetId}) => {
     /*
         skillName,
         playerId,
         chooseToRelease: undefined,
     */
     const originPlayer = gameStatus.players[originId];
-    const originHeroId = originPlayer.heroId;
-    const originPlayerId = originPlayer.playerId;
+    const originHeroId = originPlayer?.heroId;
+    const originPlayerId = originPlayer?.playerId;
     const targetPlayer = gameStatus.players?.[targetId];
     const targetHeroId = targetPlayer?.heroId;
     const targetPlayerId = targetPlayer?.playerId;
 
-    let eventSkills = [];
+    let eventTimingSkills = [];
 
     // 判定 相关技能
-    if (name == PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT) {
+    if (eventTimingName == PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT) {
         const allPlayers = getAllPlayersStartFromFirstLocation(gameStatus, gameStatus.players[originId].location)
-        allPlayers.forEach((p) => {
-            const eventSkillsForPlayer = SKILLS[p.heroId]
-                .filter((skill) => skill.triggerTiming == name)
-                .map((skill) => configSkillToEventSkill(skill, p.playerId))
-            eventSkills = eventSkills.concat(eventSkillsForPlayer)
+        allPlayers.forEach((player) => {
+            const eventSkillsForPlayer = SKILLS[player.heroId]
+                .filter((skill) => skill.triggerTiming == eventTimingName)
+                .map((skill) => configSkillToEventSkill(skill, player.playerId))
+            eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
         })
-    } else if (name == PANDING_EVENT_TIMING.AFTER_PANDING_TAKE_EFFECT) {
+    } else if (eventTimingName == PANDING_EVENT_TIMING.AFTER_PANDING_TAKE_EFFECT) {
         const eventSkillsForPlayer = SKILLS[originHeroId]
-            .filter((skill) => skill.triggerTiming == name)
+            .filter((skill) => skill.triggerTiming == eventTimingName)
             .map((skill) => configSkillToEventSkill(skill, originPlayer.playerId))
-        eventSkills = eventSkills.concat(eventSkillsForPlayer)
+        eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
     }
 
     // 杀 相关技能
-    else if (name == USE_EVENT_TIMING.WHEN_BECOMING_TARGET) {
+    else if (eventTimingName == USE_EVENT_TIMING.WHEN_BECOMING_TARGET) {
         const eventSkillsForPlayer = SKILLS[targetHeroId]
-            .filter((skill) => skill.triggerTiming == name && skill.triggerCard == CARD_CONFIG.SHA.CN)
+            .filter((skill) => skill.triggerTiming == eventTimingName && skill.triggerCard == CARD_CONFIG.SHA.CN)
             .map((skill) => configSkillToEventSkill(skill, targetPlayerId))
-        eventSkills = eventSkills.concat(eventSkillsForPlayer)
-    } else if (name == USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET) {
+        eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
+    } else if (eventTimingName == USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET) {
         const eventSkillsForPlayer = SKILLS[originHeroId]
-            .filter((skill) => skill.triggerTiming == name && skill.triggerCard == CARD_CONFIG.SHA.CN)
+            .filter((skill) => skill.triggerTiming == eventTimingName && skill.triggerCard == CARD_CONFIG.SHA.CN)
             .map((skill) => configSkillToEventSkill(skill, originPlayerId))
-        eventSkills = eventSkills.concat(eventSkillsForPlayer)
+        eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
+
+        // 雌雄双股剑
+        if (originPlayer.gender !== targetPlayer.gender) {
+            eventTimingSkills = eventTimingSkills.concat({
+                skillName: '雌雄双股剑',
+                playerId: originPlayer.playerId,
+                chooseToRelease: undefined,
+            })
+        }
+
     }
-    return eventSkills;
+    return eventTimingSkills;
 }
 
 exports.configSkillToEventSkill = configSkillToEventSkill;
 exports.findAllEventSkillsByTimingName = findAllEventSkillsByTimingName;
+exports.findOnGoingUseStrikeEvent = findOnGoingUseStrikeEvent;
+exports.setEventSkillResponse = setEventSkillResponse;

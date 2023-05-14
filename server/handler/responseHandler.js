@@ -64,14 +64,17 @@ const responseCardHandler = {
         const skillResponse = gameStatus.skillResponse;
         const skillName = gameStatus.skillResponse.skillName;
         const chooseToResponse = response.chooseToResponse;
+        skillResponse.chooseToRelease = chooseToResponse;
         if (!chooseToResponse) {
             delete gameStatus.skillResponse
             return
         }
 
         if (skillName == "铁骑") {
-            pandingEvent.generatePandingEvent(gameStatus, skillResponse.playerId, skillName)
             delete gameStatus.skillResponse
+            pandingEvent.generatePandingEvent(gameStatus, skillResponse.playerId, skillName)
+        } else if (skillName == '鬼才') {
+
         }
     },
 

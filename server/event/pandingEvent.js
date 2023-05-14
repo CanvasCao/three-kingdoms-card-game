@@ -1,3 +1,7 @@
+const {setEventSkillResponse} = require("./utils");
+const {CARD_COLOR} = require("../config/cardConfig");
+const {getActualCardColor} = require("../utils/cardUtils");
+const {findOnGoingUseStrikeEvent} = require("./utils");
 const {emitNotifyPandingPlayPublicCard} = require("../utils/emitUtils");
 const {throwCards} = require("../utils/cardUtils");
 const {getCards} = require("../utils/cardUtils");
@@ -5,47 +9,76 @@ const {findAllEventSkillsByTimingName} = require("./utils");
 const {PANDING_EVENT_TIMING} = require("../config/eventConfig");
 const {last} = require("lodash");
 
-const generatePandingEvent = (gameStatus, originId, skillName) => {
+const generatePandingEvent = (gameStatus, originId, pandingContent) => {
+    const pandingResultCard = getCards(gameStatus, 1)
     gameStatus.pandingEvent = {
         originId,
-        timings: [],
-        done: false
+        eventTimingWithSkills: [],
+        done: false,
+        pandingContent,
+        pandingResultCard,
     }
 
-    const pandingResultCard = getCards(gameStatus, 1);
-    throwCards(gameStatus, pandingResultCard);
-    emitNotifyPandingPlayPublicCard(gameStatus, pandingResultCard, gameStatus.players[originId], skillName);
-
-    findNextSkillToReleaseInPandingEvent(gameStatus, originId, skillName);
+    emitNotifyPandingPlayPublicCard(gameStatus, pandingResultCard, gameStatus.players[originId], pandingContent);
+    findNextSkillToReleaseInPandingEvent(gameStatus);
 }
 
-const findNextSkillToReleaseInPandingEvent = (gameStatus, originId) => {
+const findNextSkillToReleaseInPandingEvent = (gameStatus) => {
     const pandingEvent = gameStatus.pandingEvent;
-    const pandingEventTimings = pandingEvent.timings
+    if (!pandingEvent) {
+        return
+    }
 
-    if (pandingEventTimings.length == 0) {
-        const name = PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT
-        const eventSkills = findAllEventSkillsByTimingName(gameStatus, {name, originId})
-        pandingEvent.timings.push({name, skills: eventSkills})
+    const originId = pandingEvent.originId;
+    const eventTimingWithSkills = pandingEvent.eventTimingWithSkills
 
-        if (eventSkills.length > 0) {
-            gameStatus.skillResponse= eventSkills[0]
+    if (eventTimingWithSkills.length == 0) {
+        const eventTimingName = PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT
+        const eventTimingSkills = findAllEventSkillsByTimingName(gameStatus, {eventTimingName, originId})
+        pandingEvent.eventTimingWithSkills.push({eventTimingName, eventTimingSkills})
+
+        if (eventTimingSkills.length > 0) {
+            gameStatus.skillResponse = eventTimingSkills[0]
             return;
         }
     }
 
-    if (last(pandingEventTimings).name == PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT) {
-        const name = PANDING_EVENT_TIMING.AFTER_PANDING_TAKE_EFFECT
-        const eventSkills = findAllEventSkillsByTimingName(gameStatus, {name, originId})
-        pandingEvent.timings.push({name, skills: eventSkills})
+    if (last(eventTimingWithSkills).eventTimingName == PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT) {
+        const unChooseToReleaseSkill = last(eventTimingWithSkills).eventTimingSkills
+            .find((eventTimingSkill) => eventTimingSkill.chooseToRelease == undefined)
 
-        if (eventSkills.length > 0) {
-            gameStatus.skillResponse = eventSkills[0]
+        if (unChooseToReleaseSkill) {
+            setEventSkillResponse(gameStatus, unChooseToReleaseSkill)
             return;
-        } else { // 判定结束
-            pandingEvent.done = true;
+        } else {
+            const eventTimingName = PANDING_EVENT_TIMING.AFTER_PANDING_TAKE_EFFECT
+            const eventTimingSkills = findAllEventSkillsByTimingName(gameStatus, {eventTimingName, originId})
+            pandingEvent.eventTimingWithSkills.push({eventTimingName, eventTimingSkills})
+
+            if (eventTimingSkills.length > 0) {
+                gameStatus.skillResponse = eventTimingSkills[0]
+                return;
+            } else { // 判定结束
+                handlePandingEventEnd(gameStatus)
+            }
         }
     }
+}
+
+const handlePandingEventEnd = (gameStatus) => {
+    const pandingEvent = gameStatus.pandingEvent;
+
+    if (pandingEvent.pandingContent == '铁骑') {
+        const useStrikeEvent = findOnGoingUseStrikeEvent(gameStatus);
+        if (getActualCardColor(pandingEvent.pandingResultCard) == CARD_COLOR.RED) {
+            useStrikeEvent.cantShan = true;
+        }
+    }
+
+    pandingEvent.done = true;
+    throwCards(gameStatus, pandingEvent.pandingResultCard);
+    delete gameStatus.pandingEvent;
 }
 
 exports.generatePandingEvent = generatePandingEvent;
+exports.findNextSkillToReleaseInPandingEvent = findNextSkillToReleaseInPandingEvent;

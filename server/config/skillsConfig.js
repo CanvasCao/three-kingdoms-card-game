@@ -1,3 +1,4 @@
+const {PANDING_EVENT_TIMING} = require("./eventConfig");
 const {CARD_CONFIG} = require("./cardConfig");
 const {USE_EVENT_TIMING} = require("./eventConfig");
 
@@ -31,6 +32,10 @@ const fakeSkills = {
             name: '铁骑',
             triggerTiming: USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET,
             triggerCard: CARD_CONFIG.SHA.CN,
+        },
+        {
+            name: '鬼才',
+            triggerTiming: PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT,
         }
     ]
 }
