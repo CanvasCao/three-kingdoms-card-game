@@ -4,11 +4,42 @@ const {getAllPlayersStartFromFirstLocation} = require("../utils/playerUtils");
 const {SKILLS} = require("../config/skillsConfig");
 const {PANDING_EVENT_TIMING} = require("../config/eventConfig");
 
+// "useStrikeEvents": [
+//     {
+//         "originId": "a2511baa-80f8-4e6b-be63-317e902bfa9d",
+//         "targetId": "1ea2ff47-b3c1-4b26-aabc-539c754b8076",
+//         "cantShan": false,
+//         "eventTimingsWithSkills": [
+//             {
+//                 "eventTimingName": "WHEN_BECOMING_TARGET",
+//                 "eventTimingSkills": [
+//
+//                 ]
+//             },
+//             {
+//                 "eventTimingName": "AFTER_SPECIFYING_TARGET",
+//                 "eventTimingSkills": [
+//                     {
+//                         "skillName": "铁骑",
+//                         "playerId": "a2511baa-80f8-4e6b-be63-317e902bfa9d",
+//                         "chooseToRelease": false
+//                             releaseTargets: [],
+//                             releaseCards: [],
+//                             done: false,
+//                     }
+//                 ]
+//             }
+//         ],
+//         "done": false
+//     }
+// ]
+
 const configSkillToEventSkill = (configSkill, playerId) => {
     return {
         skillName: configSkill.name,
         playerId,
         chooseToRelease: undefined,
+        done: false
     }
 }
 
@@ -18,9 +49,16 @@ const setEventSkillResponse = (gameStatus, skill) => {
 
 const findOnGoingUseStrikeEvent = (gameStatus) => {
     const useStrikeEvent = gameStatus?.useStrikeEvents.find((event) => !event.done)
-    if (useStrikeEvent) {
-        return useStrikeEvent
-    }
+    return useStrikeEvent
+}
+
+const findOnGoingUseStrikeEventSkill = (gameStatus) => {
+    const useStrikeEvent = findOnGoingUseStrikeEvent(gameStatus)
+    const eventTimingsWithSkills = useStrikeEvent?.eventTimingsWithSkills;
+    const eventTiming = eventTimingsWithSkills.find((et) => et.eventTimingSkills.some((s) => s.done === false))
+
+    const onGoingUseStrikeEventSkill = eventTiming.eventTimingSkills.find((s) => s.done === false)
+    return onGoingUseStrikeEventSkill
 }
 
 const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, targetId}) => {
@@ -82,4 +120,5 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
 exports.configSkillToEventSkill = configSkillToEventSkill;
 exports.findAllEventSkillsByTimingName = findAllEventSkillsByTimingName;
 exports.findOnGoingUseStrikeEvent = findOnGoingUseStrikeEvent;
+exports.findOnGoingUseStrikeEventSkill = findOnGoingUseStrikeEventSkill;
 exports.setEventSkillResponse = setEventSkillResponse;

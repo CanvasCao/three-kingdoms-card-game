@@ -9,33 +9,33 @@ const {findAllEventSkillsByTimingName} = require("./utils");
 const {PANDING_EVENT_TIMING} = require("../config/eventConfig");
 const {last} = require("lodash");
 
-const generatePandingEvent = (gameStatus, originId, pandingContent) => {
+const generatePandingEventThenSetNextPandingEventSkillToSkillResponse = (gameStatus, originId, pandingContent) => {
     const pandingResultCard = getCards(gameStatus, 1)
     gameStatus.pandingEvent = {
         originId,
-        eventTimingWithSkills: [],
+        eventTimingsWithSkills: [],
         done: false,
         pandingContent,
         pandingResultCard,
     }
 
     emitNotifyPandingPlayPublicCard(gameStatus, pandingResultCard, gameStatus.players[originId], pandingContent);
-    findNextSkillToReleaseInPandingEvent(gameStatus);
+    setNextPandingEventSkillToSkillResponse(gameStatus);
 }
 
-const findNextSkillToReleaseInPandingEvent = (gameStatus) => {
+const setNextPandingEventSkillToSkillResponse = (gameStatus) => {
     const pandingEvent = gameStatus.pandingEvent;
     if (!pandingEvent) {
-        return
+        return;
     }
 
     const originId = pandingEvent.originId;
-    const eventTimingWithSkills = pandingEvent.eventTimingWithSkills
+    const eventTimingsWithSkills = pandingEvent.eventTimingsWithSkills
 
-    if (eventTimingWithSkills.length == 0) {
+    if (eventTimingsWithSkills.length == 0) {
         const eventTimingName = PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT
         const eventTimingSkills = findAllEventSkillsByTimingName(gameStatus, {eventTimingName, originId})
-        pandingEvent.eventTimingWithSkills.push({eventTimingName, eventTimingSkills})
+        pandingEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
 
         if (eventTimingSkills.length > 0) {
             gameStatus.skillResponse = eventTimingSkills[0]
@@ -43,9 +43,9 @@ const findNextSkillToReleaseInPandingEvent = (gameStatus) => {
         }
     }
 
-    if (last(eventTimingWithSkills).eventTimingName == PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT) {
-        const unChooseToReleaseSkill = last(eventTimingWithSkills).eventTimingSkills
-            .find((eventTimingSkill) => eventTimingSkill.chooseToRelease == undefined)
+    if (last(eventTimingsWithSkills).eventTimingName == PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT) {
+        const unChooseToReleaseSkill = last(eventTimingsWithSkills).eventTimingSkills
+            .find((eventTimingSkill) => !eventTimingSkill.done)
 
         if (unChooseToReleaseSkill) {
             setEventSkillResponse(gameStatus, unChooseToReleaseSkill)
@@ -53,13 +53,14 @@ const findNextSkillToReleaseInPandingEvent = (gameStatus) => {
         } else {
             const eventTimingName = PANDING_EVENT_TIMING.AFTER_PANDING_TAKE_EFFECT
             const eventTimingSkills = findAllEventSkillsByTimingName(gameStatus, {eventTimingName, originId})
-            pandingEvent.eventTimingWithSkills.push({eventTimingName, eventTimingSkills})
+            pandingEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
 
             if (eventTimingSkills.length > 0) {
                 gameStatus.skillResponse = eventTimingSkills[0]
                 return;
             } else { // 判定结束
                 handlePandingEventEnd(gameStatus)
+                return;
             }
         }
     }
@@ -80,5 +81,5 @@ const handlePandingEventEnd = (gameStatus) => {
     delete gameStatus.pandingEvent;
 }
 
-exports.generatePandingEvent = generatePandingEvent;
-exports.findNextSkillToReleaseInPandingEvent = findNextSkillToReleaseInPandingEvent;
+exports.generatePandingEventThenSetNextPandingEventSkillToSkillResponse = generatePandingEventThenSetNextPandingEventSkillToSkillResponse;
+exports.setNextPandingEventSkillToSkillResponse = setNextPandingEventSkillToSkillResponse;

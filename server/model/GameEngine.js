@@ -89,7 +89,7 @@ class GameEngine {
         // BASIC
         if ([BASIC_CARDS_CONFIG.SHA.CN, BASIC_CARDS_CONFIG.LEI_SHA.CN, BASIC_CARDS_CONFIG.HUO_SHA.CN].includes(action.actualCard.CN)
         ) {
-            strikeEvent.generateUseStrikeEvents(this.gameStatus, action.originId, action.targetIds);
+            strikeEvent.generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse(this.gameStatus, action.originId, action.targetIds);
         } else if (action.actualCard.CN == BASIC_CARDS_CONFIG.TAO.CN) {
             actionHandler.setStatusByTaoAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);

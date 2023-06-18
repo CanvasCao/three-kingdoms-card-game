@@ -1,5 +1,7 @@
 const strikeEvent = require("../event/strikeEvent");
 const pandingEvent = require("../event/pandingEvent");
+const {setNextStrikeEventSkillToSkillResponse} = require("../event/strikeEvent");
+const {findOnGoingUseStrikeEventSkill} = require("../event/utils");
 const {generateWuxieSimultaneousResStageByScroll} = require("../utils/wuxieUtils");
 const {CARD_CONFIG, EQUIPMENT_CARDS_CONFIG} = require("../config/cardConfig");
 const {setStatusWhenPlayerDie} = require("../utils/dieUtils");
@@ -64,15 +66,19 @@ const responseCardHandler = {
         const skillResponse = gameStatus.skillResponse;
         const skillName = gameStatus.skillResponse.skillName;
         const chooseToResponse = response.chooseToResponse;
-        skillResponse.chooseToRelease = chooseToResponse;
-        if (!chooseToResponse) {
-            delete gameStatus.skillResponse
-            return
-        }
+        const onGoingUseStrikeEventSkill = findOnGoingUseStrikeEventSkill(gameStatus);
 
         if (skillName == "铁骑") {
+            onGoingUseStrikeEventSkill.done = true;
             delete gameStatus.skillResponse
-            pandingEvent.generatePandingEvent(gameStatus, skillResponse.playerId, skillName)
+            if (chooseToResponse) {
+                pandingEvent.generatePandingEventThenSetNextPandingEventSkillToSkillResponse(gameStatus, skillResponse.playerId, skillName);
+                if (!gameStatus.skillResponse) {
+                    setNextStrikeEventSkillToSkillResponse(gameStatus)
+                }
+            } else {
+                setNextStrikeEventSkillToSkillResponse(gameStatus)
+            }
         } else if (skillName == '鬼才') {
 
         }
@@ -203,7 +209,7 @@ const responseCardHandler = {
             const APlayer = gameStatus.players[curScrollResStage.originId]
             const BPlayer = gameStatus.players[curScrollResStage.targetId]
             gameStatus.players[APlayer.playerId].removeHandCards(response.cards);
-            strikeEvent.generateUseStrikeEvents(gameStatus, APlayer.playerId, [BPlayer.playerId]);
+            strikeEvent.generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse(gameStatus, APlayer.playerId, [BPlayer.playerId]);
         } else {
             // TODO 如果没有杀 自动不出
             // 不出杀 A=>B A不出 A把刀给当前用户

@@ -14,7 +14,7 @@ const {
 } = require("../utils/playerUtils");
 
 
-const generateUseStrikeEvents = (gameStatus, originId, targetIds) => {
+const generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse = (gameStatus, originId, targetIds) => {
     gameStatus.useStrikeEvents = [];
     const targetPlayers = getAllPlayersStartFromFirstLocation(gameStatus, getCurrentPlayer(gameStatus).location)
         .filter(p => targetIds.includes(p.playerId))
@@ -30,15 +30,15 @@ const generateUseStrikeEvents = (gameStatus, originId, targetIds) => {
             originId,
             targetId: targetPlayer.playerId,
             cantShan: false,
-            eventTimingWithSkills: [],
+            eventTimingsWithSkills: [],
             done: false
         }
     })
 
-    findNextSkillToReleaseInStrikeEvent(gameStatus);
+    setNextStrikeEventSkillToSkillResponse(gameStatus);
 }
 
-const findNextSkillToReleaseInStrikeEvent = (gameStatus) => {
+const setNextStrikeEventSkillToSkillResponse = (gameStatus) => {
     const action = gameStatus.action;
     const useStrikeEvent = findOnGoingUseStrikeEvent(gameStatus)
 
@@ -46,15 +46,15 @@ const findNextSkillToReleaseInStrikeEvent = (gameStatus) => {
         return
     }
 
-    const eventTimingWithSkills = useStrikeEvent.eventTimingWithSkills;
+    const eventTimingsWithSkills = useStrikeEvent.eventTimingsWithSkills;
     const originId = useStrikeEvent.originId
     const targetId = useStrikeEvent.targetId;
     const originPlayer = gameStatus.players[originId];
     const targetPlayer = gameStatus.players[targetId];
-    if (eventTimingWithSkills.length == 0) {
+    if (eventTimingsWithSkills.length == 0) {
         const eventTimingName = USE_EVENT_TIMING.WHEN_BECOMING_TARGET
         const eventTimingSkills = findAllEventSkillsByTimingName(gameStatus, {eventTimingName, originId, targetId})
-        eventTimingWithSkills.push({eventTimingName, eventTimingSkills})
+        eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
 
         if (eventTimingSkills.length > 0) {
             setEventSkillResponse(gameStatus, eventTimingSkills[0])
@@ -62,9 +62,9 @@ const findNextSkillToReleaseInStrikeEvent = (gameStatus) => {
         }
     }
 
-    if (last(eventTimingWithSkills).eventTimingName == USE_EVENT_TIMING.WHEN_BECOMING_TARGET) {
-        const unChooseToReleaseSkill = last(eventTimingWithSkills).eventTimingSkills
-            .find((eventTimingSkill) => eventTimingSkill.chooseToRelease == undefined)
+    if (last(eventTimingsWithSkills).eventTimingName == USE_EVENT_TIMING.WHEN_BECOMING_TARGET) {
+        const unChooseToReleaseSkill = last(eventTimingsWithSkills).eventTimingSkills
+            .find((eventTimingSkill) => !eventTimingSkill.done)
 
         if (unChooseToReleaseSkill) {
             setEventSkillResponse(gameStatus, unChooseToReleaseSkill)
@@ -72,7 +72,7 @@ const findNextSkillToReleaseInStrikeEvent = (gameStatus) => {
         } else {
             const eventTimingName = USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET
             const eventTimingSkills = findAllEventSkillsByTimingName(gameStatus, {eventTimingName, originId, targetId})
-            eventTimingWithSkills.push({eventTimingName, eventTimingSkills})
+            eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
 
             if (eventTimingSkills.length > 0) {
                 setEventSkillResponse(gameStatus, eventTimingSkills[0])
@@ -81,9 +81,9 @@ const findNextSkillToReleaseInStrikeEvent = (gameStatus) => {
         }
     }
 
-    if (last(eventTimingWithSkills).eventTimingName == USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET) {
-        const unChooseToReleaseSkill = last(eventTimingWithSkills).eventTimingSkills
-            .find((eventTimingSkill) => eventTimingSkill.chooseToRelease == undefined)
+    if (last(eventTimingsWithSkills).eventTimingName == USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET) {
+        const unChooseToReleaseSkill = last(eventTimingsWithSkills).eventTimingSkills
+            .find((eventTimingSkill) => !eventTimingSkill.done)
 
         if (unChooseToReleaseSkill) {
             setEventSkillResponse(gameStatus, unChooseToReleaseSkill)
@@ -94,7 +94,7 @@ const findNextSkillToReleaseInStrikeEvent = (gameStatus) => {
                 targetPlayer.shieldCard?.CN == EQUIPMENT_CARDS_CONFIG.REN_WANG_DUN.CN &&
                 originPlayer.weaponCard?.CN != EQUIPMENT_CARDS_CONFIG.QIN_GANG_JIAN.CN) {
             } else if (useStrikeEvent.cantShan) {
-
+                targetPlayer.reduceBlood();
             } else {
                 gameStatus.shanResponse = {
                     originId: targetId,
@@ -108,4 +108,5 @@ const findNextSkillToReleaseInStrikeEvent = (gameStatus) => {
     }
 }
 
-exports.generateUseStrikeEvents = generateUseStrikeEvents;
+exports.generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse = generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse;
+exports.setNextStrikeEventSkillToSkillResponse = setNextStrikeEventSkillToSkillResponse;

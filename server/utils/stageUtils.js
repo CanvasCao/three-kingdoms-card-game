@@ -1,4 +1,4 @@
-const {findNextSkillToReleaseInPandingEvent} = require("../event/pandingEvent");
+const {setNextPandingEventSkillToSkillResponse} = require("../event/pandingEvent");
 const {STAGE_NAMES, STAGE_NAME} = require("../config/gameConfig");
 const {isNil} = require("lodash");
 const {emitRefreshStatus, emitNotifyDrawCards} = require("./emitUtils");
@@ -82,7 +82,6 @@ const tryGoToNextPlayOrResponseOrThrowTurn = (gameStatus) => {
             goToNextStage(gameStatus);
         } else {
             if (gameStatus.pandingEvent) {
-                findNextSkillToReleaseInPandingEvent(gameStatus);
                 emitRefreshStatus(gameStatus);
                 tryGoToNextPlayOrResponseOrThrowTurn(gameStatus);
             }

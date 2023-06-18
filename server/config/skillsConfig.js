@@ -33,10 +33,10 @@ const fakeSkills = {
             triggerTiming: USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET,
             triggerCard: CARD_CONFIG.SHA.CN,
         },
-        {
-            name: '鬼才',
-            triggerTiming: PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT,
-        }
+        // {
+        //     name: '鬼才',
+        //     triggerTiming: PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT,
+        // }
     ]
 }
 
