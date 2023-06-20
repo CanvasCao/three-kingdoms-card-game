@@ -13,6 +13,10 @@ const emitNotifyPlayPublicCard = (gameStatus, behaviour) => {
 
     const io = gameStatus.io;
     const roomId = gameStatus.roomId;
+    const type = gameStatus?.skillResponse?.skillName == '鬼才' ?
+        ADD_TO_PUBLIC_CARD_TYPE.CHANGE_PANDING :
+        ADD_TO_PUBLIC_CARD_TYPE.PLAY;
+
     if (behaviour.cards?.[0]) {
         io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PUBLIC_CARD, {
             fromId: behaviour.originId,
@@ -20,7 +24,7 @@ const emitNotifyPlayPublicCard = (gameStatus, behaviour) => {
             targetId: behaviour.targetId,
             cards: behaviour.cards,
             originIndexes: behaviour.selectedIndexes,
-            type: ADD_TO_PUBLIC_CARD_TYPE.PLAY
+            type
         });
     }
 }
@@ -31,7 +35,7 @@ const emitNotifyPandingPlayPublicCard = (gameStatus, pandingResultCard, player, 
     io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PUBLIC_CARD, {
         cards: [pandingResultCard],
         fromId: CARD_LOCATION.PAIDUI,
-        pandingPlayerId:player.playerId,
+        pandingPlayerId: player.playerId,
         pandingName,
         type: ADD_TO_PUBLIC_CARD_TYPE.PANDING
     });
@@ -48,7 +52,7 @@ const emitNotifyThrowPlayPublicCard = (gameStatus, data, player) => {
         cards: data.cards,
         fromId: player.playerId,
         originIndexes: data.selectedIndexes,
-        throwPlayerId:player.playerId,
+        throwPlayerId: player.playerId,
         type: ADD_TO_PUBLIC_CARD_TYPE.THROW
     });
 }
@@ -131,7 +135,12 @@ const emitNotifyAddLines = (gameStatus, behavior) => {
     });
 }
 
-const omitGSArray = ['throwedCards', 'initCards', 'currentLocation', 'stageIndex', 'io']
+const omitGSArray = [
+    // 'throwedCards',
+    'initCards',
+    'currentLocation',
+    'stageIndex',
+    'io']
 // 只能在goToNextStage调用 和GameEngine的handler之后调用
 const emitRefreshStatus = (gameStatus) => {
     const io = gameStatus.io;

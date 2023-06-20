@@ -102,8 +102,11 @@ const setNextStrikeEventSkillToSkillResponse = (gameStatus) => {
                     cardNumber: 1,
                 }
             }
-            throwCards(gameStatus, action.cards);
             useStrikeEvent.done = true;
+            throwCards(gameStatus, action.cards);
+            if(gameStatus.useStrikeEvents.every((e)=>e.done)){
+                delete gameStatus.useStrikeEvents;
+            }
         }
     }
 }

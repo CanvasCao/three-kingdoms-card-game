@@ -22,7 +22,7 @@ const {PANDING_EVENT_TIMING} = require("../config/eventConfig");
 //                     {
 //                         "skillName": "铁骑",
 //                         "playerId": "a2511baa-80f8-4e6b-be63-317e902bfa9d",
-//                         "chooseToRelease": false
+//                         "chooseToReleaseSkill": false
 //                             releaseTargets: [],
 //                             releaseCards: [],
 //                             done: false,
@@ -38,7 +38,7 @@ const configSkillToEventSkill = (configSkill, playerId) => {
     return {
         skillName: configSkill.name,
         playerId,
-        chooseToRelease: undefined,
+        chooseToReleaseSkill: undefined,
         done: false
     }
 }
@@ -57,15 +57,26 @@ const findOnGoingUseStrikeEventSkill = (gameStatus) => {
     const eventTimingsWithSkills = useStrikeEvent?.eventTimingsWithSkills;
     const eventTiming = eventTimingsWithSkills.find((et) => et.eventTimingSkills.some((s) => s.done === false))
 
-    const onGoingUseStrikeEventSkill = eventTiming.eventTimingSkills.find((s) => s.done === false)
+    const onGoingUseStrikeEventSkill = eventTiming?.eventTimingSkills.find((s) => s.done === false)
     return onGoingUseStrikeEventSkill
+}
+
+const findOnGoingPandingEvent= (gameStatus) => {
+    return gameStatus?.pandingEvent
+}
+
+const findOnGoingPandingEventSkill = (gameStatus) => {
+    const eventTiming =gameStatus?.pandingEvent?.eventTimingsWithSkills.find((et) => et.eventTimingSkills.some((s) => s.done === false))
+
+    const onGoingPandingEventSkill = eventTiming?.eventTimingSkills.find((s) => s.done === false)
+    return onGoingPandingEventSkill
 }
 
 const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, targetId}) => {
     /*
         skillName,
         playerId,
-        chooseToRelease: undefined,
+        chooseToReleaseSkill: undefined,
     */
     const originPlayer = gameStatus.players[originId];
     const originHeroId = originPlayer?.heroId;
@@ -109,7 +120,7 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
             eventTimingSkills = eventTimingSkills.concat({
                 skillName: '雌雄双股剑',
                 playerId: originPlayer.playerId,
-                chooseToRelease: undefined,
+                chooseToReleaseSkill: undefined,
             })
         }
 
@@ -120,5 +131,7 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
 exports.configSkillToEventSkill = configSkillToEventSkill;
 exports.findAllEventSkillsByTimingName = findAllEventSkillsByTimingName;
 exports.findOnGoingUseStrikeEvent = findOnGoingUseStrikeEvent;
+exports.findOnGoingPandingEvent = findOnGoingPandingEvent;
 exports.findOnGoingUseStrikeEventSkill = findOnGoingUseStrikeEventSkill;
+exports.findOnGoingPandingEventSkill = findOnGoingPandingEventSkill;
 exports.setEventSkillResponse = setEventSkillResponse;

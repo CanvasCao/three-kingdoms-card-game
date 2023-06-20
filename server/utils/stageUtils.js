@@ -46,13 +46,13 @@ const tryGoToNextPlayOrResponseOrThrowTurn = (gameStatus) => {
         return
     }
 
-    const player = getCurrentPlayer(gameStatus);
-    if (player.isDead) { // 自己的回合死亡后 需要直接移动到下一个人（闪电 决斗）
+    const currentPlayer = getCurrentPlayer(gameStatus);
+    if (currentPlayer.isDead) { // 自己的回合死亡后 需要直接移动到下一个人（闪电 决斗）
         goNextPlayerStartStage(gameStatus)
     }
 
     const currentStageName = STAGE_NAMES[gameStatus.stage.stageIndex]
-    if (STAGE_NAMES[gameStatus.stage.stageIndex] == STAGE_NAME.START) {
+    if (currentStageName == STAGE_NAME.START) {
         goToNextStage(gameStatus);
     } else if (currentStageName == STAGE_NAME.JUDGE) {
         const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus)
@@ -74,11 +74,11 @@ const tryGoToNextPlayOrResponseOrThrowTurn = (gameStatus) => {
         }
     } else if (currentStageName == STAGE_NAME.DRAW) {
         const cards = getCards(gameStatus, 2)
-        player.addCards(cards)
-        emitNotifyDrawCards(gameStatus, cards, player)
+        currentPlayer.addCards(cards)
+        emitNotifyDrawCards(gameStatus, cards, currentPlayer)
         goToNextStage(gameStatus);
     } else if (currentStageName == STAGE_NAME.PLAY) {
-        if (player.skipPlay) {
+        if (currentPlayer.skipPlay) {
             goToNextStage(gameStatus);
         } else {
             if (gameStatus.pandingEvent) {
@@ -87,7 +87,7 @@ const tryGoToNextPlayOrResponseOrThrowTurn = (gameStatus) => {
             }
         }
     } else if (currentStageName == STAGE_NAME.THROW) {
-        if (!player.needThrow()) {
+        if (!currentPlayer.needThrow()) {
             goToNextStage(gameStatus);
         }
     } else if (currentStageName == STAGE_NAME.END) {

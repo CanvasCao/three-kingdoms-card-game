@@ -3,6 +3,7 @@ const ADD_TO_PUBLIC_CARD_TYPE = {
     PANDING: "PANDING",
     THROW: "THROW",
     CHAI: "CHAI",
+    CHANGE_PANDING:"CHANGE_PANDING"
 }
 
 const EMIT_TYPE = {

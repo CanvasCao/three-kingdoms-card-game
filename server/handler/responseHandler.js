@@ -1,5 +1,8 @@
 const strikeEvent = require("../event/strikeEvent");
 const pandingEvent = require("../event/pandingEvent");
+const {findOnGoingPandingEvent} = require("../event/utils");
+const {setNextPandingEventSkillToSkillResponse} = require("../event/pandingEvent");
+const {findOnGoingPandingEventSkill} = require("../event/utils");
 const {setNextStrikeEventSkillToSkillResponse} = require("../event/strikeEvent");
 const {findOnGoingUseStrikeEventSkill} = require("../event/utils");
 const {generateWuxieSimultaneousResStageByScroll} = require("../utils/wuxieUtils");
@@ -62,16 +65,30 @@ const responseCardHandler = {
         }
     },
 
+    // Response
+    // {
+    //     chooseToResponse: boolean,
+    //     cards: Card[],
+    //     actualCard: Card,
+    //     originId: string,
+    //     targetId?: string,
+    //
+    //     // 为了校验无懈可击是否冲突
+    //     wuxieTargetCardId?: string,
+    //
+    //     selectedIndexes: number[],
+    // }
     setStatusBySkillResponse: (gameStatus, response) => {
         const skillResponse = gameStatus.skillResponse;
         const skillName = gameStatus.skillResponse.skillName;
-        const chooseToResponse = response.chooseToResponse;
-        const onGoingUseStrikeEventSkill = findOnGoingUseStrikeEventSkill(gameStatus);
+        const chooseToReleaseSkill = response.chooseToResponse;
+        const originPlayer = gameStatus.players[response.originId];
 
         if (skillName == "铁骑") {
+            const onGoingUseStrikeEventSkill = findOnGoingUseStrikeEventSkill(gameStatus);
             onGoingUseStrikeEventSkill.done = true;
             delete gameStatus.skillResponse
-            if (chooseToResponse) {
+            if (chooseToReleaseSkill) {
                 pandingEvent.generatePandingEventThenSetNextPandingEventSkillToSkillResponse(gameStatus, skillResponse.playerId, skillName);
                 if (!gameStatus.skillResponse) {
                     setNextStrikeEventSkillToSkillResponse(gameStatus)
@@ -80,7 +97,27 @@ const responseCardHandler = {
                 setNextStrikeEventSkillToSkillResponse(gameStatus)
             }
         } else if (skillName == '鬼才') {
+            const onGoingPandingEventSkill = findOnGoingPandingEventSkill(gameStatus);
+            const onGoingPandingEvent = findOnGoingPandingEvent(gameStatus)
 
+            if (onGoingPandingEventSkill.chooseToReleaseSkill === undefined) {
+                onGoingPandingEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
+                if (chooseToReleaseSkill) {
+                } else {
+                    onGoingPandingEventSkill.done = true;
+                    delete gameStatus.skillResponse
+
+                    setNextPandingEventSkillToSkillResponse(gameStatus)
+                }
+            } else {
+                onGoingPandingEvent.pandingResultCard = response.cards[0]
+                onGoingPandingEventSkill.releaseCards=response.cards
+                onGoingPandingEventSkill.done = true;
+                delete gameStatus.skillResponse
+                originPlayer.removeHandCards(response.cards);
+
+                setNextPandingEventSkillToSkillResponse(gameStatus)
+            }
         }
     },
 

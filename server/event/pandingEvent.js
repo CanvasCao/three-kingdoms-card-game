@@ -1,3 +1,4 @@
+const {setNextStrikeEventSkillToSkillResponse} = require("./strikeEvent");
 const {setEventSkillResponse} = require("./utils");
 const {CARD_COLOR} = require("../config/cardConfig");
 const {getActualCardColor} = require("../utils/cardUtils");
@@ -74,10 +75,14 @@ const handlePandingEventEnd = (gameStatus) => {
         if (getActualCardColor(pandingEvent.pandingResultCard) == CARD_COLOR.RED) {
             useStrikeEvent.cantShan = true;
         }
+        setNextStrikeEventSkillToSkillResponse(gameStatus)
     }
 
     pandingEvent.done = true;
-    throwCards(gameStatus, pandingEvent.pandingResultCard);
+    const allChangePandingCards=pandingEvent.eventTimingsWithSkills[0].eventTimingSkills
+        .map(s => s.releaseCards[0])
+        .filter(Boolean)
+    throwCards(gameStatus,[...allChangePandingCards,pandingEvent.pandingResultCard]);
     delete gameStatus.pandingEvent;
 }
 
