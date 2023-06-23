@@ -1,3 +1,4 @@
+const {SKILL_NAMES} = require("../config/skillsConfig");
 const {setNextStrikeEventSkillToSkillResponse} = require("./strikeEvent");
 const {setEventSkillResponse} = require("./utils");
 const {CARD_COLOR} = require("../config/cardConfig");
@@ -70,7 +71,7 @@ const setNextPandingEventSkillToSkillResponse = (gameStatus) => {
 const handlePandingEventEnd = (gameStatus) => {
     const pandingEvent = gameStatus.pandingEvent;
 
-    if (pandingEvent.pandingContent == '铁骑') {
+    if (pandingEvent.pandingContent == SKILL_NAMES.SHU["006"].TIE_JI) {
         const useStrikeEvent = findOnGoingUseStrikeEvent(gameStatus);
         if (getActualCardColor(pandingEvent.pandingResultCard) == CARD_COLOR.RED) {
             useStrikeEvent.cantShan = true;

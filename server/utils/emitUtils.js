@@ -1,3 +1,4 @@
+const {SKILL_NAMES} = require("../config/skillsConfig");
 const {EMIT_TYPE} = require("../config/emitConfig");
 const {GAME_STATUS} = require("../config/gameConfig");
 const {CARD_LOCATION} = require("../config/cardConfig");
@@ -13,7 +14,7 @@ const emitNotifyPlayPublicCard = (gameStatus, behaviour) => {
 
     const io = gameStatus.io;
     const roomId = gameStatus.roomId;
-    const type = gameStatus?.skillResponse?.skillName == '鬼才' ?
+    const type = gameStatus?.skillResponse?.skillName == SKILL_NAMES.WEI["002"].GUI_CAI ?
         ADD_TO_PUBLIC_CARD_TYPE.CHANGE_PANDING :
         ADD_TO_PUBLIC_CARD_TYPE.PLAY;
 

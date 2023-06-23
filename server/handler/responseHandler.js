@@ -1,5 +1,6 @@
 const strikeEvent = require("../event/strikeEvent");
 const pandingEvent = require("../event/pandingEvent");
+const {SKILL_NAMES} = require("../config/skillsConfig");
 const {findOnGoingPandingEvent} = require("../event/utils");
 const {setNextPandingEventSkillToSkillResponse} = require("../event/pandingEvent");
 const {findOnGoingPandingEventSkill} = require("../event/utils");
@@ -84,7 +85,7 @@ const responseCardHandler = {
         const chooseToReleaseSkill = response.chooseToResponse;
         const originPlayer = gameStatus.players[response.originId];
 
-        if (skillName == "铁骑") {
+        if (skillName == SKILL_NAMES.SHU["006"].TIE_JI) {
             const onGoingUseStrikeEventSkill = findOnGoingUseStrikeEventSkill(gameStatus);
             onGoingUseStrikeEventSkill.done = true;
             delete gameStatus.skillResponse
@@ -96,7 +97,7 @@ const responseCardHandler = {
             } else {
                 setNextStrikeEventSkillToSkillResponse(gameStatus)
             }
-        } else if (skillName == '鬼才') {
+        } else if (skillName == SKILL_NAMES.WEI["002"].GUI_CAI) {
             const onGoingPandingEventSkill = findOnGoingPandingEventSkill(gameStatus);
             const onGoingPandingEvent = findOnGoingPandingEvent(gameStatus)
 
