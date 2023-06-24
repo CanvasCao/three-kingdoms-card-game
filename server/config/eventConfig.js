@@ -45,7 +45,7 @@ const USE_STRIKE_EVENT_TIMINGS = [
     USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET, // 【铁骑】【烈弓】【雌雄双股剑】
     // USE_EVENT_TIMING.AFTER_BECOMING_TARGET, // 【贞烈】
 
-    USE_EVENT_TIMING.WHEN_SETTLEMENT_BEGINS,// 【仁王盾】【藤甲①】 如目标无效 本事件终止 若有效生成闪ResStages
+    USE_EVENT_TIMING.WHEN_SETTLEMENT_BEGINS,// 【仁王盾】【藤甲①】 如目标无效 本事件终止 若有效生成闪Responses
     // USE_EVENT_TIMING.BEFORE_TAKE_EFFECT, // 如被响应才会触发【贯石斧】、【青龙偃月刀】若没有触发【贯石斧】、【青龙偃月刀】生成伤害事件
     // USE_EVENT_TIMING.WHEN_TAKE_EFFECT,
     // USE_EVENT_TIMING.AFTER_TAKE_EFFECT, // 生成伤害和铁索连环事件 此事件进入弃牌堆

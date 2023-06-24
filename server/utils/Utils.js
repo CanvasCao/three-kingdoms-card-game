@@ -4,7 +4,6 @@ const {setNextPandingEventSkillToSkillResponse} = require("../event/pandingEvent
 const {tryGoToNextPlayOrResponseOrThrowTurn} = require("./stageUtils");
 const {ifAnyPlayerNeedToResponse} = require("./stageUtils");
 const tryGoToNextStageOrFindNextSkillResponseAfterAnyResponse = (gameStatus) => {
-
     if (ifAnyPlayerNeedToResponse(gameStatus)) {
         return
     }
@@ -27,7 +26,7 @@ const tryGoToNextStageOrFindNextSkillResponseAfterAnyResponse = (gameStatus) => 
     // 其他铁锁连环角色受到伤害
     if (gameStatus.tieSuoTempStorage.length) {
         setGameStatusByTieSuoTempStorage(gameStatus);
-        if (gameStatus.taoResStages.length) {
+        if (gameStatus.taoResponses.length) {
             return;
         }
     }

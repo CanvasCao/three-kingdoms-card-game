@@ -44,17 +44,19 @@ class GameEngine {
 
             // 基础牌
             shanResponse: undefined,
-            taoResStages: [],
+            taoResponses: [],
+
+            skillResponse: undefined,
 
             // 锦囊
-            scrollResStages: [],
-            wuxieSimultaneousResStage: {
+            scrollResponses: [],
+            wuxieSimultaneousResponse: {
                 hasWuxiePlayerIds: [],
                 wuxieChain: []// 等待全员无懈可击
             },
 
             // 其他
-            weaponResStages: [],
+            weaponResponses: [],
             wugufengdengCards: [],
             tieSuoTempStorage: [],
 
@@ -140,23 +142,23 @@ class GameEngine {
 
     handleResponse(response) {
         emitNotifyPlayPublicCard(this.gameStatus, response);
-        if (this.gameStatus.taoResStages.length > 0 && response?.actualCard?.CN == BASIC_CARDS_CONFIG.SHAN.CN) {
+        if (this.gameStatus.taoResponses.length > 0 && response?.actualCard?.CN == BASIC_CARDS_CONFIG.SHAN.CN) {
             throw new Error("求桃的时候不能出闪")
         }
 
         const needResponseShan = this.gameStatus.shanResponse;
         const needResponseSkill = this.gameStatus.skillResponse;
-        const needResponseTao = this.gameStatus.taoResStages.length > 0;
-        const needResponseWuxie = this.gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds.length > 0;
+        const needResponseTao = this.gameStatus.taoResponses.length > 0;
+        const needResponseWuxie = this.gameStatus.wuxieSimultaneousResponse.hasWuxiePlayerIds.length > 0;
 
-        const curScrollResStages = this.gameStatus.scrollResStages;
-        const needResponseNanMan = this.gameStatus.scrollResStages.length > 0 && curScrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.CN;
-        const needResponseWanJian = this.gameStatus.scrollResStages.length > 0 && curScrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.CN;
-        const needResponseJueDou = this.gameStatus.scrollResStages.length > 0 && curScrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.JUE_DOU.CN;
+        const curScrollResponse = this.gameStatus.scrollResponses;
+        const needResponseNanMan = this.gameStatus.scrollResponses.length > 0 && curScrollResponse[0].actualCard.CN == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.CN;
+        const needResponseWanJian = this.gameStatus.scrollResponses.length > 0 && curScrollResponse[0].actualCard.CN == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.CN;
+        const needResponseJueDou = this.gameStatus.scrollResponses.length > 0 && curScrollResponse[0].actualCard.CN == SCROLL_CARDS_CONFIG.JUE_DOU.CN;
 
         // 只是响应是否出杀
-        const needResponseJieDao = this.gameStatus.scrollResStages.length > 0 && curScrollResStages[0].actualCard.CN == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.CN;
-        const needResponseQingLongYanYueDao = this.gameStatus.weaponResStages.length > 0;
+        const needResponseJieDao = this.gameStatus.scrollResponses.length > 0 && curScrollResponse[0].actualCard.CN == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.CN;
+        const needResponseQingLongYanYueDao = this.gameStatus.weaponResponses.length > 0;
 
         if (needResponseShan) {
             responseCardHandler.setStatusByShanResponse(this.gameStatus, response);
@@ -202,7 +204,7 @@ class GameEngine {
     }
 
     // 任意角色blood<=0时
-    generateNewRoundQiuTaoResponseStages(qiutaoTargetPlayer) {
+    generateNewRoundQiuTaoResponses(qiutaoTargetPlayer) {
         if (qiutaoTargetPlayer.currentBlood > 0) {
             throw new Error("Don't need TAO")
         }
@@ -211,7 +213,7 @@ class GameEngine {
         const firstLocation = currentPlayer.location;
         const players = getAllPlayersStartFromFirstLocation(this.gameStatus, firstLocation)
 
-        this.gameStatus.taoResStages = players.map((player) => {
+        this.gameStatus.taoResponses = players.map((player) => {
             return {
                 originId: player.playerId,
                 targetId: qiutaoTargetPlayer.playerId,

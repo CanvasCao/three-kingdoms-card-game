@@ -103,7 +103,7 @@ io.on('connection', (socket) => {
                 name: p.playerName,
                 playerId: p.playerId,
                 location: locations[i]
-            }, gameEngine.generateNewRoundQiuTaoResponseStages.bind(gameEngine));
+            }, gameEngine.generateNewRoundQiuTaoResponses.bind(gameEngine));
             gameEngine.gameStatus.players[newPlayer.playerId] = newPlayer;
         })
 

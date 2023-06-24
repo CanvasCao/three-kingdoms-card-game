@@ -4,7 +4,7 @@ const {differenceBy} = require("lodash/array");
 const {v4: uuidv4} = require('uuid');
 
 class Player {
-    constructor(player, generateNewRoundQiuTaoResponseStages) {
+    constructor(player, generateNewRoundQiuTaoResponses) {
         this.maxBlood = 4;
         this.currentBlood = 3 || this.maxBlood;
         this.imageName = player.imageName;
@@ -63,7 +63,7 @@ class Player {
         this.heroId = this.imageName;
 
         // 耦合 掉血和求桃
-        this.generateNewRoundQiuTaoResponseStages = generateNewRoundQiuTaoResponseStages;
+        this.generateNewRoundQiuTaoResponses = generateNewRoundQiuTaoResponses;
 
     }
 
@@ -111,7 +111,7 @@ class Player {
     reduceBlood(number = 1) {
         this.currentBlood = this.currentBlood - number;
         if (this.currentBlood <= 0) {
-            this.generateNewRoundQiuTaoResponseStages(this);
+            this.generateNewRoundQiuTaoResponses(this);
         }
     }
 

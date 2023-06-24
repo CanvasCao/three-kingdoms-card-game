@@ -15,7 +15,7 @@ const {
     getActualCardColor
 } = require("../utils/cardUtils");
 const {
-    generateWuxieSimultaneousResStageByScroll,
+    generateWuxieSimultaneousResponseByScroll,
     setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect
 } = require("../utils/wuxieUtils");
 const {v4: uuidv4} = require('uuid');
@@ -57,24 +57,24 @@ const actionHandler = {
         //     targetIds:[A,B],
         //     isEffect:false,
         // }
-        // scrollResStages=[{
+        // scrollResponses=[{
         //     originId: A,
         //     targetId: B,
         //     isEffect:false,
         // }]
 
         // 1.失效
-        // scrollResStages=[]
+        // scrollResponses=[]
         //
         // 2.生效
-        // scrollResStages=[{
+        // scrollResponses=[{
         //     originId: A,
         //     targetId: B,
         //     isEffect:true,
         // }]
         //
         // 2.1 出杀
-        // scrollResStages=[]
+        // scrollResponses=[]
         // shanResponse = {
         //     originId: B,
         //     targetId: A,
@@ -82,7 +82,7 @@ const actionHandler = {
         // }
         //
         // 2.2 不出杀
-        // scrollResStages=[]
+        // scrollResponses=[]
         // A remove weapon
         // CurrentPlayer add weapon
 
@@ -98,7 +98,7 @@ const actionHandler = {
         if (action.targetIds) {
             if (action.actualCard.CN == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.CN ||
                 action.actualCard.CN == SCROLL_CARDS_CONFIG.GUO_HE_CHAI_QIAO.CN) {
-                gameStatus.scrollResStages = action.targetIds.map((targetId) => {
+                gameStatus.scrollResponses = action.targetIds.map((targetId) => {
                     return {
                         originId: action.originId,
                         targetId: targetId,
@@ -110,7 +110,7 @@ const actionHandler = {
                     }
                 })
             } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.CN) {
-                gameStatus.scrollResStages = [{
+                gameStatus.scrollResponses = [{
                     originId: action.targetIds[0],
                     targetId: action.targetIds[1],
                     cardTakeEffectOnPlayerId: action.targetIds[0],
@@ -121,7 +121,7 @@ const actionHandler = {
             }
         } else if (action.targetId) {
             if (action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.CN) {
-                gameStatus.scrollResStages = [{
+                gameStatus.scrollResponses = [{
                     originId: action.originId,
                     targetId: action.targetId,
                     cardTakeEffectOnPlayerId: action.originId,
@@ -131,7 +131,7 @@ const actionHandler = {
                 }]
             } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.JUE_DOU.CN) {
                 // 决斗originId targetId的值相反
-                gameStatus.scrollResStages = [{
+                gameStatus.scrollResponses = [{
                     originId: action.targetId,
                     targetId: action.originId,
                     cardTakeEffectOnPlayerId: action.targetId,
@@ -142,7 +142,7 @@ const actionHandler = {
             }
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
             const players = getAllPlayersStartFromFirstLocation(gameStatus, getCurrentPlayer(gameStatus).location)
-            gameStatus.scrollResStages = players.filter((p) => p.currentBlood < p.maxBlood).map((player) => {
+            gameStatus.scrollResponses = players.filter((p) => p.currentBlood < p.maxBlood).map((player) => {
                 return {
                     originId: player.playerId,
                     cardTakeEffectOnPlayerId: player.playerId,
@@ -157,7 +157,7 @@ const actionHandler = {
             const firstLocation = currentPlayer.location;
             const players = getAllPlayersStartFromFirstLocation(gameStatus, firstLocation)
 
-            const scrollResStages = players.filter(p => p.playerId !== currentPlayer.playerId).map((player) => {
+            const scrollResponses = players.filter(p => p.playerId !== currentPlayer.playerId).map((player) => {
                 return {
                     originId: player.playerId,
                     targetId: action.originId,
@@ -167,13 +167,13 @@ const actionHandler = {
                     isEffect: undefined,
                 }
             })
-            gameStatus.scrollResStages = scrollResStages
+            gameStatus.scrollResponses = scrollResponses
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_GU_FENG_DENG.CN) {
             const currentPlayer = getCurrentPlayer(gameStatus);
             const firstLocation = currentPlayer.location;
             const players = getAllPlayersStartFromFirstLocation(gameStatus, firstLocation)
 
-            const scrollResStages = players.map((player) => {
+            const scrollResponses = players.map((player) => {
                 return {
                     originId: player.playerId,
                     cards: action.cards,
@@ -183,7 +183,7 @@ const actionHandler = {
                     stageId: uuidv4(), // 前端刷新Board的依据
                 }
             })
-            gameStatus.scrollResStages = scrollResStages
+            gameStatus.scrollResponses = scrollResponses
 
             // 有wugufengdengCards展示WuGuFengDengBoard
             gameStatus.wugufengdengCards = getCards(gameStatus, 8)// players.length)
@@ -191,7 +191,7 @@ const actionHandler = {
 
         const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
         if (hasWuxiePlayers.length > 0) {
-            generateWuxieSimultaneousResStageByScroll(gameStatus)
+            generateWuxieSimultaneousResponseByScroll(gameStatus)
         } else { // 没人有无懈可击直接生效
             setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, "setStatusByScrollAction" + action.actualCard.CN);
         }

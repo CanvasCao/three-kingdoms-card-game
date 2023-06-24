@@ -4,8 +4,8 @@ const {isNil} = require("lodash");
 const {emitRefreshStatus, emitNotifyDrawCards} = require("./emitUtils");
 const {getCurrentPlayer, getAllHasWuxiePlayers} = require("./playerUtils");
 const {setCurrentLocationToNextLocation} = require("./locationUtils");
-const {generateWuxieSimultaneousResStageByPandingCard} = require("./wuxieUtils");
-const {clearAllResStages} = require("./clearResStageUtils");
+const {generateWuxieSimultaneousResponseByPandingCard} = require("./wuxieUtils");
+const {clearAllResponses} = require("./clearResponseUtils");
 const {getNextNeedExecutePandingSign} = require("./pandingUtils");
 const {getCards} = require("./cardUtils");
 
@@ -35,7 +35,7 @@ const goToNextStage = (gameStatus) => {
         setGameStatusStage(gameStatus);
     }
 
-    clearAllResStages(gameStatus)
+    clearAllResponses(gameStatus)
 
     emitRefreshStatus(gameStatus);
     tryGoToNextPlayOrResponseOrThrowTurn(gameStatus);
@@ -61,7 +61,7 @@ const tryGoToNextPlayOrResponseOrThrowTurn = (gameStatus) => {
         } else if (isNil(nextNeedPandingSign.isEffect)) { // 有未生效的判定 需要无懈可击
             const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
             if (hasWuxiePlayers.length > 0) {
-                generateWuxieSimultaneousResStageByPandingCard(gameStatus)
+                generateWuxieSimultaneousResponseByPandingCard(gameStatus)
                 emitRefreshStatus(gameStatus);
             } else { // 延时锦囊需要判定
                 nextNeedPandingSign.isEffect = true;
@@ -93,10 +93,10 @@ const tryGoToNextPlayOrResponseOrThrowTurn = (gameStatus) => {
 const ifAnyPlayerNeedToResponse = (gameStatus) => {
     if (gameStatus.shanResponse ||
         gameStatus.skillResponse ||
-        gameStatus.taoResStages.length > 0 ||
-        gameStatus.scrollResStages.length > 0 ||
-        gameStatus.weaponResStages.length > 0 ||
-        gameStatus.wuxieSimultaneousResStage.hasWuxiePlayerIds.length > 0
+        gameStatus.taoResponses.length > 0 ||
+        gameStatus.scrollResponses.length > 0 ||
+        gameStatus.weaponResponses.length > 0 ||
+        gameStatus.wuxieSimultaneousResponse.hasWuxiePlayerIds.length > 0
     ) {
         return true
     }

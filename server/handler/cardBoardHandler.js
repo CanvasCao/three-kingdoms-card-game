@@ -1,6 +1,6 @@
 const {CARD_BOARD_ACTION_TYPE} = require("../config/cardBoardConfig");
 const {throwCards} = require("../utils/cardUtils")
-const {clearNextScrollStage} = require("../utils/clearResStageUtils")
+const {clearNextScrollResponse} = require("../utils/clearResponseUtils")
 const cardBoardHandler = {
     handleCardBoard(gameStatus, data) {
         const {card, originId, targetId, type} = data;
@@ -10,7 +10,7 @@ const cardBoardHandler = {
         } else if (type == CARD_BOARD_ACTION_TYPE.MOVE) {
             gameStatus.players[originId].addCards(card);
         }
-        clearNextScrollStage(gameStatus)
+        clearNextScrollResponse(gameStatus)
     }
 }
 
