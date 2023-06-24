@@ -118,9 +118,10 @@ const setStatusWhenUseStrikeEventDone = (gameStatus) => {
 const handleUseStrikeEventEnd = (gameStatus) => {
     if (gameStatus.useStrikeEvents.every((e) => e.done)) {
         delete gameStatus.useStrikeEvents;
+        const action = gameStatus.action;
         throwCards(gameStatus, action.cards);
-    } else { // 找下一个杀事件
-        setNextStrikeEventSkillToSkillResponse(gameStatus);
+    } else {
+        setNextStrikeEventSkillToSkillResponse(gameStatus)
     }
 }
 

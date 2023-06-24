@@ -1,9 +1,9 @@
+const {emitRefreshStatus} = require("./emitUtils");
 const {setGameStatusByTieSuoTempStorage} = require("./tieSuoUtils");
 const {setNextStrikeEventSkillToSkillResponse} = require("../event/strikeEvent");
 const {setNextPandingEventSkillToSkillResponse} = require("../event/pandingEvent");
-const {tryGoToNextPlayOrResponseOrThrowTurn} = require("./stageUtils");
 const {ifAnyPlayerNeedToResponse} = require("./stageUtils");
-const tryGoToNextStageOrFindNextSkillResponseAfterAnyResponse = (gameStatus) => {
+const tryFindNextSkillResponse = (gameStatus) => {
     if (ifAnyPlayerNeedToResponse(gameStatus)) {
         return
     }
@@ -12,6 +12,7 @@ const tryGoToNextStageOrFindNextSkillResponseAfterAnyResponse = (gameStatus) => 
     if (gameStatus.pandingEvent) {
         setNextPandingEventSkillToSkillResponse(gameStatus)
         if (gameStatus.skillResponse) {
+            emitRefreshStatus(gameStatus);
             return;
         }
     }
@@ -19,6 +20,7 @@ const tryGoToNextStageOrFindNextSkillResponseAfterAnyResponse = (gameStatus) => 
     if (gameStatus.useStrikeEvents) {
         setNextStrikeEventSkillToSkillResponse(gameStatus)
         if (gameStatus.skillResponse) {
+            emitRefreshStatus(gameStatus);
             return;
         }
     }
@@ -27,13 +29,12 @@ const tryGoToNextStageOrFindNextSkillResponseAfterAnyResponse = (gameStatus) => 
     if (gameStatus.tieSuoTempStorage.length) {
         setGameStatusByTieSuoTempStorage(gameStatus);
         if (gameStatus.taoResponses.length) {
+            emitRefreshStatus(gameStatus);
             return;
         }
     }
 
-    // 打无懈可击延迟锦囊生效后 需要判断是不是从判定阶段到出牌阶段
-    // 闪电求桃之后 需要判断是不是从判定阶段到出牌阶段
-    tryGoToNextPlayOrResponseOrThrowTurn(gameStatus)
+    emitRefreshStatus(gameStatus);
 }
 
-exports.tryGoToNextStageOrFindNextSkillResponseAfterAnyResponse = tryGoToNextStageOrFindNextSkillResponseAfterAnyResponse;
+exports.tryFindNextSkillResponse = tryFindNextSkillResponse;

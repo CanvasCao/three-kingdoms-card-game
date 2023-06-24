@@ -2,9 +2,7 @@ const strikeEvent = require("../event/strikeEvent");
 const pandingEvent = require("../event/pandingEvent");
 const {SKILL_NAMES} = require("../config/skillsConfig");
 const {findOnGoingPandingEvent} = require("../event/utils");
-const {setNextPandingEventSkillToSkillResponse} = require("../event/pandingEvent");
 const {findOnGoingPandingEventSkill} = require("../event/utils");
-const {setNextStrikeEventSkillToSkillResponse} = require("../event/strikeEvent");
 const {findOnGoingUseStrikeEventSkill} = require("../event/utils");
 const {generateWuxieSimultaneousResponseByScroll} = require("../utils/wuxieUtils");
 const {CARD_CONFIG, EQUIPMENT_CARDS_CONFIG} = require("../config/cardConfig");
@@ -82,11 +80,6 @@ const responseCardHandler = {
             delete gameStatus.skillResponse
             if (chooseToReleaseSkill) {
                 pandingEvent.generatePandingEventThenSetNextPandingEventSkillToSkillResponse(gameStatus, skillResponse.playerId, skillName);
-                if (!gameStatus.skillResponse) {
-                    setNextStrikeEventSkillToSkillResponse(gameStatus)
-                }
-            } else {
-                setNextStrikeEventSkillToSkillResponse(gameStatus)
             }
         } else if (skillName == SKILL_NAMES.WEI["002"].GUI_CAI) {
             const onGoingPandingEventSkill = findOnGoingPandingEventSkill(gameStatus);
@@ -95,8 +88,6 @@ const responseCardHandler = {
             if (!chooseToReleaseSkill) {
                 onGoingPandingEventSkill.done = true;
                 delete gameStatus.skillResponse
-
-                setNextPandingEventSkillToSkillResponse(gameStatus)
                 return
             }
 
@@ -108,8 +99,6 @@ const responseCardHandler = {
                 onGoingPandingEventSkill.done = true;
                 delete gameStatus.skillResponse
                 originPlayer.removeHandCards(response.cards);
-
-                setNextPandingEventSkillToSkillResponse(gameStatus)
             }
         }
     },
@@ -235,6 +224,7 @@ const responseCardHandler = {
             const APlayer = gameStatus.players[curScrollResponse.originId]
             const BPlayer = gameStatus.players[curScrollResponse.targetId]
             gameStatus.players[APlayer.playerId].removeHandCards(response.cards);
+
             strikeEvent.generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse(gameStatus, APlayer.playerId, [BPlayer.playerId]);
         } else {
             // TODO 如果没有杀 自动不出

@@ -1,5 +1,5 @@
 const strikeEvent = require("../event/strikeEvent");
-const {tryGoToNextStageOrFindNextSkillResponseAfterAnyResponse} = require("../utils/Utils");
+const {tryFindNextSkillResponse} = require("../utils/Utils");
 const {
     getInitCards,
 } = require("../initCards");
@@ -138,6 +138,7 @@ class GameEngine {
         }
 
         emitRefreshStatus(this.gameStatus);
+        tryFindNextSkillResponse(this.gameStatus);
     }
 
     handleResponse(response) {
@@ -182,7 +183,12 @@ class GameEngine {
         }
 
         emitRefreshStatus(this.gameStatus);
-        tryGoToNextStageOrFindNextSkillResponseAfterAnyResponse(this.gameStatus);
+
+        // 第一个目标求闪/桃之后 继续找马超下一个铁骑的技能
+        tryFindNextSkillResponse(this.gameStatus);
+        // 打无懈可击延迟锦囊生效后 需要判断是不是从判定阶段到出牌阶段
+        // 闪电求桃之后 需要判断是不是从判定阶段到出牌阶段
+        tryGoToNextPlayOrResponseOrThrowTurn(this.gameStatus)
     }
 
     handleThrowCards(data) {

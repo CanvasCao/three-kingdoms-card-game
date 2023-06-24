@@ -78,7 +78,7 @@ const setNextPandingEventSkillToSkillResponse = (gameStatus) => {
 
 const setStatusBasedOnPandingResult = (gameStatus) => {
     const pandingEvent = gameStatus.pandingEvent;
-    pandingEvent.done = true;
+    // pandingEvent.done = true;
 
     const pandingResultCard = pandingEvent.pandingResultCard;
     const currentPlayer = getCurrentPlayer(gameStatus);
@@ -88,7 +88,6 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
         if (getActualCardColor(pandingResultCard) == CARD_COLOR.RED) {
             useStrikeEvent.cantShan = true;
         }
-        setNextStrikeEventSkillToSkillResponse(gameStatus) // 结算完回到铁骑
     } else if (pandingEvent.pandingContent == CARD_CONFIG.LE_BU_SI_SHU.CN || pandingEvent.pandingContent == CARD_CONFIG.SHAN_DIAN.CN) {
         const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus);
         const pandingActualCard = nextNeedPandingSign.actualCard;
