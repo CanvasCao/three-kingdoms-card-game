@@ -101,18 +101,19 @@ const responseCardHandler = {
             const onGoingPandingEventSkill = findOnGoingPandingEventSkill(gameStatus);
             const onGoingPandingEvent = findOnGoingPandingEvent(gameStatus)
 
+            if (!chooseToReleaseSkill) {
+                onGoingPandingEventSkill.done = true;
+                delete gameStatus.skillResponse
+
+                setNextPandingEventSkillToSkillResponse(gameStatus)
+                return
+            }
+
             if (onGoingPandingEventSkill.chooseToReleaseSkill === undefined) {
                 onGoingPandingEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
-                if (chooseToReleaseSkill) {
-                } else {
-                    onGoingPandingEventSkill.done = true;
-                    delete gameStatus.skillResponse
-
-                    setNextPandingEventSkillToSkillResponse(gameStatus)
-                }
             } else {
                 onGoingPandingEvent.pandingResultCard = response.cards[0]
-                onGoingPandingEventSkill.releaseCards=response.cards
+                onGoingPandingEventSkill.releaseCards = response.cards // 最后结算弃牌的时候需要 每次弃每次改判的牌
                 onGoingPandingEventSkill.done = true;
                 delete gameStatus.skillResponse
                 originPlayer.removeHandCards(response.cards);

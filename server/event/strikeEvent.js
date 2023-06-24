@@ -13,7 +13,6 @@ const {
     getAllPlayersStartFromFirstLocation
 } = require("../utils/playerUtils");
 
-
 const generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse = (gameStatus, originId, targetIds) => {
     gameStatus.useStrikeEvents = [];
     const targetPlayers = getAllPlayersStartFromFirstLocation(gameStatus, getCurrentPlayer(gameStatus).location)
@@ -39,7 +38,6 @@ const generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse = (gameS
 }
 
 const setNextStrikeEventSkillToSkillResponse = (gameStatus) => {
-    const action = gameStatus.action;
     const useStrikeEvent = findOnGoingUseStrikeEvent(gameStatus)
 
     if (!useStrikeEvent) {
@@ -49,8 +47,6 @@ const setNextStrikeEventSkillToSkillResponse = (gameStatus) => {
     const eventTimingsWithSkills = useStrikeEvent.eventTimingsWithSkills;
     const originId = useStrikeEvent.originId
     const targetId = useStrikeEvent.targetId;
-    const originPlayer = gameStatus.players[originId];
-    const targetPlayer = gameStatus.players[targetId];
     if (eventTimingsWithSkills.length == 0) {
         const eventTimingName = USE_EVENT_TIMING.WHEN_BECOMING_TARGET
         const eventTimingSkills = findAllEventSkillsByTimingName(gameStatus, {eventTimingName, originId, targetId})
@@ -89,25 +85,42 @@ const setNextStrikeEventSkillToSkillResponse = (gameStatus) => {
             setEventSkillResponse(gameStatus, unChooseToReleaseSkill)
             return;
         } else {
-            // 杀会取消的情况
-            if (getActualCardColor(action.actualCard) == CARD_COLOR.BLACK &&
-                targetPlayer.shieldCard?.CN == EQUIPMENT_CARDS_CONFIG.REN_WANG_DUN.CN &&
-                originPlayer.weaponCard?.CN != EQUIPMENT_CARDS_CONFIG.QIN_GANG_JIAN.CN) {
-            } else if (useStrikeEvent.cantShan) {
-                targetPlayer.reduceBlood();
-            } else {
-                gameStatus.shanResponse = {
-                    originId: targetId,
-                    targetId: originId,
-                    cardNumber: 1,
-                }
-            }
-            useStrikeEvent.done = true;
-            throwCards(gameStatus, action.cards);
-            if(gameStatus.useStrikeEvents.every((e)=>e.done)){
-                delete gameStatus.useStrikeEvents;
-            }
+            setStatusWhenUseStrikeEventDone(gameStatus);
+            handleUseStrikeEventEnd(gameStatus);
         }
+    }
+}
+
+const setStatusWhenUseStrikeEventDone = (gameStatus) => {
+    const useStrikeEvent = findOnGoingUseStrikeEvent(gameStatus);
+    const originId = useStrikeEvent.originId
+    const targetId = useStrikeEvent.targetId;
+    const originPlayer = gameStatus.players[originId];
+    const targetPlayer = gameStatus.players[targetId];
+    const action = gameStatus.action;
+
+    useStrikeEvent.done = true;
+    // 杀会取消的情况
+    if (getActualCardColor(action.actualCard) == CARD_COLOR.BLACK &&
+        targetPlayer.shieldCard?.CN == EQUIPMENT_CARDS_CONFIG.REN_WANG_DUN.CN &&
+        originPlayer.weaponCard?.CN != EQUIPMENT_CARDS_CONFIG.QIN_GANG_JIAN.CN) {
+    } else if (useStrikeEvent.cantShan) {
+        targetPlayer.reduceBlood();
+    } else {
+        gameStatus.shanResponse = {
+            originId: targetId,
+            targetId: originId,
+            cardNumber: 1,
+        }
+    }
+}
+
+const handleUseStrikeEventEnd = (gameStatus) => {
+    if (gameStatus.useStrikeEvents.every((e) => e.done)) {
+        delete gameStatus.useStrikeEvents;
+        throwCards(gameStatus, action.cards);
+    } else { // 找下一个杀事件
+        setNextStrikeEventSkillToSkillResponse(gameStatus);
     }
 }
 

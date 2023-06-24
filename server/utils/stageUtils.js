@@ -1,4 +1,4 @@
-const {setNextPandingEventSkillToSkillResponse} = require("../event/pandingEvent");
+const {executeNextOnePandingCard} = require("../event/pandingEvent");
 const {STAGE_NAMES, STAGE_NAME} = require("../config/gameConfig");
 const {isNil} = require("lodash");
 const {emitRefreshStatus, emitNotifyDrawCards} = require("./emitUtils");
@@ -6,7 +6,7 @@ const {getCurrentPlayer, getAllHasWuxiePlayers} = require("./playerUtils");
 const {setCurrentLocationToNextLocation} = require("./locationUtils");
 const {generateWuxieSimultaneousResStageByPandingCard} = require("./wuxieUtils");
 const {clearAllResStages} = require("./clearResStageUtils");
-const {getNextNeedExecutePandingSign, executeNextOnePanding} = require("./pandingUtils");
+const {getNextNeedExecutePandingSign} = require("./pandingUtils");
 const {getCards} = require("./cardUtils");
 
 const setGameStatusStage = (gameStatus) => {
@@ -63,12 +63,12 @@ const tryGoToNextPlayOrResponseOrThrowTurn = (gameStatus) => {
             if (hasWuxiePlayers.length > 0) {
                 generateWuxieSimultaneousResStageByPandingCard(gameStatus)
                 emitRefreshStatus(gameStatus);
-            } else {
+            } else { // 延时锦囊需要判定
                 nextNeedPandingSign.isEffect = true;
                 tryGoToNextPlayOrResponseOrThrowTurn(gameStatus); // nextNeedPandingSign生效之后进入 判定执行
             }
-        } else {
-            executeNextOnePanding(gameStatus);
+        } else { // 被无懈可击 或 开始判定
+            executeNextOnePandingCard(gameStatus);
             emitRefreshStatus(gameStatus); // 闪电之后可能要求桃
             tryGoToNextPlayOrResponseOrThrowTurn(gameStatus); // 如果还有别的判定牌会再一次回到这里
         }
@@ -80,11 +80,6 @@ const tryGoToNextPlayOrResponseOrThrowTurn = (gameStatus) => {
     } else if (currentStageName == STAGE_NAME.PLAY) {
         if (currentPlayer.skipPlay) {
             goToNextStage(gameStatus);
-        } else {
-            if (gameStatus.pandingEvent) {
-                emitRefreshStatus(gameStatus);
-                tryGoToNextPlayOrResponseOrThrowTurn(gameStatus);
-            }
         }
     } else if (currentStageName == STAGE_NAME.THROW) {
         if (!currentPlayer.needThrow()) {

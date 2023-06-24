@@ -24,6 +24,7 @@ const clearWuxieResStage = (gameStatus) => {
 const clearAllResStages = (gameStatus) => {
     clearWuxieResStage(gameStatus);
     gameStatus.shanResponse = undefined;
+    gameStatus.skillResponse = undefined;
     gameStatus.taoResStages = [];
     gameStatus.scrollResStages = [];
     gameStatus.weaponResStages = [];
