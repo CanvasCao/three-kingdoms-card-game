@@ -1,7 +1,6 @@
 const {DELAY_SCROLL_CARDS_CONFIG} = require("../config/cardConfig");
 const {isNil} = require("lodash/lang");
 const {moveShandianToNextPlayer} = require("../utils/pandingUtils");
-const {setGameStatusByTieSuoTempStorage} = require("../utils/tieSuoUtils");
 const {generateTieSuoTempStorageByShandian} = require("../utils/tieSuoUtils");
 const {CARD_HUASE} = require("../config/cardConfig");
 const {getCurrentPlayer} = require("../utils/playerUtils");
@@ -77,16 +76,6 @@ const setNextPandingEventSkillToSkillResponse = (gameStatus) => {
     }
 }
 
-const handlePandingEventEnd = (gameStatus) => {
-    const pandingEvent = gameStatus.pandingEvent;
-
-    const allChangePandingCards = pandingEvent.eventTimingsWithSkills[0].eventTimingSkills
-        .map(s => s.releaseCards?.[0])
-        .filter(Boolean)
-    throwCards(gameStatus, [...allChangePandingCards, pandingEvent.pandingResultCard]);
-    delete gameStatus.pandingEvent;
-}
-
 const setStatusBasedOnPandingResult = (gameStatus) => {
     const pandingEvent = gameStatus.pandingEvent;
     pandingEvent.done = true;
@@ -118,15 +107,21 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
 
                 currentPlayer.reduceBlood(3);
                 generateTieSuoTempStorageByShandian(gameStatus);
-
-                if (currentPlayer.currentBlood > 0) { // <0 setGameStatusByTieSuoTempStorage的逻辑在求桃之后 如果我还活着需要立刻结算下一个人的铁锁连环
-                    setGameStatusByTieSuoTempStorage(gameStatus);
-                }
             } else {
                 moveShandianToNextPlayer(gameStatus, nextNeedPandingSign)
             }
         }
     }
+}
+
+const handlePandingEventEnd = (gameStatus) => {
+    const pandingEvent = gameStatus.pandingEvent;
+
+    const allChangePandingCards = pandingEvent.eventTimingsWithSkills[0].eventTimingSkills
+        .map(s => s.releaseCards?.[0])
+        .filter(Boolean)
+    throwCards(gameStatus, [...allChangePandingCards, pandingEvent.pandingResultCard]);
+    delete gameStatus.pandingEvent;
 }
 
 const executeNextOnePandingCard = (gameStatus) => {

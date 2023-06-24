@@ -1,4 +1,5 @@
 const strikeEvent = require("../event/strikeEvent");
+const {tryGoToNextStageOrFindNextSkillResponseAfterAnyResponse} = require("../utils/Utils");
 const {
     getInitCards,
 } = require("../initCards");
@@ -179,10 +180,7 @@ class GameEngine {
         }
 
         emitRefreshStatus(this.gameStatus);
-
-        // 打无懈可击延迟锦囊生效后 需要判断是不是从判定阶段到出牌阶段
-        // 闪电求桃之后 需要判断是不是从判定阶段到出牌阶段
-        tryGoToNextPlayOrResponseOrThrowTurn(this.gameStatus);
+        tryGoToNextStageOrFindNextSkillResponseAfterAnyResponse(this.gameStatus);
     }
 
     handleThrowCards(data) {

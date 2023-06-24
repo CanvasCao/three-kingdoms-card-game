@@ -54,17 +54,7 @@ const generateTieSuoTempStorageByShandian = (gameStatus) => {
     generateTieSuoTempStorage(gameStatus, getCurrentPlayer(gameStatus), null, 3);
 }
 
-// TODO 任何响应时候都执行setGameStatusByTieSuoTempStorage
-// 一个角色掉血的时候 其他铁锁连环角色受到伤害
-// 1.一个角色求桃后死亡
-// 2.一个角色求桃后复活
-// 3.一个角色不出闪 但是没有死亡
-// 4.一个角色被闪电命中 但是没有死亡
 const setGameStatusByTieSuoTempStorage = (gameStatus) => {
-    if (gameStatus.tieSuoTempStorage.length <= 0) {
-        return
-    }
-
     const nextTieSuoAction = gameStatus.tieSuoTempStorage[0];
 
     const targetPlayer = gameStatus.players[nextTieSuoAction.targetId];

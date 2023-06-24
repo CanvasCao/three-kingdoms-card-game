@@ -116,13 +116,13 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
         eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
 
         // 雌雄双股剑
-        if (originPlayer.gender !== targetPlayer.gender) {
-            eventTimingSkills = eventTimingSkills.concat({
-                skillName: '雌雄双股剑',
-                playerId: originPlayer.playerId,
-                chooseToReleaseSkill: undefined,
-            })
-        }
+        // if (originPlayer.gender !== targetPlayer.gender) {
+        //     eventTimingSkills = eventTimingSkills.concat({
+        //         skillName: '雌雄双股剑',
+        //         playerId: originPlayer.playerId,
+        //         chooseToReleaseSkill: undefined,
+        //     })
+        // }
 
     }
     return eventTimingSkills;

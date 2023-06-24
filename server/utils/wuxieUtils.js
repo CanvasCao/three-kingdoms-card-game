@@ -1,4 +1,4 @@
-const {STAGE_NAMES, STAGE_NAME} = require( "../config/gameConfig");
+const {STAGE_NAMES, STAGE_NAME} = require("../config/gameConfig");
 const {emitNotifyDrawCards} = require("./emitUtils");
 const {getNextNeedExecutePandingSign} = require("./pandingUtils");
 const {SCROLL_CARDS_CONFIG} = require("../config/cardConfig");
@@ -95,8 +95,7 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
 
 
     // 无懈可击失效以后 下一个人的锦囊需要继续求无懈可击
-    if ((gameStatus.scrollResStages.length > 0) &&
-        !gameStatus.scrollResStages[0].isEffect
+    if (gameStatus.scrollResStages.length > 0 && !gameStatus.scrollResStages[0].isEffect
     ) {
         const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
         if (hasWuxiePlayers.length > 0) {

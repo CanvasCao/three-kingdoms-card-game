@@ -14,10 +14,7 @@ const {
     setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect,
     resetHasWuxiePlayerIdsAndPushChainAfterValidatedWuxie
 } = require("../utils/wuxieUtils");
-const {
-    generateTieSuoTempStorageByShaAction,
-    setGameStatusByTieSuoTempStorage
-} = require("../utils/tieSuoUtils");
+const {generateTieSuoTempStorageByShaAction} = require("../utils/tieSuoUtils");
 const {
     clearShanResponse,
     clearNextTaoStage,
@@ -57,12 +54,6 @@ const responseCardHandler = {
             clearShanResponse(gameStatus);
             originPlayer.reduceBlood();
             generateTieSuoTempStorageByShaAction(gameStatus);
-
-            // <0 setGameStatusByTieSuoTempStorage的逻辑在求桃之后
-            // 如果我还活着需要立刻结算下一个人的铁锁连环
-            if (originPlayer.currentBlood > 0) {
-                setGameStatusByTieSuoTempStorage(gameStatus);
-            }
         }
     },
 
@@ -132,10 +123,8 @@ const responseCardHandler = {
 
         if (response.chooseToResponse) { // 出桃了
             targetPlayer.addBlood();
-
             if (targetPlayer.currentBlood > 0) { // 出桃复活 不需要任何人再出桃
                 gameStatus.taoResStages = [];
-                setGameStatusByTieSuoTempStorage(gameStatus);
             } else { // 出桃还没复活 更新需要下一个人提示的出桃的数量
                 gameStatus.taoResStages.forEach((rs) => {
                     rs.cardNumber = 1 - targetPlayer.currentBlood;
@@ -148,7 +137,6 @@ const responseCardHandler = {
             // 没有任何人出桃 当前角色死亡
             if (gameStatus.taoResStages.length == 0) {
                 setStatusWhenPlayerDie(gameStatus, targetPlayer);
-                setGameStatusByTieSuoTempStorage(gameStatus);
             }
         }
     },
