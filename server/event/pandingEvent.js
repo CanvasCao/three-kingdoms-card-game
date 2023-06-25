@@ -48,7 +48,7 @@ const setNextPandingEventSkillToSkillResponse = (gameStatus) => {
         pandingEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
 
         if (eventTimingSkills.length > 0) {
-            gameStatus.skillResponse = eventTimingSkills[0]
+            setEventSkillResponse(gameStatus, eventTimingSkills[0])
             return;
         }
     }
@@ -66,7 +66,7 @@ const setNextPandingEventSkillToSkillResponse = (gameStatus) => {
             pandingEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
 
             if (eventTimingSkills.length > 0) {
-                gameStatus.skillResponse = eventTimingSkills[0]
+                setEventSkillResponse(gameStatus, eventTimingSkills[0])
                 return;
             } else { // 判定结束
                 setStatusBasedOnPandingResult(gameStatus);

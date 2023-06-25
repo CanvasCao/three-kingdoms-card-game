@@ -23,7 +23,7 @@ const {PANDING_EVENT_TIMING} = require("../config/eventConfig");
 //                         "skillName": "铁骑",
 //                         "playerId": "a2511baa-80f8-4e6b-be63-317e902bfa9d",
 //                         "chooseToReleaseSkill": false
-//                             releaseTargets: [],
+//                             releaseTargetIds: [],
 //                             releaseCards: [],
 //                             done: false,
 //                     }
@@ -44,7 +44,7 @@ const configSkillToEventSkill = (configSkill, playerId) => {
 }
 
 const setEventSkillResponse = (gameStatus, skill) => {
-    gameStatus.skillResponse = skill;
+    gameStatus.skillResponse = JSON.parse(JSON.stringify(skill));
 }
 
 const findOnGoingUseStrikeEvent = (gameStatus) => {
@@ -61,12 +61,12 @@ const findOnGoingUseStrikeEventSkill = (gameStatus) => {
     return onGoingUseStrikeEventSkill
 }
 
-const findOnGoingPandingEvent= (gameStatus) => {
+const findOnGoingPandingEvent = (gameStatus) => {
     return gameStatus?.pandingEvent
 }
 
 const findOnGoingPandingEventSkill = (gameStatus) => {
-    const eventTiming =gameStatus?.pandingEvent?.eventTimingsWithSkills.find((et) => et.eventTimingSkills.some((s) => s.done === false))
+    const eventTiming = gameStatus?.pandingEvent?.eventTimingsWithSkills.find((et) => et.eventTimingSkills.some((s) => s.done === false))
 
     const onGoingPandingEventSkill = eventTiming?.eventTimingSkills.find((s) => s.done === false)
     return onGoingPandingEventSkill
@@ -106,12 +106,12 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
     // 杀 相关技能
     else if (eventTimingName == USE_EVENT_TIMING.WHEN_BECOMING_TARGET) {
         const eventSkillsForPlayer = SKILLS[targetHeroId]
-            .filter((skill) => skill.triggerTiming == eventTimingName && skill.triggerCard == CARD_CONFIG.SHA.CN)
+            .filter((skill) => skill.triggerTiming == eventTimingName && skill.triggerCardName == CARD_CONFIG.SHA.CN)
             .map((skill) => configSkillToEventSkill(skill, targetPlayerId))
         eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
     } else if (eventTimingName == USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET) {
         const eventSkillsForPlayer = SKILLS[originHeroId]
-            .filter((skill) => skill.triggerTiming == eventTimingName && skill.triggerCard == CARD_CONFIG.SHA.CN)
+            .filter((skill) => skill.triggerTiming == eventTimingName && skill.triggerCardName == CARD_CONFIG.SHA.CN)
             .map((skill) => configSkillToEventSkill(skill, originPlayerId))
         eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
 

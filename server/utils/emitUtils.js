@@ -142,7 +142,8 @@ const omitGSArray = [
     'currentLocation',
     'stageIndex',
     'io']
-// 只能在goToNextStage调用 和GameEngine的handler之后调用
+process.env.NODE_ENV == 'production' && omitGSArray.push('throwedCards')
+// 只能在goToNextStage和GameEngine的handler之后调用
 const emitRefreshStatus = (gameStatus) => {
     const io = gameStatus.io;
     const roomId = gameStatus.roomId;

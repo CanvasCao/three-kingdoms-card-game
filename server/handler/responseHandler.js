@@ -1,5 +1,6 @@
 const strikeEvent = require("../event/strikeEvent");
 const pandingEvent = require("../event/pandingEvent");
+const {findOnGoingUseStrikeEvent} = require("../event/utils");
 const {SKILL_NAMES} = require("../config/skillsConfig");
 const {findOnGoingPandingEvent} = require("../event/utils");
 const {findOnGoingPandingEventSkill} = require("../event/utils");
@@ -22,6 +23,24 @@ const {
 const {throwCards} = require("../utils/cardUtils")
 const {getAllHasWuxiePlayers, getCurrentPlayer} = require("../utils/playerUtils")
 const {emitNotifyJieDaoWeaponOwnerChange} = require("../utils/emitUtils")
+
+// export type EmitResponseData = {
+//     chooseToResponse: boolean,
+//     cards: Card[],
+//     actualCard: Card,
+//     originId: string,
+//
+//     selectedIndexes: number[],
+//
+//     // 基本卡
+//     targetId?: string,
+//
+//     // 为了校验无懈可击是否冲突
+//     wuxieTargetCardId?: string,
+//
+//     // 响应技能选中的目标 流离
+//     skillTargetIds?: string[]
+// }
 
 const responseCardHandler = {
     setStatusByShanResponse: (gameStatus, response) => {
@@ -55,24 +74,13 @@ const responseCardHandler = {
         }
     },
 
-    // Response
-    // {
-    //     chooseToResponse: boolean,
-    //     cards: Card[],
-    //     actualCard: Card,
-    //     originId: string,
-    //     targetId?: string,
-    //
-    //     // 为了校验无懈可击是否冲突
-    //     wuxieTargetCardId?: string,
-    //
-    //     selectedIndexes: number[],
-    // }
     setStatusBySkillResponse: (gameStatus, response) => {
         const skillResponse = gameStatus.skillResponse;
         const skillName = gameStatus.skillResponse.skillName;
-        const chooseToReleaseSkill = response.chooseToResponse;
         const originPlayer = gameStatus.players[response.originId];
+
+        const chooseToReleaseSkill = response.chooseToResponse;
+        gameStatus.skillResponse.chooseToReleaseSkill = chooseToReleaseSkill;
 
         if (skillName == SKILL_NAMES.SHU["006"].TIE_JI) {
             const onGoingUseStrikeEventSkill = findOnGoingUseStrikeEventSkill(gameStatus);
@@ -90,13 +98,34 @@ const responseCardHandler = {
                 delete gameStatus.skillResponse
                 return
             }
-
             if (onGoingPandingEventSkill.chooseToReleaseSkill === undefined) {
                 onGoingPandingEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
             } else {
                 onGoingPandingEvent.pandingResultCard = response.cards[0]
                 onGoingPandingEventSkill.releaseCards = response.cards // 最后结算弃牌的时候需要 每次弃每次改判的牌
                 onGoingPandingEventSkill.done = true;
+                delete gameStatus.skillResponse
+                originPlayer.removeHandCards(response.cards);
+            }
+        } else if (skillName == SKILL_NAMES.WU["006"].LIU_LI) {
+            const onGoingUseStrikeEvent = findOnGoingUseStrikeEvent(gameStatus);
+            const onGoingUseStrikeEventSkill = findOnGoingUseStrikeEventSkill(gameStatus);
+
+            if (!chooseToReleaseSkill) {
+                onGoingUseStrikeEventSkill.done = true;
+                delete gameStatus.skillResponse
+                return
+            }
+
+            if (onGoingUseStrikeEventSkill.chooseToReleaseSkill === undefined) {
+                onGoingUseStrikeEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
+            } else {
+                onGoingUseStrikeEventSkill.releaseTargetIds = response.skillTargetIds
+                onGoingUseStrikeEventSkill.releaseCards = response.cards // 最后结算弃牌的时候需要
+                onGoingUseStrikeEventSkill.done = true;
+
+                onGoingUseStrikeEvent.targetId = response.skillTargetIds[0];
+
                 delete gameStatus.skillResponse
                 originPlayer.removeHandCards(response.cards);
             }
@@ -129,7 +158,6 @@ const responseCardHandler = {
             }
         }
     },
-
 
     setStatusByWuxieResponse: (gameStatus, response) => {
         let hasWuxiePlayerIds = gameStatus.wuxieSimultaneousResponse.hasWuxiePlayerIds;

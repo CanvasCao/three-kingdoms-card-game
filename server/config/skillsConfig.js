@@ -34,7 +34,7 @@ const realSkills = {
         {
             name: SKILL_NAMES.SHU["006"].TIE_JI,
             triggerTiming: USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET,
-            triggerCard: CARD_CONFIG.SHA.CN,
+            triggerCardName: CARD_CONFIG.SHA.CN,
         }
     ],
     WU006: [
@@ -47,20 +47,20 @@ const realSkills = {
 }
 const fakeSkills = {
     SHU001: [
-        // {
-        //     name: '流离',
-        //     triggerTiming: USE_EVENT_TIMING.WHEN_BECOMING_TARGET,
-        //     triggerCard: CARD_CONFIG.SHA.CN,
-        // },
+        {
+            name: SKILL_NAMES.WU["006"].LIU_LI,
+            triggerTiming: USE_EVENT_TIMING.WHEN_BECOMING_TARGET,
+            triggerCardName: CARD_CONFIG.SHA.CN,
+        },
         {
             name: SKILL_NAMES.SHU["006"].TIE_JI,
             triggerTiming: USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET,
-            triggerCard: CARD_CONFIG.SHA.CN,
+            triggerCardName: CARD_CONFIG.SHA.CN,
         },
-        {
-            name: SKILL_NAMES.WEI["002"].GUI_CAI,
-            triggerTiming: PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT,
-        }
+        // {
+        //     name: SKILL_NAMES.WEI["002"].GUI_CAI,
+        //     triggerTiming: PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT,
+        // }
     ]
 }
 
