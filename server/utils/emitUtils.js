@@ -98,8 +98,9 @@ const emitNotifyCardBoardAction = (gameStatus, boardActionData) => {
     }
 }
 
-const emitNotifyJieDaoWeaponOwnerChange = (gameStatus, action, weaponCard) => {
+const emitNotifyJieDaoWeaponOwnerChange = (gameStatus, weaponCard) => {
     const io = gameStatus.io;
+    const action = gameStatus.action;
     const roomId = gameStatus.roomId;
     io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PLAYER_CARD, {
         cards: [weaponCard],
