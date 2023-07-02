@@ -1,3 +1,5 @@
+const {findNextUnDoneSkillInLastEventTimingsWithSkills} = require("./utils");
+const {PANDING_EVENT_TIMINGS} = require("../config/eventConfig");
 const {DELAY_SCROLL_CARDS_CONFIG} = require("../config/cardConfig");
 const {isNil} = require("lodash/lang");
 const {moveShandianToNextPlayer} = require("../utils/pandingUtils");
@@ -7,7 +9,6 @@ const {getCurrentPlayer} = require("../utils/playerUtils");
 const {getNextNeedExecutePandingSign} = require("../utils/pandingUtils");
 const {CARD_CONFIG} = require("../config/cardConfig");
 const {SKILL_NAMES} = require("../config/skillsConfig");
-const {setNextStrikeEventSkillToSkillResponse} = require("./strikeEvent");
 const {setEventSkillResponse} = require("./utils");
 const {CARD_COLOR} = require("../config/cardConfig");
 const {getActualCardColor} = require("../utils/cardUtils");
@@ -16,7 +17,6 @@ const {emitNotifyPandingPlayPublicCard} = require("../utils/emitUtils");
 const {throwCards} = require("../utils/cardUtils");
 const {getCards} = require("../utils/cardUtils");
 const {findAllEventSkillsByTimingName} = require("./utils");
-const {PANDING_EVENT_TIMING} = require("../config/eventConfig");
 const {last} = require("lodash");
 
 const generatePandingEventThenSetNextPandingEventSkillToSkillResponse = (gameStatus, originId, pandingContent) => {
@@ -40,10 +40,11 @@ const setNextPandingEventSkillToSkillResponse = (gameStatus) => {
     }
 
     const originId = pandingEvent.originId;
-    const eventTimingsWithSkills = pandingEvent.eventTimingsWithSkills
+    const eventTimingsWithSkills = pandingEvent.eventTimingsWithSkills;
 
+    let timingIndex = 0;
     if (eventTimingsWithSkills.length == 0) {
-        const eventTimingName = PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT
+        const eventTimingName = PANDING_EVENT_TIMINGS[timingIndex] // BEFORE_PANDING_TAKE_EFFECT
         const eventTimingSkills = findAllEventSkillsByTimingName(gameStatus, {eventTimingName, originId})
         pandingEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
 
@@ -53,15 +54,13 @@ const setNextPandingEventSkillToSkillResponse = (gameStatus) => {
         }
     }
 
-    if (last(eventTimingsWithSkills).eventTimingName == PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT) {
-        const unChooseToReleaseSkill = last(eventTimingsWithSkills).eventTimingSkills
-            .find((eventTimingSkill) => !eventTimingSkill.done)
-
-        if (unChooseToReleaseSkill) {
-            setEventSkillResponse(gameStatus, unChooseToReleaseSkill)
+    if (last(eventTimingsWithSkills).eventTimingName == PANDING_EVENT_TIMINGS[timingIndex]) {
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(eventTimingsWithSkills)
+        if (unDoneSkill) {
+            setEventSkillResponse(gameStatus, unDoneSkill)
             return;
         } else {
-            const eventTimingName = PANDING_EVENT_TIMING.AFTER_PANDING_TAKE_EFFECT
+            const eventTimingName = PANDING_EVENT_TIMINGS[timingIndex + 1] // AFTER_PANDING_TAKE_EFFECT
             const eventTimingSkills = findAllEventSkillsByTimingName(gameStatus, {eventTimingName, originId})
             pandingEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
 

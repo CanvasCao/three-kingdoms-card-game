@@ -1,5 +1,5 @@
 const strikeEvent = require("../event/strikeEvent");
-const {tryFindNextSkillResponse} = require("../utils/Utils");
+const {tryFindNextSkillResponse} = require("../utils/responseUtils");
 const {
     getInitCards,
 } = require("../initCards");
@@ -87,7 +87,7 @@ class GameEngine {
         emitNotifyPlayPublicCard(this.gameStatus, action);
         emitNotifyAddLines(this.gameStatus, action);
         this.gameStatus.action = action;
-        this.gameStatus.players[action.originId].removeHandCards(action.cards);
+        this.gameStatus.players[action.originId].removeCards(action.cards);
 
         // BASIC
         if ([BASIC_CARDS_CONFIG.SHA.CN, BASIC_CARDS_CONFIG.LEI_SHA.CN, BASIC_CARDS_CONFIG.HUO_SHA.CN].includes(action.actualCard.CN)
@@ -186,8 +186,7 @@ class GameEngine {
 
         // 第一个目标求闪/桃之后 继续找马超下一个铁骑的技能
         tryFindNextSkillResponse(this.gameStatus);
-        // 打无懈可击延迟锦囊生效后 需要判断是不是从判定阶段到出牌阶段
-        // 闪电求桃之后 需要判断是不是从判定阶段到出牌阶段
+        // 打无懈可击延迟锦囊生效后/闪电求桃之后 需要判断是不是从判定阶段到出牌阶段
         tryGoToNextPlayOrResponseOrThrowTurn(this.gameStatus)
     }
 

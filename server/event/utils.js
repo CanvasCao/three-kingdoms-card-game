@@ -3,6 +3,7 @@ const {USE_EVENT_TIMING} = require("../config/eventConfig");
 const {getAllPlayersStartFromFirstLocation} = require("../utils/playerUtils");
 const {SKILLS} = require("../config/skillsConfig");
 const {PANDING_EVENT_TIMING} = require("../config/eventConfig");
+const {last} = require("lodash");
 
 // "useStrikeEvents": [
 //     {
@@ -23,9 +24,9 @@ const {PANDING_EVENT_TIMING} = require("../config/eventConfig");
 //                         "skillName": "铁骑",
 //                         "playerId": "a2511baa-80f8-4e6b-be63-317e902bfa9d",
 //                         "chooseToReleaseSkill": false
-//                             releaseTargetIds: [],
-//                             releaseCards: [],
-//                             done: false,
+//                          releaseTargetIds: [],
+//                          releaseCards: [],
+//                          done: false,
 //                     }
 //                 ]
 //             }
@@ -46,6 +47,10 @@ const configSkillToEventSkill = (configSkill, playerId) => {
 const setEventSkillResponse = (gameStatus, skill) => {
     gameStatus.skillResponse = JSON.parse(JSON.stringify(skill));
 }
+
+const findNextUnDoneSkillInLastEventTimingsWithSkills = (eventTimingsWithSkills) =>
+    last(eventTimingsWithSkills).eventTimingSkills.find((eventTimingSkill) => !eventTimingSkill.done)
+
 
 const findOnGoingUseStrikeEvent = (gameStatus) => {
     const useStrikeEvent = gameStatus?.useStrikeEvents.find((event) => !event.done)
@@ -135,3 +140,4 @@ exports.findOnGoingPandingEvent = findOnGoingPandingEvent;
 exports.findOnGoingUseStrikeEventSkill = findOnGoingUseStrikeEventSkill;
 exports.findOnGoingPandingEventSkill = findOnGoingPandingEventSkill;
 exports.setEventSkillResponse = setEventSkillResponse;
+exports.findNextUnDoneSkillInLastEventTimingsWithSkills = findNextUnDoneSkillInLastEventTimingsWithSkills;

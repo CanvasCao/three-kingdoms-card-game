@@ -3,7 +3,7 @@ const {throwCards} = require("../utils/cardUtils")
 const throwHandler = {
     handleThrowCards(gameStatus, data) {
         const cards = data.cards;
-        getCurrentPlayer(gameStatus).removeHandCards(cards);
+        getCurrentPlayer(gameStatus).removeCards(cards);
         throwCards(gameStatus, cards);
     }
 }

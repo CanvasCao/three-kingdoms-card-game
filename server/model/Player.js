@@ -76,7 +76,7 @@ class Player {
         this.cards = this.cards.concat(addingCards)
     }
 
-    removeHandCards(cards) {
+    _removeHandCards(cards) {
         if (!cards) {
             return
         }
@@ -88,7 +88,7 @@ class Player {
         if (!cards) {
             return
         }
-        this.removeHandCards(cards)
+        this._removeHandCards(cards)
         const removeCards = Array.isArray(cards) ? cards : [cards]
         const removeCardIds = removeCards.map(c => c.cardId);
         this.weaponCard = removeCardIds.includes(this.weaponCard?.cardId) ? null : this.weaponCard;

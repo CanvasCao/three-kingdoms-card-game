@@ -1,3 +1,4 @@
+const {findNextUnDoneSkillInLastEventTimingsWithSkills} = require("./utils");
 const {setEventSkillResponse} = require("./utils");
 const {findOnGoingUseStrikeEvent} = require("./utils");
 const {throwCards} = require("../utils/cardUtils");
@@ -5,16 +6,11 @@ const {findAllEventSkillsByTimingName} = require("./utils");
 const {EQUIPMENT_CARDS_CONFIG} = require("../config/cardConfig");
 const {CARD_COLOR} = require("../config/cardConfig");
 const {getActualCardColor} = require("../utils/cardUtils");
-const {USE_EVENT_TIMING} = require("../config/eventConfig");
+const {USE_EVENT_TIMINGS} = require("../config/eventConfig");
 const {last} = require("lodash");
-
-const {
-    getCurrentPlayer,
-    getAllPlayersStartFromFirstLocation
-} = require("../utils/playerUtils");
+const {getCurrentPlayer, getAllPlayersStartFromFirstLocation} = require("../utils/playerUtils");
 
 const generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse = (gameStatus, originId, targetIds) => {
-    gameStatus.useStrikeEvents = [];
     const targetPlayers = getAllPlayersStartFromFirstLocation(gameStatus, getCurrentPlayer(gameStatus).location)
         .filter(p => targetIds.includes(p.playerId))
     const originPlayer = gameStatus.players[originId];
@@ -23,8 +19,7 @@ const generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse = (gameS
         originPlayer.shaTimes++;
     }
 
-    gameStatus.useStrikeEvents = targetPlayers.map((player) => {
-        const targetPlayer = gameStatus.players[player.playerId]
+    gameStatus.useStrikeEvents = targetPlayers.map((targetPlayer) => {
         return {
             originId,
             targetId: targetPlayer.playerId,
@@ -47,8 +42,10 @@ const setNextStrikeEventSkillToSkillResponse = (gameStatus) => {
     const eventTimingsWithSkills = useStrikeEvent.eventTimingsWithSkills;
     const originId = useStrikeEvent.originId
     const targetId = useStrikeEvent.targetId;
+
+    let timingIndex = 0;
     if (eventTimingsWithSkills.length == 0) {
-        const eventTimingName = USE_EVENT_TIMING.WHEN_BECOMING_TARGET
+        const eventTimingName = USE_EVENT_TIMINGS[timingIndex]
         const eventTimingSkills = findAllEventSkillsByTimingName(gameStatus, {eventTimingName, originId, targetId})
         eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
 
@@ -58,15 +55,13 @@ const setNextStrikeEventSkillToSkillResponse = (gameStatus) => {
         }
     }
 
-    if (last(eventTimingsWithSkills).eventTimingName == USE_EVENT_TIMING.WHEN_BECOMING_TARGET) {
-        const unChooseToReleaseSkill = last(eventTimingsWithSkills).eventTimingSkills
-            .find((eventTimingSkill) => !eventTimingSkill.done)
-
-        if (unChooseToReleaseSkill) {
-            setEventSkillResponse(gameStatus, unChooseToReleaseSkill)
+    if (last(eventTimingsWithSkills).eventTimingName == USE_EVENT_TIMINGS[timingIndex]) {
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(eventTimingsWithSkills)
+        if (unDoneSkill) {
+            setEventSkillResponse(gameStatus, unDoneSkill)
             return;
         } else {
-            const eventTimingName = USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET
+            const eventTimingName = USE_EVENT_TIMINGS[timingIndex + 1]
             const eventTimingSkills = findAllEventSkillsByTimingName(gameStatus, {eventTimingName, originId, targetId})
             eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
 
@@ -77,12 +72,10 @@ const setNextStrikeEventSkillToSkillResponse = (gameStatus) => {
         }
     }
 
-    if (last(eventTimingsWithSkills).eventTimingName == USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET) {
-        const unChooseToReleaseSkill = last(eventTimingsWithSkills).eventTimingSkills
-            .find((eventTimingSkill) => !eventTimingSkill.done)
-
-        if (unChooseToReleaseSkill) {
-            setEventSkillResponse(gameStatus, unChooseToReleaseSkill)
+    if (last(eventTimingsWithSkills).eventTimingName == USE_EVENT_TIMINGS[timingIndex + 1]) {
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(eventTimingsWithSkills)
+        if (unDoneSkill) {
+            setEventSkillResponse(gameStatus, unDoneSkill)
             return;
         } else {
             setStatusWhenUseStrikeEventDone(gameStatus);
@@ -100,7 +93,7 @@ const setStatusWhenUseStrikeEventDone = (gameStatus) => {
     const action = gameStatus.action;
 
     useStrikeEvent.done = true;
-    // 杀会取消的情况
+    // 杀会取消的情况 仁王盾
     if (getActualCardColor(action.actualCard) == CARD_COLOR.BLACK &&
         targetPlayer.shieldCard?.CN == EQUIPMENT_CARDS_CONFIG.REN_WANG_DUN.CN &&
         originPlayer.weaponCard?.CN != EQUIPMENT_CARDS_CONFIG.QIN_GANG_JIAN.CN) {

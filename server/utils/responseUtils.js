@@ -3,6 +3,7 @@ const {setGameStatusByTieSuoTempStorage} = require("./tieSuoUtils");
 const {setNextStrikeEventSkillToSkillResponse} = require("../event/strikeEvent");
 const {setNextPandingEventSkillToSkillResponse} = require("../event/pandingEvent");
 const {ifAnyPlayerNeedToResponse} = require("./stageUtils");
+
 const tryFindNextSkillResponse = (gameStatus) => {
     if (ifAnyPlayerNeedToResponse(gameStatus)) {
         return

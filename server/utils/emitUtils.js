@@ -14,10 +14,6 @@ const emitNotifyPlayPublicCard = (gameStatus, behaviour) => {
 
     const io = gameStatus.io;
     const roomId = gameStatus.roomId;
-    const type = gameStatus?.skillResponse?.skillName == SKILL_NAMES.WEI["002"].GUI_CAI ?
-        ADD_TO_PUBLIC_CARD_TYPE.CHANGE_PANDING :
-        ADD_TO_PUBLIC_CARD_TYPE.PLAY;
-
     if (behaviour.cards?.[0]) {
         io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PUBLIC_CARD, {
             fromId: behaviour.originId,
@@ -25,7 +21,8 @@ const emitNotifyPlayPublicCard = (gameStatus, behaviour) => {
             targetId: behaviour.targetId,
             cards: behaviour.cards,
             originIndexes: behaviour.selectedIndexes,
-            type
+            type: ADD_TO_PUBLIC_CARD_TYPE.PLAY,
+            skillName: gameStatus?.skillResponse?.skillName
         });
     }
 }
@@ -76,7 +73,7 @@ const emitNotifyCardBoardAction = (gameStatus, boardActionData) => {
     //     card: Card,
     //     cardAreaType: CardAreaType
     //     type: "REMOVE" | "MOVE",
-    //     selectedIndex: number,
+    //     selectedIndexes,
     // }
     const io = gameStatus.io;
     const roomId = gameStatus.roomId;
@@ -84,7 +81,7 @@ const emitNotifyCardBoardAction = (gameStatus, boardActionData) => {
         io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PUBLIC_CARD, {
             cards: [boardActionData.card],
             fromId: boardActionData.targetId,
-            originIndexes: [boardActionData.selectedIndex],
+            originIndexes: boardActionData.selectedIndexes,
             type: ADD_TO_PUBLIC_CARD_TYPE.CHAI
         });
     } else {
@@ -93,7 +90,7 @@ const emitNotifyCardBoardAction = (gameStatus, boardActionData) => {
             fromId: boardActionData.targetId,
             toId: boardActionData.originId,
             cardAreaType: boardActionData.cardAreaType,
-            originIndexes: [boardActionData.selectedIndex],
+            originIndexes: boardActionData.selectedIndexes,
         });
     }
 }
@@ -106,7 +103,7 @@ const emitNotifyJieDaoWeaponOwnerChange = (gameStatus, weaponCard) => {
         cards: [weaponCard],
         fromId: action.targetIds[0],
         toId: action.originId,
-        cardAreaType: 'equipment',
+        cardAreaType: 'EQUIPMENT',
         originIndexes: action.originIndexes,
     });
 }

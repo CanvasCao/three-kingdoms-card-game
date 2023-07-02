@@ -47,7 +47,7 @@ const responseCardHandler = {
         const shanResponse = gameStatus.shanResponse;
         const originPlayer = gameStatus.players[shanResponse.originId];
         const targetPlayer = gameStatus.players[shanResponse.targetId];
-        originPlayer.removeHandCards(response.cards);
+        originPlayer.removeCards(response.cards);
         throwCards(gameStatus, response.cards);
 
         if (response.chooseToResponse) { // 出闪了
@@ -105,7 +105,7 @@ const responseCardHandler = {
                 onGoingPandingEventSkill.releaseCards = response.cards // 最后结算弃牌的时候需要 每次弃每次改判的牌
                 onGoingPandingEventSkill.done = true;
                 delete gameStatus.skillResponse
-                originPlayer.removeHandCards(response.cards);
+                originPlayer.removeCards(response.cards);
             }
         } else if (skillName == SKILL_NAMES.WU["006"].LIU_LI) {
             const onGoingUseStrikeEvent = findOnGoingUseStrikeEvent(gameStatus);
@@ -127,7 +127,7 @@ const responseCardHandler = {
                 onGoingUseStrikeEvent.targetId = response.skillTargetIds[0];
 
                 delete gameStatus.skillResponse
-                originPlayer.removeHandCards(response.cards);
+                originPlayer.removeCards(response.cards);
             }
         }
     },
@@ -136,7 +136,7 @@ const responseCardHandler = {
         const curTaoResponse = gameStatus.taoResponses[0];
         const originPlayer = gameStatus.players[curTaoResponse.originId];
         const targetPlayer = gameStatus.players[curTaoResponse.targetId];
-        originPlayer.removeHandCards(response.cards);
+        originPlayer.removeCards(response.cards);
         throwCards(gameStatus, response.cards);
 
         if (response.chooseToResponse) { // 出桃了
@@ -188,7 +188,7 @@ const responseCardHandler = {
             const validatedChainResponse = lastWuxieChainItem.actualCard.cardId === response.wuxieTargetCardId;
 
             if (validatedChainResponse) {
-                originPlayer.removeHandCards(response.cards);
+                originPlayer.removeCards(response.cards);
                 resetHasWuxiePlayerIdsAndPushChainAfterValidatedWuxie(gameStatus, response);
                 const newHasWuxiePlayers = getAllHasWuxiePlayers(gameStatus);
                 if (newHasWuxiePlayers.length == 0) {
@@ -213,7 +213,7 @@ const responseCardHandler = {
 
         if (response.chooseToResponse) {
             clearNextScrollResponse(gameStatus);
-            originPlayer.removeHandCards(response.cards);
+            originPlayer.removeCards(response.cards);
         } else {
             clearNextScrollResponse(gameStatus);
             originPlayer.reduceBlood();
@@ -233,7 +233,7 @@ const responseCardHandler = {
         const curScrollResponse = gameStatus.scrollResponses[0];
 
         if (response.chooseToResponse) {
-            gameStatus.players[curScrollResponse.originId].removeHandCards(response.cards);
+            gameStatus.players[curScrollResponse.originId].removeCards(response.cards);
 
             // 决斗出杀之后 需要互换目标
             const oriTargetId = curScrollResponse.targetId;
@@ -251,7 +251,7 @@ const responseCardHandler = {
             const curScrollResponse = gameStatus.scrollResponses[0];
             const APlayer = gameStatus.players[curScrollResponse.originId]
             const BPlayer = gameStatus.players[curScrollResponse.targetId]
-            gameStatus.players[APlayer.playerId].removeHandCards(response.cards);
+            gameStatus.players[APlayer.playerId].removeCards(response.cards);
 
             strikeEvent.generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse(gameStatus, APlayer.playerId, [BPlayer.playerId]);
         } else {
