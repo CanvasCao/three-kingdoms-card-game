@@ -69,8 +69,40 @@ const PANDING_EVENT_TIMINGS = [
     PANDING_EVENT_TIMING.AFTER_PANDING_TAKE_EFFECT, // 【天妒】、【洛神】
 ]
 
+// https://gltjk.com/sanguosha/rules/flow/damage.html
+const DAMAGE_EVENT_TIMING = {
+    //【狂风】、【大雾】
+    "WHEN_SETTLEMENT_BEGINS": "WHEN_SETTLEMENT_BEGINS",
+
+    // a.武将技能：【裸衣】伤害值+1的效果 【雷击】回复1点体力的效果
+    // b.装备技能：【麒麟弓】、【寒冰剑】、【古锭刀】
+    "WHEN_CAUSE_DAMAGE": "WHEN_CAUSE_DAMAGE",
+
+    // a.武将技能：【仁心】【无言②】、【天香】
+    // b.装备技能：【藤甲②】、【白银狮子①】、【太平要术①】
+    "WHEN_TAKE_DAMAGE": "WHEN_TAKE_DAMAGE",
+
+    // 【奸雄】、【反馈】、【刚烈】、【遗计】、【节命】、【放逐】
+    "AFTER_CAUSE_DAMAGE": "AFTER_CAUSE_DAMAGE",
+
+    // a.能执行的技能效果：【天香】摸牌的效果。
+    // b.若该角色是在处于连环状态时受到属性伤害，其须重置。
+    "WHEN_SETTLEMENT_ENDS": "WHEN_SETTLEMENT_ENDS",
+
+}
+
+const DAMAGE_EVENT_TIMINGS = [
+    // DAMAGE_EVENT_TIMING.WHEN_SETTLEMENT_BEGINS,
+    DAMAGE_EVENT_TIMING.WHEN_CAUSE_DAMAGE,
+    DAMAGE_EVENT_TIMING.WHEN_TAKE_DAMAGE,
+    DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE,
+    // DAMAGE_EVENT_TIMING.WHEN_SETTLEMENT_ENDS,
+]
+
 
 exports.USE_EVENT_TIMING = USE_EVENT_TIMING;
 exports.USE_EVENT_TIMINGS = USE_EVENT_TIMINGS;
 exports.PANDING_EVENT_TIMING = PANDING_EVENT_TIMING;
 exports.PANDING_EVENT_TIMINGS = PANDING_EVENT_TIMINGS;
+exports.DAMAGE_EVENT_TIMING = DAMAGE_EVENT_TIMING;
+exports.DAMAGE_EVENT_TIMINGS = DAMAGE_EVENT_TIMINGS;
