@@ -1,3 +1,4 @@
+const {DAMAGE_EVENT_TIMING} = require("./eventConfig");
 const {PANDING_EVENT_TIMING} = require("./eventConfig");
 const {CARD_CONFIG} = require("./cardConfig");
 const {USE_EVENT_TIMING} = require("./eventConfig");
@@ -28,7 +29,16 @@ const SKILL_NAMES = {
 }
 
 const realSkills = {
-    WEI002: [],
+    WEI002: [
+        {
+            name: SKILL_NAMES.WEI["002"].FAN_KUI,
+            triggerTiming: DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE,
+        },
+        {
+            name: SKILL_NAMES.WEI["002"].GUI_CAI,
+            triggerTiming: PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT,
+        }
+    ],
     SHU006: [
         {name: SKILL_NAMES.SHU["006"].MA_SHU},
         {
@@ -47,20 +57,10 @@ const realSkills = {
 }
 const fakeSkills = {
     SHU001: [
-        // {
-        //     name: SKILL_NAMES.WU["006"].LIU_LI,
-        //     triggerTiming: USE_EVENT_TIMING.WHEN_BECOMING_TARGET,
-        //     triggerCardName: CARD_CONFIG.SHA.CN,
-        // },
-        // {
-        //     name: SKILL_NAMES.SHU["006"].TIE_JI,
-        //     triggerTiming: USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET,
-        //     triggerCardName: CARD_CONFIG.SHA.CN,
-        // },
-        // {
-        //     name: SKILL_NAMES.WEI["002"].GUI_CAI,
-        //     triggerTiming: PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT,
-        // }
+        realSkills.WEI002[0],
+        realSkills.WEI002[1],
+        realSkills.SHU006[1],
+        // realSkills.WU006[1],
     ]
 }
 

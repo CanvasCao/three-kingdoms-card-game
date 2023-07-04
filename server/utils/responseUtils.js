@@ -1,3 +1,4 @@
+const {setNextDamageEventSkillToSkillResponse} = require("../event/damageEvent");
 const {emitRefreshStatus} = require("./emitUtils");
 const {setGameStatusByTieSuoTempStorage} = require("./tieSuoUtils");
 const {setNextStrikeEventSkillToSkillResponse} = require("../event/strikeEvent");
@@ -12,6 +13,14 @@ const tryFindNextSkillResponse = (gameStatus) => {
     // 响应判定技能后
     if (gameStatus.pandingEvent) {
         setNextPandingEventSkillToSkillResponse(gameStatus)
+        if (gameStatus.skillResponse) {
+            emitRefreshStatus(gameStatus);
+            return;
+        }
+    }
+
+    if (gameStatus.damageEvent) {
+        setNextDamageEventSkillToSkillResponse(gameStatus)
         if (gameStatus.skillResponse) {
             emitRefreshStatus(gameStatus);
             return;

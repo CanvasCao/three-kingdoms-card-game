@@ -88,7 +88,6 @@ const DAMAGE_EVENT_TIMING = {
     // a.能执行的技能效果：【天香】摸牌的效果。
     // b.若该角色是在处于连环状态时受到属性伤害，其须重置。
     "WHEN_SETTLEMENT_ENDS": "WHEN_SETTLEMENT_ENDS",
-
 }
 
 const DAMAGE_EVENT_TIMINGS = [

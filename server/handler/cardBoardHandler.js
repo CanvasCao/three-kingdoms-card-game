@@ -1,3 +1,4 @@
+const {clearSkillResponse} = require("../utils/clearResponseUtils");
 const {CARD_BOARD_ACTION_TYPE} = require("../config/cardBoardConfig");
 const {throwCards} = require("../utils/cardUtils")
 const {clearNextScrollResponse} = require("../utils/clearResponseUtils")
@@ -10,7 +11,13 @@ const cardBoardHandler = {
         } else if (type == CARD_BOARD_ACTION_TYPE.MOVE) {
             gameStatus.players[originId].addCards(card);
         }
-        clearNextScrollResponse(gameStatus)
+
+        // 顺拆
+        if(gameStatus.scrollResponses?.[0]){
+            clearNextScrollResponse(gameStatus)
+        }
+        // 反馈
+        clearSkillResponse(gameStatus);
     }
 }
 

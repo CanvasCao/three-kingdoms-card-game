@@ -74,8 +74,8 @@ const responseCardHandler = {
                 damageCards: action.cards,
                 damageActualCard: action.actualCard, // 渠道
                 damageAttribute: action.actualCard?.attribute,// 属性
-                originId: responseTargetPlayer,// 来源
-                targetId: responseOriginPlayer
+                originId: shanResponse.targetId,// 来源
+                targetId: shanResponse.originId
             })
         }
     },
