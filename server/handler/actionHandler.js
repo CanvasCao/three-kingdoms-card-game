@@ -106,7 +106,7 @@ const actionHandler = {
                         cards: action.cards,
                         actualCard: action.actualCard,
                         isEffect: undefined,
-                        stageId: uuidv4(), // 前端刷新Board的依据
+                        boardObserveId: uuidv4(), // 前端刷新Board的依据
                     }
                 })
             } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.CN) {
@@ -180,7 +180,7 @@ const actionHandler = {
                     cardTakeEffectOnPlayerId: player.playerId,
                     actualCard: action.actualCard,
                     isEffect: undefined,
-                    stageId: uuidv4(), // 前端刷新Board的依据
+                    boardObserveId: uuidv4(), // 前端刷新Board的依据
                 }
             })
             gameStatus.scrollResponses = scrollResponses

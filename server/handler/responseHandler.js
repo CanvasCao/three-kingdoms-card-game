@@ -1,5 +1,6 @@
 const strikeEvent = require("../event/strikeEvent");
 const pandingEvent = require("../event/pandingEvent");
+const {generateDamageEventThenSetNextDamageEventSkillToSkillResponse} = require("../event/damageEvent");
 const {findOnGoingUseStrikeEvent} = require("../event/utils");
 const {SKILL_NAMES} = require("../config/skillsConfig");
 const {findOnGoingPandingEvent} = require("../event/utils");
@@ -13,7 +14,6 @@ const {
     setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect,
     resetHasWuxiePlayerIdsAndPushChainAfterValidatedWuxie
 } = require("../utils/wuxieUtils");
-const {generateTieSuoTempStorageByShaAction} = require("../utils/tieSuoUtils");
 const {
     clearShanResponse,
     clearNextTaoResponse,
@@ -45,9 +45,10 @@ const {emitNotifyJieDaoWeaponOwnerChange} = require("../utils/emitUtils")
 const responseCardHandler = {
     setStatusByShanResponse: (gameStatus, response) => {
         const shanResponse = gameStatus.shanResponse;
-        const originPlayer = gameStatus.players[shanResponse.originId];
-        const targetPlayer = gameStatus.players[shanResponse.targetId];
-        originPlayer.removeCards(response.cards);
+        const action = gameStatus.action;
+        const responseOriginPlayer = gameStatus.players[shanResponse.originId];
+        const responseTargetPlayer = gameStatus.players[shanResponse.targetId];
+        responseOriginPlayer.removeCards(response.cards);
         throwCards(gameStatus, response.cards);
 
         if (response.chooseToResponse) { // 出闪了
@@ -55,22 +56,27 @@ const responseCardHandler = {
             if (shanResponse.cardNumber == 0) {
                 clearShanResponse(gameStatus);
 
-                if (targetPlayer?.weaponCard?.CN == EQUIPMENT_CARDS_CONFIG.QING_LONG_YAN_YUE_DAO.CN) {
-                    gameStatus.weaponResponses = [
-                        {
-                            originId: shanResponse.targetId,
-                            targetId: shanResponse.originId,
-                            weaponCardName: CARD_CONFIG.QING_LONG_YAN_YUE_DAO.CN,
-                        }
-                    ];
-                }
+                // if (targetPlayer?.weaponCard?.CN == EQUIPMENT_CARDS_CONFIG.QING_LONG_YAN_YUE_DAO.CN) {
+                //     gameStatus.weaponResponses = [
+                //         {
+                //             originId: shanResponse.targetId,
+                //             targetId: shanResponse.originId,
+                //             weaponCardName: CARD_CONFIG.QING_LONG_YAN_YUE_DAO.CN,
+                //         }
+                //     ];
+                // }
             } else {
                 // do nothing
             }
         } else { // 没出闪
             clearShanResponse(gameStatus);
-            originPlayer.reduceBlood();
-            generateTieSuoTempStorageByShaAction(gameStatus);
+            generateDamageEventThenSetNextDamageEventSkillToSkillResponse(gameStatus, {
+                damageCards: action.cards,
+                damageActualCard: action.actualCard, // 渠道
+                damageAttribute: action.actualCard?.attribute,// 属性
+                originId: responseTargetPlayer,// 来源
+                targetId: responseOriginPlayer
+            })
         }
     },
 

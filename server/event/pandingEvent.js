@@ -87,7 +87,8 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
         if (getActualCardColor(pandingResultCard) == CARD_COLOR.RED) {
             useStrikeEvent.cantShan = true;
         }
-    } else if (pandingEvent.pandingContent == CARD_CONFIG.LE_BU_SI_SHU.CN || pandingEvent.pandingContent == CARD_CONFIG.SHAN_DIAN.CN) {
+    } else if (pandingEvent.pandingContent == CARD_CONFIG.LE_BU_SI_SHU.CN ||
+        pandingEvent.pandingContent == CARD_CONFIG.SHAN_DIAN.CN) {
         const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus);
         const pandingActualCard = nextNeedPandingSign.actualCard;
 

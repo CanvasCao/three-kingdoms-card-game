@@ -76,6 +76,14 @@ class Player {
         this.cards = this.cards.concat(addingCards)
     }
 
+    hasAnyHandCardsOrEquipmentCards() {
+        return this.cards.length ||
+            this.plusHorseCard ||
+            this.minusHorseCard ||
+            this.shieldCard ||
+            this.weaponCard
+    }
+
     _removeHandCards(cards) {
         if (!cards) {
             return
