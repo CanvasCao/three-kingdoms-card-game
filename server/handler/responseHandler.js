@@ -214,14 +214,23 @@ const responseCardHandler = {
     },
 
     setStatusByNanManOrWanJianResponse: (gameStatus, response) => {
-        const originPlayer = gameStatus.players[response.originId];
+        const action = gameStatus.action;
+        const originId = response.originId;
+        const originPlayer = gameStatus.players[originId];
+        const curScrollResponse = gameStatus.scrollResponses[0];
 
         if (response.chooseToResponse) {
             clearNextScrollResponse(gameStatus);
             originPlayer.removeCards(response.cards);
         } else {
             clearNextScrollResponse(gameStatus);
-            originPlayer.reduceBlood();
+            generateDamageEventThenSetNextDamageEventSkillToSkillResponse(gameStatus, {
+                damageCards: action.cards,
+                damageActualCard: action.actualCard, // 渠道
+                damageAttribute: undefined,// 属性
+                originId: curScrollResponse.targetId,// 来源
+                targetId: curScrollResponse.originId
+            })
         }
 
         if (gameStatus.scrollResponses.length > 0) {
@@ -235,6 +244,7 @@ const responseCardHandler = {
     },
 
     setStatusByJueDouResponse: (gameStatus, response) => {
+        const action = gameStatus.action;
         const curScrollResponse = gameStatus.scrollResponses[0];
 
         if (response.chooseToResponse) {
@@ -246,8 +256,14 @@ const responseCardHandler = {
             curScrollResponse.targetId = oriOriginId;
             curScrollResponse.originId = oriTargetId;
         } else {
-            gameStatus.players[curScrollResponse.originId].reduceBlood();
             clearNextScrollResponse(gameStatus);
+            generateDamageEventThenSetNextDamageEventSkillToSkillResponse(gameStatus, {
+                damageCards: action.cards,
+                damageActualCard: action.actualCard, // 渠道
+                damageAttribute: undefined,// 属性
+                originId: curScrollResponse.targetId,// 来源
+                targetId: curScrollResponse.originId
+            })
         }
     },
 

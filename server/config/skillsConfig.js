@@ -33,6 +33,7 @@ const realSkills = {
         {
             name: SKILL_NAMES.WEI["002"].FAN_KUI,
             triggerTiming: DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE,
+            needOrigin: true,
         },
         {
             name: SKILL_NAMES.WEI["002"].GUI_CAI,

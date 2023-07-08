@@ -185,7 +185,7 @@ const actionHandler = {
             gameStatus.scrollResponses = scrollResponses
 
             // 有wugufengdengCards展示WuGuFengDengBoard
-            gameStatus.wugufengdengCards = getCards(gameStatus, 8)// players.length)
+            gameStatus.wugufengdengCards = getCards(gameStatus, players.length)
         }
 
         const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)

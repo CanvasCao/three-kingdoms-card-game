@@ -1,9 +1,10 @@
+const {CARD_ATTRIBUTE} = require("../config/cardConfig");
+const {generateDamageEventThenSetNextDamageEventSkillToSkillResponse} = require("./damageEvent");
 const {findNextUnDoneSkillInLastEventTimingsWithSkills} = require("./utils");
 const {PANDING_EVENT_TIMINGS} = require("../config/eventConfig");
 const {DELAY_SCROLL_CARDS_CONFIG} = require("../config/cardConfig");
 const {isNil} = require("lodash/lang");
 const {moveShandianToNextPlayer} = require("../utils/pandingUtils");
-const {generateTieSuoTempStorageByShandian} = require("../utils/tieSuoUtils");
 const {CARD_HUASE} = require("../config/cardConfig");
 const {getCurrentPlayer} = require("../utils/playerUtils");
 const {getNextNeedExecutePandingSign} = require("../utils/pandingUtils");
@@ -91,6 +92,7 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
         pandingEvent.pandingContent == CARD_CONFIG.SHAN_DIAN.CN) {
         const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus);
         const pandingActualCard = nextNeedPandingSign.actualCard;
+        const pandingCard = nextNeedPandingSign.card;
 
         if (pandingEvent.pandingContent == CARD_CONFIG.LE_BU_SI_SHU.CN) {
             currentPlayer.removePandingSign(nextNeedPandingSign);
@@ -104,8 +106,14 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
                 currentPlayer.removePandingSign(nextNeedPandingSign);
                 throwCards(gameStatus, pandingActualCard);
 
-                currentPlayer.reduceBlood(3);
-                generateTieSuoTempStorageByShandian(gameStatus);
+                generateDamageEventThenSetNextDamageEventSkillToSkillResponse(gameStatus, {
+                    damageCards: [pandingCard],
+                    damageActualCard: pandingActualCard, // 渠道
+                    damageAttribute: CARD_ATTRIBUTE.LIGHTNING,// 属性
+                    damageNumber: 3,
+                    originId: undefined,// 来源
+                    targetId: currentPlayer.playerId
+                })
             } else {
                 moveShandianToNextPlayer(gameStatus, nextNeedPandingSign)
             }

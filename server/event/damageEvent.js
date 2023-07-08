@@ -1,4 +1,3 @@
-const {generateTieSuoTempStorageByShaAction} = require("../utils/tieSuoUtils");
 const {findNextUnDoneSkillInLastEventTimingsWithSkills} = require("./utils");
 const {setEventSkillResponse} = require("./utils");
 const {findAllEventSkillsByTimingName} = require("./utils");
@@ -83,7 +82,7 @@ const setNextDamageEventSkillToSkillResponse = (gameStatus) => {
             return;
         } else {
             const eventTimingName = DAMAGE_EVENT_TIMINGS[timingIndex + 2] // AFTER_CAUSE_DAMAGE
-            const eventTimingSkills = findAllEventSkillsByTimingName(gameStatus, {eventTimingName, targetId})
+            const eventTimingSkills = findAllEventSkillsByTimingName(gameStatus, {eventTimingName, targetId, originId})
             damageEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
 
             if (eventTimingSkills.length > 0) {
@@ -100,7 +99,8 @@ const setNextDamageEventSkillToSkillResponse = (gameStatus) => {
 const setStatusWhenDamageEventDone = (gameStatus) => {
     const damageEvent = gameStatus.damageEvent;
     // damageEvent.done = true;
-    generateTieSuoTempStorageByShaAction(gameStatus);
+    // generateTieSuoTempStorageByShaAction(gameStatus);
+    // generateTieSuoTempStorageByShandian(gameStatus);
 }
 
 const handleDamageEventEnd = (gameStatus) => {

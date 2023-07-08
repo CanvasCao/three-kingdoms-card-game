@@ -126,10 +126,18 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
         //     })
         // }
     }
+
     // 伤害
     else if (eventTimingName == DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE) {
         const eventSkillsForPlayer = SKILLS[targetHeroId]
             .filter((skill) => skill.triggerTiming == eventTimingName)
+            .filter((skill) => {
+                if (skill.needOrigin) { // 如果技能需要来源
+                    return skill.needOrigin && originId
+                } else { // 如果技能不需要来源
+                    return true
+                }
+            })
             .map((skill) => configSkillToSkillResponseSkill(skill, targetPlayerId))
         eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
     }

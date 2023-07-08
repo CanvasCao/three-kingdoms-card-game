@@ -58,7 +58,8 @@ const setGameStatusByTieSuoTempStorage = (gameStatus) => {
     const nextTieSuoAction = gameStatus.tieSuoTempStorage[0];
 
     const targetPlayer = gameStatus.players[nextTieSuoAction.targetId];
-    targetPlayer.reduceBlood(nextTieSuoAction.damage);
+    // targetPlayer.reduceBlood(nextTieSuoAction.damage);
+    // TODO generate damageTarget
     gameStatus.tieSuoTempStorage.shift();
 }
 
