@@ -8,6 +8,7 @@ const {GameEngine} = require("./model/GameEngine");
 const express = require('express');
 const app = express();
 const path = require('path');
+const {sample} = require("lodash/collection");
 const {EMIT_TYPE} = require("./config/emitConfig");
 const server = require('http').createServer(app);
 const io = require('socket.io')(server, {
@@ -92,14 +93,12 @@ io.on('connection', (socket) => {
         rooms[roomId].gameEngine = gameEngine;
 
         const roomPlayers = rooms[roomId].players
-        // for (let i = 0; i < 6; i++) {
-        //     roomPlayers.push({name: uuidv4(), playerId: uuidv4()})
-        // }
-        // let locations = ([0, 1, 2, 3, 4, 5, 6, 7].slice(0, roomPlayers.length));
         let locations = shuffle([0, 1, 2, 3, 4, 5, 6, 7].slice(0, roomPlayers.length));
+
+        const heroIds = ["WEI002", "SHU006", "WU006"]
         roomPlayers.forEach((p, i) => {
             const newPlayer = new Player({
-                imageName: "SHU001",
+                heroId: sample(heroIds),
                 name: p.playerName,
                 playerId: p.playerId,
                 location: locations[i]

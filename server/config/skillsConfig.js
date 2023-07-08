@@ -52,6 +52,7 @@ const realSkills = {
         {
             name: SKILL_NAMES.WU["006"].LIU_LI,
             triggerTiming: USE_EVENT_TIMING.WHEN_BECOMING_TARGET,
+            triggerCardName: CARD_CONFIG.SHA.CN,
         }
     ],
 }
@@ -64,7 +65,7 @@ const fakeSkills = {
     ]
 }
 
-const SKILLS = fakeSkills;
-// const SKILLS = realSkills;
+// const SKILLS = fakeSkills;
+const SKILLS = realSkills;
 exports.SKILLS = SKILLS;
 exports.SKILL_NAMES = SKILL_NAMES;

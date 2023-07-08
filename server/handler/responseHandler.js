@@ -7,7 +7,6 @@ const {findOnGoingPandingEvent} = require("../event/utils");
 const {findOnGoingPandingEventSkill} = require("../event/utils");
 const {findOnGoingUseStrikeEventSkill} = require("../event/utils");
 const {generateWuxieSimultaneousResponseByScroll} = require("../utils/wuxieUtils");
-const {CARD_CONFIG, EQUIPMENT_CARDS_CONFIG} = require("../config/cardConfig");
 const {setStatusWhenPlayerDie} = require("../utils/dieUtils");
 const {cloneDeep} = require("lodash");
 const {
@@ -259,7 +258,13 @@ const responseCardHandler = {
             const BPlayer = gameStatus.players[curScrollResponse.targetId]
             gameStatus.players[APlayer.playerId].removeCards(response.cards);
 
-            strikeEvent.generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse(gameStatus, APlayer.playerId, [BPlayer.playerId]);
+            strikeEvent.generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse(gameStatus,
+                {
+                    originId: APlayer.playerId,
+                    targetIds: [BPlayer.playerId],
+                    cards: response.cards || [],
+                    actualCard: response.actualCard
+                });
         } else {
             // TODO 如果没有杀 自动不出
             // 不出杀 A=>B A不出 A把刀给当前用户

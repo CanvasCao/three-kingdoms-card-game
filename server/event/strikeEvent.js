@@ -1,3 +1,4 @@
+const {generateDamageEventThenSetNextDamageEventSkillToSkillResponse} = require("./damageEvent");
 const {findNextUnDoneSkillInLastEventTimingsWithSkills} = require("./utils");
 const {setEventSkillResponse} = require("./utils");
 const {findOnGoingUseStrikeEvent} = require("./utils");
@@ -10,7 +11,7 @@ const {USE_EVENT_TIMINGS} = require("../config/eventConfig");
 const {last} = require("lodash");
 const {getCurrentPlayer, getAllPlayersStartFromFirstLocation} = require("../utils/playerUtils");
 
-const generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse = (gameStatus, originId, targetIds) => {
+const generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse = (gameStatus, {originId, targetIds, cards, actualCard}) => {
     const targetPlayers = getAllPlayersStartFromFirstLocation(gameStatus, getCurrentPlayer(gameStatus).location)
         .filter(p => targetIds.includes(p.playerId))
     const originPlayer = gameStatus.players[originId];
@@ -23,6 +24,8 @@ const generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse = (gameS
         return {
             originId,
             targetId: targetPlayer.playerId,
+            cards,
+            actualCard,
             cantShan: false,
             eventTimingsWithSkills: [],
             done: false
@@ -98,7 +101,13 @@ const setStatusWhenUseStrikeEventDone = (gameStatus) => {
         targetPlayer.shieldCard?.CN == EQUIPMENT_CARDS_CONFIG.REN_WANG_DUN.CN &&
         originPlayer.weaponCard?.CN != EQUIPMENT_CARDS_CONFIG.QIN_GANG_JIAN.CN) {
     } else if (useStrikeEvent.cantShan) {
-        targetPlayer.reduceBlood();
+        generateDamageEventThenSetNextDamageEventSkillToSkillResponse(gameStatus, {
+            damageCards: useStrikeEvent.cards,
+            damageActualCard: useStrikeEvent.actualCard, // 渠道
+            damageAttribute: useStrikeEvent.actualCard?.attribute,// 属性
+            originId,// 来源
+            targetId
+        })
     } else {
         gameStatus.shanResponse = {
             originId: targetId,

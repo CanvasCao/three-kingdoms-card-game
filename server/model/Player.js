@@ -7,7 +7,7 @@ class Player {
     constructor(player, generateNewRoundQiuTaoResponses) {
         this.maxBlood = 4;
         this.currentBlood = 3 || this.maxBlood;
-        this.imageName = player.imageName;
+        this.heroId = player.heroId;
         this.playerId = player.playerId;
         this.name = player.name;
         this.location = player.location;
@@ -58,9 +58,6 @@ class Player {
         this.shaTimes = 0;
 
         this.isDead = false
-
-        // TODO
-        this.heroId = this.imageName;
 
         // 耦合 掉血和求桃
         this.generateNewRoundQiuTaoResponses = generateNewRoundQiuTaoResponses;

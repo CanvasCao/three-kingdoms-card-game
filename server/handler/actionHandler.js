@@ -11,8 +11,7 @@ const {
 } = require("../utils/playerUtils");
 const {
     getCards,
-    throwCards,
-    getActualCardColor
+    throwCards
 } = require("../utils/cardUtils");
 const {
     generateWuxieSimultaneousResponseByScroll,
