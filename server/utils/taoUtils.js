@@ -1,6 +1,10 @@
-const {getAllAlivePlayersStartFromFirstLocation} = require("./playerUtils");
+const {getAllAlivePlayersStartFromFirstLocation, getCurrentPlayer} = require("./playerUtils");
 
 const generateQiuTaoResponses = (gameStatus, qiutaoTargetPlayer) => {
+    if (qiutaoTargetPlayer.currentBlood > 0) {
+        return
+    }
+
     const currentPlayer = getCurrentPlayer(gameStatus);
     const firstLocation = currentPlayer.location;
     const players = getAllAlivePlayersStartFromFirstLocation(gameStatus, firstLocation)

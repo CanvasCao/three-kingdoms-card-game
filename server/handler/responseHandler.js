@@ -283,6 +283,7 @@ const responseCardHandler = {
             currentPlayer.addCards(weaponCard)
             emitNotifyJieDaoWeaponOwnerChange(gameStatus, weaponCard);
         }
+
         clearNextScrollResponse(gameStatus);
     },
 

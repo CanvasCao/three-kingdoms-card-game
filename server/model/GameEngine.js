@@ -155,29 +155,39 @@ class GameEngine {
             throw new Error("求桃的时候不能出闪")
         }
 
+        const needResponseTao = this.gameStatus.taoResponses.length > 0;
         const needResponseShan = this.gameStatus.shanResponse;
         const needResponseSkill = this.gameStatus.skillResponse;
-        const needResponseTao = this.gameStatus.taoResponses.length > 0;
         const needResponseWuxie = this.gameStatus.wuxieSimultaneousResponse.hasWuxiePlayerIds.length > 0;
 
+        // weapon
+        const needResponseQingLongYanYueDao = this.gameStatus.weaponResponses.length > 0;
+
+        // scroll
         const curScrollResponse = this.gameStatus.scrollResponses;
         const needResponseNanMan = this.gameStatus.scrollResponses.length > 0 && curScrollResponse[0].actualCard.CN == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.CN;
         const needResponseWanJian = this.gameStatus.scrollResponses.length > 0 && curScrollResponse[0].actualCard.CN == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.CN;
         const needResponseJueDou = this.gameStatus.scrollResponses.length > 0 && curScrollResponse[0].actualCard.CN == SCROLL_CARDS_CONFIG.JUE_DOU.CN;
-
         // 只是响应是否出杀
         const needResponseJieDao = this.gameStatus.scrollResponses.length > 0 && curScrollResponse[0].actualCard.CN == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.CN;
-        const needResponseQingLongYanYueDao = this.gameStatus.weaponResponses.length > 0;
 
-        if (needResponseShan) {
+
+        if (needResponseTao) {
+            responseCardHandler.setStatusByTaoResponse(this.gameStatus, response);
+        } else if (needResponseShan) {
             responseCardHandler.setStatusByShanResponse(this.gameStatus, response);
         } else if (needResponseSkill) {
             responseCardHandler.setStatusBySkillResponse(this.gameStatus, response);
         } else if (needResponseWuxie) {
             responseCardHandler.setStatusByWuxieResponse(this.gameStatus, response);
-        } else if (needResponseTao) {
-            responseCardHandler.setStatusByTaoResponse(this.gameStatus, response);
-        } else if (needResponseNanMan || needResponseWanJian) {
+        }
+
+        // 武器
+        else if (needResponseQingLongYanYueDao) {
+            responseCardHandler.setStatusByQingLongYanYueDaoResponse(this.gameStatus, response);
+        }
+        // scroll
+        else if (needResponseNanMan || needResponseWanJian) {
             responseCardHandler.setStatusByNanManOrWanJianResponse(this.gameStatus, response);
         } else if (needResponseJueDou) {
             responseCardHandler.setStatusByJueDouResponse(this.gameStatus, response);
@@ -185,10 +195,6 @@ class GameEngine {
             responseCardHandler.setStatusByJieDaoResponse(this.gameStatus, response);
         }
 
-        // 武器
-        else if (needResponseQingLongYanYueDao) {
-            responseCardHandler.setStatusByQingLongYanYueDaoResponse(this.gameStatus, response);
-        }
 
         // 第一个目标求闪/桃之后 继续找马超下一个铁骑的技能
         tryFindNextSkillResponse(this.gameStatus);

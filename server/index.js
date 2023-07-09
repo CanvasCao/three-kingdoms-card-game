@@ -77,7 +77,9 @@ io.on('connection', (socket) => {
             rooms[roomId].players = differenceBy(rooms[roomId].players, [{playerId}], 'playerId');
             socket.leave(roomId);
             if (rooms[roomId].players.length <= 0) {
-                rooms[roomId].gameEngine = null
+                if (process.env.NODE_ENV == 'production') {
+                    rooms[roomId].gameEngine = null
+                }
             }
             emitRefreshRooms(io, rooms)
             emitRefreshRoomPlayers(io, rooms, roomId)
@@ -96,14 +98,14 @@ io.on('connection', (socket) => {
         let locations = shuffle([0, 1, 2, 3, 4, 5, 6, 7].slice(0, roomPlayers.length));
 
         // const heroIds = ["WEI002", "SHU006"]
-        const heroIds = ["WEI002", "SHU006", "WU006"]
+        const heroIds = ["WEI002"]//, "SHU006", "WU006"]
         roomPlayers.forEach((p, i) => {
             const newPlayer = new Player({
                 heroId: sample(heroIds),
                 name: p.playerName,
                 playerId: p.playerId,
                 location: locations[i]
-            }, gameEngine.generateNewRoundQiuTaoResponses.bind(gameEngine));
+            });
             gameEngine.gameStatus.players[newPlayer.playerId] = newPlayer;
         })
 

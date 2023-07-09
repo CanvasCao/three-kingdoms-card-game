@@ -1,3 +1,4 @@
+const {EQUIPMENT_TYPE} = require("../config/cardConfig");
 const {SKILL_NAMES} = require("../config/skillsConfig");
 const {EMIT_TYPE} = require("../config/emitConfig");
 const {GAME_STATUS} = require("../config/gameConfig");
@@ -104,7 +105,7 @@ const emitNotifyJieDaoWeaponOwnerChange = (gameStatus, weaponCard) => {
         fromId: action.targetIds[0],
         toId: action.originId,
         cardAreaType: 'EQUIPMENT',
-        originIndexes: action.originIndexes,
+        originIndexes: [EQUIPMENT_TYPE.WEAPON],
     });
 }
 
