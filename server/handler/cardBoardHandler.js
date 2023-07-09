@@ -12,12 +12,14 @@ const cardBoardHandler = {
             gameStatus.players[originId].addCards(card);
         }
 
+        // 反馈
+        if (gameStatus.skillResponse) {
+            clearSkillResponse(gameStatus);
+        }
         // 顺拆
-        if(gameStatus.scrollResponses?.[0]){
+        else {
             clearNextScrollResponse(gameStatus)
         }
-        // 反馈
-        clearSkillResponse(gameStatus);
     }
 }
 

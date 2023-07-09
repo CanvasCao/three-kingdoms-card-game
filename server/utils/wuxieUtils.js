@@ -47,7 +47,7 @@ const generateWuxieSimultaneousResponseByPandingCard = (gameStatus) => {
 const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (gameStatus, from) => {
     // console.log("from", from)
     if (gameStatus.wuxieSimultaneousResponse.hasWuxiePlayerIds.length != 0) {
-        throw new Error("还有人出无懈可击 不可以结算锦囊");
+        throw new Error("还有人思考无懈可击 无法开始结算锦囊");
     }
 
     const isScrollEffected = (gameStatus.wuxieSimultaneousResponse.wuxieChain.length % 2 == 1) || // wuxieChain长度为奇数个 锦囊生效
@@ -72,22 +72,10 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
             } else if (curScrollResponse.actualCard.CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
                 gameStatus.players[curScrollResponse.originId].addBlood();
                 clearNextScrollResponse(gameStatus);
-            } else if (curScrollResponse.actualCard.CN == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.CN ||
-                curScrollResponse.actualCard.CN == SCROLL_CARDS_CONFIG.GUO_HE_CHAI_QIAO.CN
-            ) { // 顺 拆
-                curScrollResponse.isEffect = true;
-            } else if (curScrollResponse.actualCard.CN == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.CN ||
-                curScrollResponse.actualCard.CN == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.CN
-            ) {
-                curScrollResponse.isEffect = true;
-            } else if (curScrollResponse.actualCard.CN == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.CN) {
-                curScrollResponse.isEffect = true;
-            } else if (curScrollResponse.actualCard.CN == SCROLL_CARDS_CONFIG.JUE_DOU.CN) {
-                curScrollResponse.isEffect = true;
-            } else if (curScrollResponse.actualCard.CN == SCROLL_CARDS_CONFIG.WU_GU_FENG_DENG.CN) {
+            } else {
                 curScrollResponse.isEffect = true;
             }
-        } else {// 失效
+        } else { // 失效
             clearNextScrollResponse(gameStatus);
         }
     }
@@ -95,7 +83,7 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
 
 
     // 无懈可击失效以后 下一个人的锦囊需要继续求无懈可击
-    if (gameStatus.scrollResponses.length > 0 && !gameStatus.scrollResponses[0].isEffect
+    if (gameStatus.scrollResponses.length > 0 && gameStatus.scrollResponses[0].isEffect === undefined
     ) {
         const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
         if (hasWuxiePlayers.length > 0) {

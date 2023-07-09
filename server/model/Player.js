@@ -17,32 +17,8 @@ class Player {
 
         // pandingSigns
         this.pandingSigns = [];
-        this.weaponCard = process.env.NODE_ENV == 'production' ? null : {
-            "huase": CARD_HUASE.CAOHUA,
-            "number": 1,
-            "key": "ZHU_GE_LIAN_NU",
-            "KEY": "ZHU_GE_LIAN_NU",
-            "cardId": uuidv4(),
-            "cardNumDesc": "A",
-            "CN": EQUIPMENT_CARDS_CONFIG.ZHANG_BA_SHE_MAO.CN,
-            "EN": "Green Steel Sword",
-            "type": "EQUIPMENT",
-            "equipmentType": EQUIPMENT_TYPE.WEAPON,
-            "distance": 3,
-            "distanceDesc": "三",
-        };
-        this.shieldCard = process.env.NODE_ENV == 'production' ? null : {
-            "huase": CARD_HUASE.CAOHUA,
-            "number": 2,
-            "key": "BA_GUA_ZHEN",
-            "KEY": "BA_GUA_ZHEN",
-            "cardId": uuidv4(),
-            "cardNumDesc": 2,
-            "CN": EQUIPMENT_CARDS_CONFIG.REN_WANG_DUN.CN,
-            "EN": "Eight Diagrams",
-            "type": "EQUIPMENT",
-            "equipmentType": "SHIELD"
-        };
+        this.weaponCard =null
+        this.shieldCard =null
         this.plusHorseCard = null;
         this.minusHorseCard = null;
 

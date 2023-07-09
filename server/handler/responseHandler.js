@@ -6,7 +6,6 @@ const {SKILL_NAMES} = require("../config/skillsConfig");
 const {findOnGoingPandingEvent} = require("../event/utils");
 const {findOnGoingPandingEventSkill} = require("../event/utils");
 const {findOnGoingUseStrikeEventSkill} = require("../event/utils");
-const {generateWuxieSimultaneousResponseByScroll} = require("../utils/wuxieUtils");
 const {setStatusWhenPlayerDie} = require("../utils/dieUtils");
 const {cloneDeep} = require("lodash");
 const {
@@ -231,15 +230,6 @@ const responseCardHandler = {
                 originId: curScrollResponse.targetId,// 来源
                 targetId: curScrollResponse.originId
             })
-        }
-
-        if (gameStatus.scrollResponses.length > 0) {
-            const newHasWuxiePlayers = getAllHasWuxiePlayers(gameStatus);
-            if (newHasWuxiePlayers.length == 0) {
-                setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, "setStatusByNanManResponse");
-            } else {
-                generateWuxieSimultaneousResponseByScroll(gameStatus)
-            }
         }
     },
 

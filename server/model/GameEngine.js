@@ -1,5 +1,6 @@
 const strikeEvent = require("../event/strikeEvent");
-const {tryFindNextSkillResponse} = require("../utils/responseUtils");
+const {trySettleNextScroll} = require("../utils/afterActionAndResponseUtils");
+const {tryFindNextSkillResponse} = require("../utils/afterActionAndResponseUtils");
 const {
     getInitCards,
 } = require("../initCards");
@@ -60,7 +61,7 @@ class GameEngine {
             wugufengdengCards: [],
             tieSuoTempStorage: [],
 
-            // 不需要传到前端的
+            // 不需要传到前端
             io: io,
             throwedCards: [],
             initCards: getInitCards(),
@@ -86,6 +87,7 @@ class GameEngine {
     handleAction(action) {
         emitNotifyPlayPublicCard(this.gameStatus, action);
         emitNotifyAddLines(this.gameStatus, action);
+
         this.gameStatus.action = action;
         this.gameStatus.players[action.originId].removeCards(action.cards);
 
@@ -143,8 +145,9 @@ class GameEngine {
             throwCards(this.gameStatus, action.cards);
         }
 
-        emitRefreshStatus(this.gameStatus);
+        trySettleNextScroll(this.gameStatus);
         tryFindNextSkillResponse(this.gameStatus);
+        emitRefreshStatus(this.gameStatus);
     }
 
     handleResponse(response) {
@@ -188,12 +191,16 @@ class GameEngine {
             responseCardHandler.setStatusByQingLongYanYueDaoResponse(this.gameStatus, response);
         }
 
-        emitRefreshStatus(this.gameStatus);
-
         // 第一个目标求闪/桃之后 继续找马超下一个铁骑的技能
         tryFindNextSkillResponse(this.gameStatus);
+
+        // 下一个人自动响应锦囊 或求无懈
+        trySettleNextScroll(this.gameStatus)
+
         // 打无懈可击延迟锦囊生效后/闪电求桃之后 需要判断是不是从判定阶段到出牌阶段
-        tryGoToNextPlayOrResponseOrThrowTurn(this.gameStatus)
+        tryGoToNextPlayOrResponseOrThrowTurn(this.gameStatus);
+
+        emitRefreshStatus(this.gameStatus);
     }
 
     handleThrowCards(data) {
@@ -205,12 +212,25 @@ class GameEngine {
     handleCardBoardAction(data) {
         emitNotifyCardBoardAction(this.gameStatus, data)
         cardBoardHandler.handleCardBoard(this.gameStatus, data)
+
+        // 第一个目标求闪/桃之后 继续找马超下一个铁骑的技能
+        tryFindNextSkillResponse(this.gameStatus);
+
+        // 下一个人自动响应锦囊 或求无懈
+        trySettleNextScroll(this.gameStatus)
+
+        // 打无懈可击延迟锦囊生效后/闪电求桃之后 需要判断是不是从判定阶段到出牌阶段
+        tryGoToNextPlayOrResponseOrThrowTurn(this.gameStatus);
+
         emitRefreshStatus(this.gameStatus);
     }
 
     handleWuguBoardAction(data) {
         emitNotifyPickWuGuCard(this.gameStatus, data);
         wuguBoardHandler.handleWuGuBoard(this.gameStatus, data)
+
+        // 下一个五谷丰登
+        trySettleNextScroll(this.gameStatus)
         emitRefreshStatus(this.gameStatus);
     }
 

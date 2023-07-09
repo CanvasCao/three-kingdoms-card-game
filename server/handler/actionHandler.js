@@ -1,11 +1,8 @@
 const {
     EQUIPMENT_TYPE,
-    EQUIPMENT_CARDS_CONFIG,
     SCROLL_CARDS_CONFIG,
-    CARD_COLOR
 } = require("../config/cardConfig")
 const {
-    getAllHasWuxiePlayers,
     getCurrentPlayer,
     getAllPlayersStartFromFirstLocation
 } = require("../utils/playerUtils");
@@ -13,10 +10,6 @@ const {
     getCards,
     throwCards
 } = require("../utils/cardUtils");
-const {
-    generateWuxieSimultaneousResponseByScroll,
-    setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect
-} = require("../utils/wuxieUtils");
 const {v4: uuidv4} = require('uuid');
 
 const actionHandler = {
@@ -186,13 +179,6 @@ const actionHandler = {
 
             // 有wugufengdengCards展示WuGuFengDengBoard
             gameStatus.wugufengdengCards = getCards(gameStatus, players.length)
-        }
-
-        const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
-        if (hasWuxiePlayers.length > 0) {
-            generateWuxieSimultaneousResponseByScroll(gameStatus)
-        } else { // 没人有无懈可击直接生效
-            setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, "setStatusByScrollAction" + action.actualCard.CN);
         }
     },
 
