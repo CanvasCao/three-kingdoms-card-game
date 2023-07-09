@@ -132,11 +132,12 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
         const eventSkillsForPlayer = SKILLS[targetHeroId]
             .filter((skill) => skill.triggerTiming == eventTimingName)
             .filter((skill) => {
-                if (skill.needOrigin) { // 如果技能需要来源
-                    return skill.needOrigin && originId
-                } else { // 如果技能不需要来源
-                    return true
-                }
+                // 如果技能需要来源
+                return skill.needOrigin ? !!originId : true
+            })
+            .filter((skill) => {
+                // 如果需要技能来源有卡牌技能需要来源
+                return skill.needOriginHasCards ? originPlayer.hasAnyHandCardsOrEquipmentCards() : true
             })
             .map((skill) => configSkillToSkillResponseSkill(skill, targetPlayerId))
         eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)

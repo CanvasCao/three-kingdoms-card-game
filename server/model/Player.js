@@ -17,8 +17,8 @@ class Player {
 
         // pandingSigns
         this.pandingSigns = [];
-        this.weaponCard =null
-        this.shieldCard =null
+        this.weaponCard = null
+        this.shieldCard = null
         this.plusHorseCard = null;
         this.minusHorseCard = null;
 
@@ -40,6 +40,7 @@ class Player {
 
     }
 
+    // Card
     addCards(cards) {
         if (!cards) {
             return
@@ -47,6 +48,10 @@ class Player {
         let addingCards = Array.isArray(cards) ? cards : [cards]
         addingCards = addingCards.map(c => new Card(c))
         this.cards = this.cards.concat(addingCards)
+    }
+
+    hasAnyCards() {
+        return this.hasAnyHandCardsOrEquipmentCards() || this.pandingSigns?.length > 0
     }
 
     hasAnyHandCardsOrEquipmentCards() {
@@ -89,6 +94,8 @@ class Player {
         this.pandingSigns = differenceBy(this.pandingSigns, [sign], 'card.cardId');
     }
 
+    // blood
+    // 只能在damage event调用
     reduceBlood(number = 1) {
         this.currentBlood = this.currentBlood - number;
         if (this.currentBlood <= 0) {
