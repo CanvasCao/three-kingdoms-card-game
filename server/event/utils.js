@@ -51,10 +51,19 @@ const setEventSkillResponse = (gameStatus, skill) => {
     gameStatus.skillResponse = JSON.parse(JSON.stringify(skill));
 }
 
-const findNextUnDoneSkillInLastEventTimingsWithSkills = (eventTimingsWithSkills) =>
-    last(eventTimingsWithSkills).eventTimingSkills.find((eventTimingSkill) => !eventTimingSkill.done)
+// UnDoneSkill
+const findNextUnDoneSkillInLastEventTimingsWithSkills = (gameStatus, eventTimingsWithSkills) => {
+    const eventTimingSkills = last(eventTimingsWithSkills).eventTimingSkills
+
+    // 找到没有放而且释放角色还没有阵亡的技能
+    return eventTimingSkills.find((eventTimingSkill) => {
+        const needReleaseSkillPlayer = gameStatus.players[eventTimingSkill.playerId];
+        return !eventTimingSkill.done && !needReleaseSkillPlayer.isDead
+    })
+}
 
 
+// UseStrikeEvent
 const findOnGoingUseStrikeEvent = (gameStatus) => {
     const useStrikeEvent = gameStatus?.useStrikeEvents.find((event) => !event.done)
     return useStrikeEvent
@@ -69,6 +78,7 @@ const findOnGoingUseStrikeEventSkill = (gameStatus) => {
     return onGoingUseStrikeEventSkill
 }
 
+// PandingEvent
 const findOnGoingPandingEvent = (gameStatus) => {
     return gameStatus?.pandingEvent
 }
@@ -80,6 +90,19 @@ const findOnGoingPandingEventSkill = (gameStatus) => {
     return onGoingPandingEventSkill
 }
 
+// damage
+const findOnGoingDamageEvent = (gameStatus) => {
+    return gameStatus?.damageEvent
+}
+
+const findOnGoingDamageEventSkill = (gameStatus) => {
+    const eventTiming = gameStatus?.damageEvent?.eventTimingsWithSkills.find((et) => et.eventTimingSkills.some((s) => s.done === false))
+
+    const onGoingDamageEventSkill = eventTiming?.eventTimingSkills.find((s) => s.done === false)
+    return onGoingDamageEventSkill
+}
+
+// AllEventSkills
 const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, targetId}) => {
     const originPlayer = gameStatus.players[originId];
     const originHeroId = originPlayer?.heroId;
@@ -145,11 +168,18 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
 
     return eventTimingSkills;
 }
+
+
 exports.configSkillToEventSkill = configSkillToSkillResponseSkill;
 exports.findAllEventSkillsByTimingName = findAllEventSkillsByTimingName;
+
 exports.findOnGoingUseStrikeEvent = findOnGoingUseStrikeEvent;
 exports.findOnGoingPandingEvent = findOnGoingPandingEvent;
+exports.findOnGoingDamageEvent = findOnGoingDamageEvent;
+
 exports.findOnGoingUseStrikeEventSkill = findOnGoingUseStrikeEventSkill;
 exports.findOnGoingPandingEventSkill = findOnGoingPandingEventSkill;
+exports.findOnGoingDamageEventSkill = findOnGoingDamageEventSkill;
+
 exports.setEventSkillResponse = setEventSkillResponse;
 exports.findNextUnDoneSkillInLastEventTimingsWithSkills = findNextUnDoneSkillInLastEventTimingsWithSkills;

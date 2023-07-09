@@ -59,7 +59,7 @@ const setNextStrikeEventSkillToSkillResponse = (gameStatus) => {
     }
 
     if (last(eventTimingsWithSkills).eventTimingName == USE_EVENT_TIMINGS[timingIndex]) {
-        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(eventTimingsWithSkills)
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus,eventTimingsWithSkills)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
@@ -76,7 +76,7 @@ const setNextStrikeEventSkillToSkillResponse = (gameStatus) => {
     }
 
     if (last(eventTimingsWithSkills).eventTimingName == USE_EVENT_TIMINGS[timingIndex + 1]) {
-        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(eventTimingsWithSkills)
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus,eventTimingsWithSkills)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;

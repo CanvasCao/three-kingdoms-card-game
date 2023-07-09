@@ -58,7 +58,7 @@ const setNextDamageEventSkillToSkillResponse = (gameStatus) => {
     }
 
     if (last(eventTimingsWithSkills).eventTimingName == DAMAGE_EVENT_TIMINGS[timingIndex]) {
-        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(eventTimingsWithSkills)
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus,eventTimingsWithSkills)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
@@ -73,13 +73,13 @@ const setNextDamageEventSkillToSkillResponse = (gameStatus) => {
             } else { // WHEN_TAKE_DAMAGE结束 扣减体力
                 targetPlayer.reduceBlood(damageEvent.damageNumber)
                 // 求桃
-                generateQiuTaoResponses(gameStatus,targetPlayer)
+                generateQiuTaoResponses(gameStatus, targetPlayer)
             }
         }
     }
 
     if (last(eventTimingsWithSkills).eventTimingName == DAMAGE_EVENT_TIMINGS[timingIndex + 1]) {
-        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(eventTimingsWithSkills)
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus,eventTimingsWithSkills)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
@@ -91,10 +91,19 @@ const setNextDamageEventSkillToSkillResponse = (gameStatus) => {
             if (eventTimingSkills.length > 0) {
                 setEventSkillResponse(gameStatus, eventTimingSkills[0])
                 return;
-            } else { // 伤害事件结束
-                setStatusWhenDamageEventDone(gameStatus);
-                handleDamageEventEnd(gameStatus);
             }
+        }
+    }
+
+    if (last(eventTimingsWithSkills).eventTimingName == DAMAGE_EVENT_TIMINGS[timingIndex + 2]) {
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus,eventTimingsWithSkills)
+        if (unDoneSkill) {
+            setEventSkillResponse(gameStatus, unDoneSkill)
+            return;
+        } else {
+            // 伤害事件结束
+            setStatusWhenDamageEventDone(gameStatus);
+            handleDamageEventEnd(gameStatus);
         }
     }
 }

@@ -1,5 +1,6 @@
 const strikeEvent = require("../event/strikeEvent");
 const pandingEvent = require("../event/pandingEvent");
+const {findOnGoingDamageEventSkill} = require("../event/utils");
 const {generateDamageEventThenSetNextDamageEventSkillToSkillResponse} = require("../event/damageEvent");
 const {findOnGoingUseStrikeEvent} = require("../event/utils");
 const {SKILL_NAMES} = require("../config/skillsConfig");
@@ -92,6 +93,22 @@ const responseCardHandler = {
             delete gameStatus.skillResponse
             if (chooseToReleaseSkill) {
                 pandingEvent.generatePandingEventThenSetNextPandingEventSkillToSkillResponse(gameStatus, skillResponse.playerId, skillName);
+            }
+        } else if (skillName == SKILL_NAMES.WEI["002"].FAN_KUI) {
+            const onGoingDamageEventSkill = findOnGoingDamageEventSkill(gameStatus);
+
+            if (!chooseToReleaseSkill) {
+                onGoingDamageEventSkill.done = true;
+                delete gameStatus.skillResponse
+                return
+            }
+
+            if (onGoingDamageEventSkill.chooseToReleaseSkill === undefined) {
+                onGoingDamageEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
+            } else {
+                // 在CardBoard
+                // onGoingDamageEventSkill.done = true;
+                // 不能删除 gameStatus.skillResponse
             }
         } else if (skillName == SKILL_NAMES.WEI["002"].GUI_CAI) {
             const onGoingPandingEventSkill = findOnGoingPandingEventSkill(gameStatus);

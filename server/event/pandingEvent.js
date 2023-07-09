@@ -56,7 +56,7 @@ const setNextPandingEventSkillToSkillResponse = (gameStatus) => {
     }
 
     if (last(eventTimingsWithSkills).eventTimingName == PANDING_EVENT_TIMINGS[timingIndex]) {
-        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(eventTimingsWithSkills)
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus,eventTimingsWithSkills)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;

@@ -1,3 +1,4 @@
+const {findOnGoingDamageEventSkill} = require("../event/utils");
 const {clearSkillResponse} = require("../utils/clearResponseUtils");
 const {CARD_BOARD_ACTION_TYPE} = require("../config/cardBoardConfig");
 const {throwCards} = require("../utils/cardUtils")
@@ -14,6 +15,8 @@ const cardBoardHandler = {
 
         // 反馈
         if (gameStatus.skillResponse) {
+            const onGoingDamageEventSkill = findOnGoingDamageEventSkill(gameStatus);
+            onGoingDamageEventSkill.done = true;
             clearSkillResponse(gameStatus);
         }
         // 顺拆
