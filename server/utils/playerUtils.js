@@ -22,7 +22,7 @@ const getAllHasWuxiePlayers = (gameStatus) => {
     return Object.values(gameStatus.players).filter((u) => u.cards.map((c) => c.CN).includes(SCROLL_CARDS_CONFIG.WU_XIE_KE_JI.CN));
 }
 
-const getAllPlayersStartFromFirstLocation = (gameStatus, firstLocation) => {
+const getAllAlivePlayersStartFromFirstLocation = (gameStatus, firstLocation) => {
     const players = []
     for (let i = firstLocation; i < firstLocation + Object.keys(gameStatus.players).length; i++) {
         const modLocation = i % Object.keys(gameStatus.players).length;
@@ -37,4 +37,4 @@ const getAllPlayersStartFromFirstLocation = (gameStatus, firstLocation) => {
 exports.getCurrentPlayer = getCurrentPlayer;
 exports.getNextShandianPlayer = getNextShandianPlayer;
 exports.getAllHasWuxiePlayers = getAllHasWuxiePlayers;
-exports.getAllPlayersStartFromFirstLocation = getAllPlayersStartFromFirstLocation;
+exports.getAllAlivePlayersStartFromFirstLocation = getAllAlivePlayersStartFromFirstLocation;

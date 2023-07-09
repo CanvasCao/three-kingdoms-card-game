@@ -1,4 +1,4 @@
-const {getCurrentPlayer, getAllPlayersStartFromFirstLocation} = require("./playerUtils");
+const {getCurrentPlayer, getAllAlivePlayersStartFromFirstLocation} = require("./playerUtils");
 
 const resetTieSuo = (gameStatus) => {
     Object.values(gameStatus.players).forEach((player) => {
@@ -7,7 +7,7 @@ const resetTieSuo = (gameStatus) => {
 }
 
 const generateTieSuoTempStorage = (gameStatus, firstAttributeDamageTargetPlayer, firstAttributeAction, damage) => {
-    const players = getAllPlayersStartFromFirstLocation(gameStatus, getCurrentPlayer(gameStatus).location)
+    const players = getAllAlivePlayersStartFromFirstLocation(gameStatus, getCurrentPlayer(gameStatus).location)
     gameStatus.tieSuoTempStorage = players
         .filter(player => player.playerId !== firstAttributeDamageTargetPlayer.playerId && player.isTieSuo)
         .map((player) => {

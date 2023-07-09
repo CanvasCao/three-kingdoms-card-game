@@ -4,7 +4,7 @@ const {
 } = require("../config/cardConfig")
 const {
     getCurrentPlayer,
-    getAllPlayersStartFromFirstLocation
+    getAllAlivePlayersStartFromFirstLocation
 } = require("../utils/playerUtils");
 const {
     getCards,
@@ -133,7 +133,7 @@ const actionHandler = {
                 }]
             }
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
-            const players = getAllPlayersStartFromFirstLocation(gameStatus, getCurrentPlayer(gameStatus).location)
+            const players = getAllAlivePlayersStartFromFirstLocation(gameStatus, getCurrentPlayer(gameStatus).location)
             gameStatus.scrollResponses = players.filter((p) => p.currentBlood < p.maxBlood).map((player) => {
                 return {
                     originId: player.playerId,
@@ -147,7 +147,7 @@ const actionHandler = {
             action.actualCard.CN == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.CN) {
             const currentPlayer = getCurrentPlayer(gameStatus);
             const firstLocation = currentPlayer.location;
-            const players = getAllPlayersStartFromFirstLocation(gameStatus, firstLocation)
+            const players = getAllAlivePlayersStartFromFirstLocation(gameStatus, firstLocation)
 
             const scrollResponses = players.filter(p => p.playerId !== currentPlayer.playerId).map((player) => {
                 return {
@@ -163,7 +163,7 @@ const actionHandler = {
         } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_GU_FENG_DENG.CN) {
             const currentPlayer = getCurrentPlayer(gameStatus);
             const firstLocation = currentPlayer.location;
-            const players = getAllPlayersStartFromFirstLocation(gameStatus, firstLocation)
+            const players = getAllAlivePlayersStartFromFirstLocation(gameStatus, firstLocation)
 
             const scrollResponses = players.map((player) => {
                 return {

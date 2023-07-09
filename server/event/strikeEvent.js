@@ -9,10 +9,10 @@ const {CARD_COLOR} = require("../config/cardConfig");
 const {getActualCardColor} = require("../utils/cardUtils");
 const {USE_EVENT_TIMINGS} = require("../config/eventConfig");
 const {last} = require("lodash");
-const {getCurrentPlayer, getAllPlayersStartFromFirstLocation} = require("../utils/playerUtils");
+const {getCurrentPlayer, getAllAlivePlayersStartFromFirstLocation} = require("../utils/playerUtils");
 
 const generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse = (gameStatus, {originId, targetIds, cards, actualCard}) => {
-    const targetPlayers = getAllPlayersStartFromFirstLocation(gameStatus, getCurrentPlayer(gameStatus).location)
+    const targetPlayers = getAllAlivePlayersStartFromFirstLocation(gameStatus, getCurrentPlayer(gameStatus).location)
         .filter(p => targetIds.includes(p.playerId))
     const originPlayer = gameStatus.players[originId];
 

@@ -1,7 +1,7 @@
 const {DAMAGE_EVENT_TIMING} = require("../config/eventConfig");
 const {CARD_CONFIG} = require("../config/cardConfig");
 const {USE_EVENT_TIMING} = require("../config/eventConfig");
-const {getAllPlayersStartFromFirstLocation} = require("../utils/playerUtils");
+const {getAllAlivePlayersStartFromFirstLocation} = require("../utils/playerUtils");
 const {SKILLS} = require("../config/skillsConfig");
 const {PANDING_EVENT_TIMING} = require("../config/eventConfig");
 const {last} = require("lodash");
@@ -91,7 +91,7 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
     let eventTimingSkills = [];
     // 判定 相关技能
     if (eventTimingName == PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT) {
-        const allPlayers = getAllPlayersStartFromFirstLocation(gameStatus, gameStatus.players[originId].location)
+        const allPlayers = getAllAlivePlayersStartFromFirstLocation(gameStatus, gameStatus.players[originId].location)
         allPlayers.forEach((player) => {
             const eventSkillsForPlayer = SKILLS[player.heroId]
                 .filter((skill) => skill.triggerTiming == eventTimingName)

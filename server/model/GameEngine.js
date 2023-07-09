@@ -20,7 +20,6 @@ const {
 } = require("../utils/emitUtils");
 const {
     getCurrentPlayer,
-    getAllPlayersStartFromFirstLocation,
 } = require("../utils/playerUtils");
 const {
     throwCards, everyoneGetInitialCards
@@ -232,25 +231,6 @@ class GameEngine {
         // 下一个五谷丰登
         trySettleNextScroll(this.gameStatus)
         emitRefreshStatus(this.gameStatus);
-    }
-
-    // 任意角色blood<=0时
-    generateNewRoundQiuTaoResponses(qiutaoTargetPlayer) {
-        if (qiutaoTargetPlayer.currentBlood > 0) {
-            throw new Error("Don't need TAO")
-        }
-
-        const currentPlayer = getCurrentPlayer(this.gameStatus);
-        const firstLocation = currentPlayer.location;
-        const players = getAllPlayersStartFromFirstLocation(this.gameStatus, firstLocation)
-
-        this.gameStatus.taoResponses = players.map((player) => {
-            return {
-                originId: player.playerId,
-                targetId: qiutaoTargetPlayer.playerId,
-                cardNumber: 1 - qiutaoTargetPlayer.currentBlood,
-            }
-        })
     }
 }
 

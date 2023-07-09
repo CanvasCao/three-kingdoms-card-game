@@ -4,7 +4,7 @@ const {differenceBy} = require("lodash/array");
 const {v4: uuidv4} = require('uuid');
 
 class Player {
-    constructor(player, generateNewRoundQiuTaoResponses) {
+    constructor(player) {
         this.maxBlood = 4;
         this.currentBlood = 3 || this.maxBlood;
         this.heroId = player.heroId;
@@ -34,10 +34,6 @@ class Player {
         this.shaTimes = 0;
 
         this.isDead = false
-
-        // 耦合 掉血和求桃
-        this.generateNewRoundQiuTaoResponses = generateNewRoundQiuTaoResponses;
-
     }
 
     // Card
@@ -98,9 +94,6 @@ class Player {
     // 只能在damage event调用
     reduceBlood(number = 1) {
         this.currentBlood = this.currentBlood - number;
-        if (this.currentBlood <= 0) {
-            this.generateNewRoundQiuTaoResponses(this);
-        }
     }
 
     addBlood(number = 1) {

@@ -1,3 +1,4 @@
+const {generateQiuTaoResponses} = require("../utils/taoUtils");
 const {findNextUnDoneSkillInLastEventTimingsWithSkills} = require("./utils");
 const {setEventSkillResponse} = require("./utils");
 const {findAllEventSkillsByTimingName} = require("./utils");
@@ -71,6 +72,8 @@ const setNextDamageEventSkillToSkillResponse = (gameStatus) => {
                 return;
             } else { // WHEN_TAKE_DAMAGE结束 扣减体力
                 targetPlayer.reduceBlood(damageEvent.damageNumber)
+                // 求桃
+                generateQiuTaoResponses(gameStatus,targetPlayer)
             }
         }
     }
