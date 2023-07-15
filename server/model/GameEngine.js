@@ -84,9 +84,6 @@ class GameEngine {
     }
 
     handleAction(action) {
-        emitNotifyPlayPublicCard(this.gameStatus, action);
-        emitNotifyAddLines(this.gameStatus, action);
-
         this.gameStatus.action = action;
         this.gameStatus.players[action.originId].removeCards(action.cards);
 
@@ -147,10 +144,12 @@ class GameEngine {
         trySettleNextScroll(this.gameStatus);
         tryFindNextSkillResponse(this.gameStatus);
         emitRefreshStatus(this.gameStatus);
+
+        emitNotifyPlayPublicCard(this.gameStatus, action);
+        emitNotifyAddLines(this.gameStatus, action);
     }
 
     handleResponse(response) {
-        emitNotifyPlayPublicCard(this.gameStatus, response);
         if (this.gameStatus.taoResponses.length > 0 && response?.actualCard?.CN == BASIC_CARDS_CONFIG.SHAN.CN) {
             throw new Error("求桃的时候不能出闪")
         }
@@ -206,16 +205,20 @@ class GameEngine {
         tryGoToNextPlayOrResponseOrThrowTurn(this.gameStatus);
 
         emitRefreshStatus(this.gameStatus);
+
+        emitNotifyPlayPublicCard(this.gameStatus, response);
     }
 
     handleThrowCards(data) {
-        emitNotifyThrowPlayPublicCard(this.gameStatus, data, getCurrentPlayer(this.gameStatus));
         throwHandler.handleThrowCards(this.gameStatus, data)
+
+        emitNotifyThrowPlayPublicCard(this.gameStatus, data, getCurrentPlayer(this.gameStatus));
+
+        // 必须在emitNotify之后
         goToNextStage(this.gameStatus);
     }
 
     handleCardBoardAction(data) {
-        emitNotifyCardBoardAction(this.gameStatus, data)
         cardBoardHandler.handleCardBoard(this.gameStatus, data)
 
         // 第一个目标求闪/桃之后 继续找马超下一个铁骑的技能
@@ -228,15 +231,18 @@ class GameEngine {
         tryGoToNextPlayOrResponseOrThrowTurn(this.gameStatus);
 
         emitRefreshStatus(this.gameStatus);
+
+        emitNotifyCardBoardAction(this.gameStatus, data)
     }
 
     handleWuguBoardAction(data) {
-        emitNotifyPickWuGuCard(this.gameStatus, data);
         wuguBoardHandler.handleWuGuBoard(this.gameStatus, data)
 
         // 下一个五谷丰登
         trySettleNextScroll(this.gameStatus)
         emitRefreshStatus(this.gameStatus);
+
+        emitNotifyPickWuGuCard(this.gameStatus, data);
     }
 }
 

@@ -29,7 +29,6 @@ const {emitNotifyJieDaoWeaponOwnerChange} = require("../utils/emitUtils")
 //     actualCard: Card,
 //     originId: string,
 //
-//     selectedIndexes: number[],
 //
 //     // 基本卡
 //     targetId?: string,
