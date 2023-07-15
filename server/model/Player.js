@@ -6,7 +6,7 @@ const {v4: uuidv4} = require('uuid');
 class Player {
     constructor(player) {
         this.maxBlood = 4;
-        this.currentBlood = 1 || this.maxBlood;
+        this.currentBlood = process.env.NODE_ENV == 'production' ? this.maxBlood : 1;
         this.heroId = player.heroId;
         this.playerId = player.playerId;
         this.name = player.name;
