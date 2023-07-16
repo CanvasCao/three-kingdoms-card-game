@@ -1,4 +1,5 @@
 const strikeEvent = require("../event/strikeEvent");
+const {heroSelectBoardBoardHandler} = require("../handler/heroSelectBoardHandler");
 const {RESPONSE_TYPE_CONFIG} = require("../config/responseTypeConfig");
 const {EQUIPMENT_CARDS_CONFIG} = require("../config/cardConfig");
 const {getResponseType} = require("../utils/responseUtils");
@@ -73,20 +74,9 @@ class GameEngine {
     }
 
     startEngine(roomId) {
-        this.gameStatus.stage = {
-            playerId: getCurrentPlayer(this.gameStatus).playerId,
-            stageIndex: this.gameStatus.stageIndex,
-        }
         this.gameStatus.roomId = roomId;
-
-
+        // 选将
         emitInit(this.gameStatus);
-
-        // setTimeout(() => {
-
-        //     everyoneGetInitialCards(this.gameStatus)
-        //     tryGoToNextPlayOrResponseOrThrowTurn(this.gameStatus)
-        // }, 1000)
     }
 
     handleAction(action) {
@@ -214,11 +204,11 @@ class GameEngine {
 
     handleThrowCards(data) {
         throwHandler.handleThrowCards(this.gameStatus, data)
-
         emitNotifyThrowPlayPublicCard(this.gameStatus, data, getCurrentPlayer(this.gameStatus));
 
         // 必须在emitNotify之后
         goToNextStage(this.gameStatus);
+        emitRefreshStatus(this.gameStatus);
     }
 
     handleCardBoardAction(data) {
@@ -246,6 +236,11 @@ class GameEngine {
         emitRefreshStatus(this.gameStatus);
 
         emitNotifyPickWuGuCard(this.gameStatus, data);
+    }
+
+    handleHeroSelectBoardAction(data) {
+        heroSelectBoardBoardHandler.handleHeroSelect(this.gameStatus, data)
+        emitRefreshStatus(this.gameStatus);
     }
 }
 

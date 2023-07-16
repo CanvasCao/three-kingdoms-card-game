@@ -21,6 +21,7 @@ const EMIT_TYPE = {
     "THROW": "throw",
     "CARD_BOARD_ACTION": "card_board_action",
     "WUGU_BOARD_ACTION": "wugu_board_action",
+    "HERO_SELECT_BOARD_ACTION": "hero_select_board_action",
 
     "NOTIFY_ADD_TO_PLAYER_CARD": "notify_add_to_player_card",
     "NOTIFY_ADD_TO_PUBLIC_CARD": "notify_add_to_public_card",

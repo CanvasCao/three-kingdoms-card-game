@@ -8,6 +8,7 @@ const {GameEngine} = require("./model/GameEngine");
 const express = require('express');
 const app = express();
 const path = require('path');
+const {emitRefreshStatus} = require("./utils/emitUtils");
 const {sample} = require("lodash/collection");
 const {EMIT_TYPE} = require("./config/emitConfig");
 const server = require('http').createServer(app);
@@ -116,6 +117,7 @@ io.on('connection', (socket) => {
 
     socket.on(EMIT_TYPE.GO_NEXT_STAGE, () => {
         rooms?.[roomId]?.gameEngine && goToNextStage(rooms[roomId].gameEngine.gameStatus);
+        emitRefreshStatus(rooms[roomId].gameEngine.gameStatus);
     });
 
     socket.on(EMIT_TYPE.ACTION, (action) => {
@@ -132,6 +134,10 @@ io.on('connection', (socket) => {
 
     socket.on(EMIT_TYPE.WUGU_BOARD_ACTION, (data) => {
         rooms?.[roomId]?.gameEngine?.handleWuguBoardAction(data);
+    });
+
+    socket.on(EMIT_TYPE.HERO_SELECT_BOARD_ACTION, (data) => {
+        rooms?.[roomId]?.gameEngine?.handleHeroSelectBoardAction(data);
     });
 
     socket.on(EMIT_TYPE.THROW, (data) => {

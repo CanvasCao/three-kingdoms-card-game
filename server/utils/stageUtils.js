@@ -1,7 +1,7 @@
 const {executeNextOnePandingCard} = require("../event/pandingEvent");
 const {STAGE_NAMES, STAGE_NAME} = require("../config/gameConfig");
 const {isNil} = require("lodash");
-const {emitRefreshStatus, emitNotifyDrawCards} = require("./emitUtils");
+const {emitNotifyDrawCards} = require("./emitUtils");
 const {getCurrentPlayer, getAllHasWuxiePlayers} = require("./playerUtils");
 const {setCurrentLocationToNextLocation} = require("./locationUtils");
 const {generateWuxieSimultaneousResponseByPandingCard} = require("./wuxieUtils");
@@ -36,8 +36,6 @@ const goToNextStage = (gameStatus) => {
     }
 
     clearAllResponses(gameStatus)
-
-    emitRefreshStatus(gameStatus);
     tryGoToNextPlayOrResponseOrThrowTurn(gameStatus);
 }
 
@@ -62,14 +60,12 @@ const tryGoToNextPlayOrResponseOrThrowTurn = (gameStatus) => {
             const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
             if (hasWuxiePlayers.length > 0) {
                 generateWuxieSimultaneousResponseByPandingCard(gameStatus)
-                emitRefreshStatus(gameStatus);
             } else { // 延时锦囊需要判定
                 nextNeedPandingSign.isEffect = true;
                 tryGoToNextPlayOrResponseOrThrowTurn(gameStatus); // nextNeedPandingSign生效之后进入 判定执行
             }
         } else { // 被无懈可击 或 开始判定
             executeNextOnePandingCard(gameStatus);
-            emitRefreshStatus(gameStatus); // 闪电之后可能要求桃
             tryGoToNextPlayOrResponseOrThrowTurn(gameStatus); // 如果还有别的判定牌会再一次回到这里
         }
     } else if (currentStageName == STAGE_NAME.DRAW) {
@@ -103,6 +99,7 @@ const ifAnyPlayerNeedToResponse = (gameStatus) => {
     return false
 }
 
+exports.setGameStatusStage = setGameStatusStage;
 exports.goToNextStage = goToNextStage;
 exports.ifAnyPlayerNeedToResponse = ifAnyPlayerNeedToResponse;
 exports.tryGoToNextPlayOrResponseOrThrowTurn = tryGoToNextPlayOrResponseOrThrowTurn;
