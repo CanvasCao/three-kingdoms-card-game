@@ -1,4 +1,6 @@
 const strikeEvent = require("../event/strikeEvent");
+const {everyoneGetInitialCards} = require("../utils/cardUtils");
+const {setGameStatusStage} = require("../utils/stageUtils");
 const {heroSelectBoardBoardHandler} = require("../handler/heroSelectBoardHandler");
 const {RESPONSE_TYPE_CONFIG} = require("../config/responseTypeConfig");
 const {EQUIPMENT_CARDS_CONFIG} = require("../config/cardConfig");
@@ -23,14 +25,10 @@ const {
     emitNotifyPickWuGuCard,
 } = require("../utils/emitUtils");
 const {
-    getCurrentPlayer,
-} = require("../utils/playerUtils");
-const {
-    throwCards, everyoneGetInitialCards
+    throwCards
 } = require("../utils/cardUtils");
 const {
     tryGoToNextPlayOrResponseOrThrowTurn,
-    goToNextStage,
 } = require("../utils/stageUtils");
 const {actionHandler} = require("../handler/actionHandler");
 const {responseCardHandler} = require("../handler/responseHandler");
@@ -151,17 +149,18 @@ class GameEngine {
         }
 
         const responseType = getResponseType(this.gameStatus);
+        const skillName = this.gameStatus?.skillResponse?.skillName
         switch (responseType) {
             case RESPONSE_TYPE_CONFIG.TAO:
                 responseCardHandler.setStatusByTaoResponse(this.gameStatus, response);
                 break;
-            case   RESPONSE_TYPE_CONFIG.SHAN:
+            case RESPONSE_TYPE_CONFIG.SHAN:
                 responseCardHandler.setStatusByShanResponse(this.gameStatus, response);
                 break;
-            case   RESPONSE_TYPE_CONFIG.SKILL:
+            case RESPONSE_TYPE_CONFIG.SKILL:
                 responseCardHandler.setStatusBySkillResponse(this.gameStatus, response);
                 break;
-            case   RESPONSE_TYPE_CONFIG.WUXIE:
+            case RESPONSE_TYPE_CONFIG.WUXIE:
                 responseCardHandler.setStatusByWuxieResponse(this.gameStatus, response);
                 break;
             case RESPONSE_TYPE_CONFIG.WEAPON:
@@ -198,7 +197,7 @@ class GameEngine {
         emitNotifyPlayPublicCard(
             this.gameStatus,
             response,
-            responseType == RESPONSE_TYPE_CONFIG.SKILL ? this.gameStatus.skillResponse.skillName : undefined
+            responseType == RESPONSE_TYPE_CONFIG.SKILL ? skillName : undefined
         );
     }
 
@@ -241,7 +240,18 @@ class GameEngine {
 
     handleHeroSelectBoardAction(data) {
         heroSelectBoardBoardHandler.handleHeroSelect(this.gameStatus, data)
-        emitRefreshStatus(this.gameStatus);
+
+        if (Object.values(this.gameStatus.players).every((p) => p.heroId)) {
+            setGameStatusStage(this.gameStatus)
+            everyoneGetInitialCards(this.gameStatus)
+            emitRefreshStatus(this.gameStatus);
+
+            tryGoToNextPlayOrResponseOrThrowTurn(this.gameStatus)
+        }
+
+        setTimeout(() => {
+            emitRefreshStatus(this.gameStatus);
+        }, 1000)
     }
 }
 
