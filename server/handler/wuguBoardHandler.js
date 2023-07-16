@@ -1,4 +1,4 @@
-const {clearNextScrollResponse} = require("../utils/clearResponseUtils")
+const {clearNextScrollResponse} = require("../utils/responseUtils")
 const wuguBoardHandler = {
     handleWuGuBoard(gameStatus, data) {
         const wuguPlayer = gameStatus.players[data.playerId]

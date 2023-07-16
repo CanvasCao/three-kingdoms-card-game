@@ -1,5 +1,3 @@
-const {EQUIPMENT_TYPE} = require("../config/cardConfig");
-const {SKILL_NAMES} = require("../config/skillsConfig");
 const {EMIT_TYPE} = require("../config/emitConfig");
 const {GAME_STATUS} = require("../config/gameConfig");
 const {CARD_LOCATION} = require("../config/cardConfig");
@@ -7,7 +5,7 @@ const {ADD_TO_PUBLIC_CARD_TYPE} = require("../config/emitConfig");
 const {omit} = require("lodash")
 
 // TO PUBLIC EMIT
-const emitNotifyPlayPublicCard = (gameStatus, behaviour) => {
+const emitNotifyPlayPublicCard = (gameStatus, behaviour,skillName) => {
     // behaviour is action/response
     if (!behaviour) {
         throw new Error("need behaviour")
@@ -15,14 +13,15 @@ const emitNotifyPlayPublicCard = (gameStatus, behaviour) => {
 
     const io = gameStatus.io;
     const roomId = gameStatus.roomId;
-    if (behaviour.cards?.[0]) {
+
+    if (behaviour.cards?.length) {
         io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PUBLIC_CARD, {
             fromId: behaviour.originId,
             originId: behaviour.originId,
             targetId: behaviour.targetId,
             cards: behaviour.cards,
             type: ADD_TO_PUBLIC_CARD_TYPE.PLAY,
-            skillName: gameStatus?.skillResponse?.skillName
+            skillName
         });
     }
 }

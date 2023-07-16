@@ -5,7 +5,7 @@ const {emitRefreshStatus, emitNotifyDrawCards} = require("./emitUtils");
 const {getCurrentPlayer, getAllHasWuxiePlayers} = require("./playerUtils");
 const {setCurrentLocationToNextLocation} = require("./locationUtils");
 const {generateWuxieSimultaneousResponseByPandingCard} = require("./wuxieUtils");
-const {clearAllResponses} = require("./clearResponseUtils");
+const {clearAllResponses} = require("./responseUtils");
 const {getNextNeedExecutePandingSign} = require("./pandingUtils");
 const {getCards} = require("./cardUtils");
 

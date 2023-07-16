@@ -65,6 +65,10 @@ io.on('connection', (socket) => {
         playerName = data.playerName
         roomId = data.roomId
         if (playerId && playerName && roomId && rooms[roomId] && (rooms[roomId].gameEngine == null)) {
+            if (rooms[roomId].players.length >= 8) {
+                return
+            }
+
             rooms[roomId].players.push({playerId, playerName})
             socket.join(roomId);
             emitRefreshRooms(io, rooms)
@@ -97,20 +101,17 @@ io.on('connection', (socket) => {
         const roomPlayers = rooms[roomId].players
         let locations = shuffle([0, 1, 2, 3, 4, 5, 6, 7].slice(0, roomPlayers.length));
 
-        // const heroIds = ["WEI002", "SHU006"]
-        const heroIds = ["WEI002", "SHU006", "WU006"]
         roomPlayers.forEach((p, i) => {
             const newPlayer = new Player({
-                heroId: sample(heroIds),
                 name: p.playerName,
                 playerId: p.playerId,
-                location: locations[i]
+                location: locations[i],
             });
             gameEngine.gameStatus.players[newPlayer.playerId] = newPlayer;
         })
 
         gameEngine.startEngine(roomId);
-        emitRefreshRooms(io, rooms)
+        emitRefreshRooms(io, rooms);
     });
 
     socket.on(EMIT_TYPE.GO_NEXT_STAGE, () => {

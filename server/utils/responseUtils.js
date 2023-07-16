@@ -1,3 +1,5 @@
+const {RESPONSE_TYPE_CONFIG} = require("../config/responseTypeConfig");
+
 const clearShanResponse = (gameStatus) => {
     gameStatus.shanResponse = undefined;
 }
@@ -34,6 +36,22 @@ const clearAllResponses = (gameStatus) => {
     gameStatus.weaponResponses = [];
 }
 
+const getResponseType = (gameStatus) => {
+    if (gameStatus.taoResponses.length > 0) {
+        return RESPONSE_TYPE_CONFIG.TAO;
+    } else if (gameStatus.shanResponse) {
+        return RESPONSE_TYPE_CONFIG.SHAN;
+    } else if (gameStatus.skillResponse) {
+        return RESPONSE_TYPE_CONFIG.SKILL;
+    } else if (gameStatus.wuxieSimultaneousResponse?.hasWuxiePlayerIds?.length > 0) {
+        return RESPONSE_TYPE_CONFIG.WUXIE;
+    } else if (gameStatus.weaponResponses.length > 0) {
+        return RESPONSE_TYPE_CONFIG.WEAPON;
+    } else if (gameStatus.scrollResponses.length > 0) {
+        return RESPONSE_TYPE_CONFIG.SCROLL;
+    }
+}
+
 exports.clearNextTaoResponse = clearNextTaoResponse;
 exports.clearShanResponse = clearShanResponse;
 exports.clearSkillResponse = clearSkillResponse;
@@ -41,3 +59,4 @@ exports.clearNextScrollResponse = clearNextScrollResponse;
 exports.clearNextWeaponResponse = clearNextWeaponResponse;
 exports.clearWuxieSimultaneousResponse = clearWuxieSimultaneousResponse;
 exports.clearAllResponses = clearAllResponses;
+exports.getResponseType = getResponseType;

@@ -18,7 +18,7 @@ const {
     clearNextTaoResponse,
     clearNextScrollResponse,
     clearNextWeaponResponse
-} = require("../utils/clearResponseUtils");
+} = require("../utils/responseUtils");
 const {throwCards} = require("../utils/cardUtils")
 const {getAllHasWuxiePlayers, getCurrentPlayer} = require("../utils/playerUtils")
 const {emitNotifyJieDaoWeaponOwnerChange} = require("../utils/emitUtils")

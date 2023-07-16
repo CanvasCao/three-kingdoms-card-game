@@ -1,8 +1,8 @@
 const {findOnGoingDamageEventSkill} = require("../event/utils");
-const {clearSkillResponse} = require("../utils/clearResponseUtils");
+const {clearSkillResponse} = require("../utils/responseUtils");
 const {CARD_BOARD_ACTION_TYPE} = require("../config/cardBoardConfig");
 const {throwCards} = require("../utils/cardUtils")
-const {clearNextScrollResponse} = require("../utils/clearResponseUtils")
+const {clearNextScrollResponse} = require("../utils/responseUtils")
 const cardBoardHandler = {
     handleCardBoard(gameStatus, data) {
         const {card, originId, targetId, type} = data;
