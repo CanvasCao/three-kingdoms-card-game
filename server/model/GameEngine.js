@@ -198,17 +198,18 @@ class GameEngine {
         emitNotifyPlayPublicCard(
             this.gameStatus,
             response,
-            responseType == RESPONSE_TYPE_CONFIG.SCROLL ? this.gameStatus.skillResponse.skillName : undefined
+            responseType == RESPONSE_TYPE_CONFIG.SKILL ? this.gameStatus.skillResponse.skillName : undefined
         );
     }
 
     handleThrowCards(data) {
         throwHandler.handleThrowCards(this.gameStatus, data)
-        emitNotifyThrowPlayPublicCard(this.gameStatus, data, getCurrentPlayer(this.gameStatus));
 
-        // 必须在emitNotify之后
-        goToNextStage(this.gameStatus);
+        tryGoToNextPlayOrResponseOrThrowTurn(this.gameStatus);
+
         emitRefreshStatus(this.gameStatus);
+
+        emitNotifyThrowPlayPublicCard(this.gameStatus, data);
     }
 
     handleCardBoardAction(data) {

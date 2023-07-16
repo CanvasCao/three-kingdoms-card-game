@@ -5,7 +5,7 @@ const {ADD_TO_PUBLIC_CARD_TYPE} = require("../config/emitConfig");
 const {omit} = require("lodash")
 
 // TO PUBLIC EMIT
-const emitNotifyPlayPublicCard = (gameStatus, behaviour,skillName) => {
+const emitNotifyPlayPublicCard = (gameStatus, behaviour, skillName) => {
     // behaviour is action/response
     if (!behaviour) {
         throw new Error("need behaviour")
@@ -38,16 +38,17 @@ const emitNotifyPandingPlayPublicCard = (gameStatus, pandingResultCard, player, 
     });
 }
 
-const emitNotifyThrowPlayPublicCard = (gameStatus, data, player) => {
-    // EmitThrowData = {
-    //     cards: Card[]
+const emitNotifyThrowPlayPublicCard = (gameStatus, data) => {
+    // export type EmitThrowData = {
+    //     cards: Card[],
+    //     playerId: string,
     // }
     const io = gameStatus.io;
     const roomId = gameStatus.roomId;
+    const {cards, playerId} = data
     io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PUBLIC_CARD, {
-        cards: data.cards,
-        fromId: player.playerId,
-        throwPlayerId: player.playerId,
+        cards,
+        fromId: playerId,
         type: ADD_TO_PUBLIC_CARD_TYPE.THROW
     });
 }
@@ -134,7 +135,8 @@ const omitGSArray = [
     'stageIndex',
     'io']
 process.env.NODE_ENV == 'production' && omitGSArray.push('throwedCards')
-// 只能在goToNextStage和GameEngine的handler之后调用
+
+// 只能在GameEngine的handler之后调用
 const emitRefreshStatus = (gameStatus) => {
     const io = gameStatus.io;
     const roomId = gameStatus.roomId;
