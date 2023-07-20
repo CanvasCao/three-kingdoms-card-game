@@ -5,13 +5,12 @@ const {v4: uuidv4} = require('uuid');
 
 class Player {
     constructor(player) {
-        this.maxBlood = 4;
-        this.currentBlood = process.env.NODE_ENV == 'production' ? this.maxBlood : 2;
         this.heroId = player.heroId;
         this.playerId = player.playerId;
-        this.name = player.name;
         this.location = player.location;
+        this.playerName = player.playerName;
 
+        // TODO
         this.canSelectHeroIds = ["WEI002", "SHU006", "WU006"]
 
         // cards
@@ -35,7 +34,15 @@ class Player {
         // played tags
         this.shaTimes = 0;
 
-        this.isDead = false
+        this.isDead = false;
+    }
+
+    setPlayerConfig(config){
+        this.maxBlood = config.maxBlood;
+        this.currentBlood = process.env.NODE_ENV == 'production' ? config.maxBlood : 2;
+        this.heroName = config.heroName;
+        this.kingdom = config.kingdom;
+        this.skills = config.skills;
     }
 
     // Card

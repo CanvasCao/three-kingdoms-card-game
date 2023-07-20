@@ -31,9 +31,10 @@ server.listen(port, () => {
 app.use(express.static(path.join(__dirname, '../client')));
 
 
-const rooms = {
-    '1': {gameEngine: null, players: []},
-    '2': {gameEngine: null, players: []},
+const roomNumber = 3;
+const rooms = {};
+for (let i = 1; i <= roomNumber; i++) {
+    rooms[i] = {gameEngine: null, players: []}
 }
 
 io.on('connection', (socket) => {
@@ -104,7 +105,7 @@ io.on('connection', (socket) => {
 
         roomPlayers.forEach((p, i) => {
             const newPlayer = new Player({
-                name: p.playerName,
+                playerName: p.playerName,
                 playerId: p.playerId,
                 location: locations[i],
             });

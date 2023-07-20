@@ -2,7 +2,7 @@ const {DAMAGE_EVENT_TIMING} = require("../config/eventConfig");
 const {CARD_CONFIG} = require("../config/cardConfig");
 const {USE_EVENT_TIMING} = require("../config/eventConfig");
 const {getAllAlivePlayersStartFromFirstLocation} = require("../utils/playerUtils");
-const {SKILLS} = require("../config/skillsConfig");
+const {TIMING_SKILLS} = require("../config/skillsConfig");
 const {PANDING_EVENT_TIMING} = require("../config/eventConfig");
 const {last} = require("lodash");
 const {v4: uuidv4} = require('uuid');
@@ -43,7 +43,6 @@ const configSkillToSkillResponseSkill = (configSkill, playerId) => {
         playerId,
         chooseToReleaseSkill: undefined,
         done: false,
-        boardObserveId: uuidv4(),
     }
 }
 
@@ -116,13 +115,13 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
     if (eventTimingName == PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT) {
         const allPlayers = getAllAlivePlayersStartFromFirstLocation(gameStatus, gameStatus.players[originId].location)
         allPlayers.forEach((player) => {
-            const eventSkillsForPlayer = SKILLS[player.heroId]
+            const eventSkillsForPlayer = TIMING_SKILLS[player.heroId]
                 .filter((skill) => skill.triggerTiming == eventTimingName)
                 .map((skill) => configSkillToSkillResponseSkill(skill, player.playerId))
             eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
         })
     } else if (eventTimingName == PANDING_EVENT_TIMING.AFTER_PANDING_TAKE_EFFECT) {
-        const eventSkillsForPlayer = SKILLS[originHeroId]
+        const eventSkillsForPlayer = TIMING_SKILLS[originHeroId]
             .filter((skill) => skill.triggerTiming == eventTimingName)
             .map((skill) => configSkillToSkillResponseSkill(skill, originPlayer.playerId))
         eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
@@ -130,12 +129,12 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
 
     // 杀 相关技能
     else if (eventTimingName == USE_EVENT_TIMING.WHEN_BECOMING_TARGET) {
-        const eventSkillsForPlayer = SKILLS[targetHeroId]
+        const eventSkillsForPlayer = TIMING_SKILLS[targetHeroId]
             .filter((skill) => skill.triggerTiming == eventTimingName && skill.triggerCardName == CARD_CONFIG.SHA.CN)
             .map((skill) => configSkillToSkillResponseSkill(skill, targetPlayerId))
         eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
     } else if (eventTimingName == USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET) {
-        const eventSkillsForPlayer = SKILLS[originHeroId]
+        const eventSkillsForPlayer = TIMING_SKILLS[originHeroId]
             .filter((skill) => skill.triggerTiming == eventTimingName && skill.triggerCardName == CARD_CONFIG.SHA.CN)
             .map((skill) => configSkillToSkillResponseSkill(skill, originPlayerId))
         eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
@@ -152,7 +151,7 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
 
     // 伤害
     else if (eventTimingName == DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE) {
-        const eventSkillsForPlayer = SKILLS[targetHeroId]
+        const eventSkillsForPlayer = TIMING_SKILLS[targetHeroId]
             .filter((skill) => skill.triggerTiming == eventTimingName)
             .filter((skill) => {
                 // 如果技能需要来源

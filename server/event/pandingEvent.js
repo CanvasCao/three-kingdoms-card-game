@@ -83,7 +83,7 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
     const pandingResultCard = pandingEvent.pandingResultCard;
     const currentPlayer = getCurrentPlayer(gameStatus);
 
-    if (pandingEvent.pandingContent == SKILL_NAMES.SHU["006"].TIE_JI) {
+    if (pandingEvent.pandingContent == SKILL_NAMES.SHU006.TIE_JI.CN) {
         const useStrikeEvent = findOnGoingUseStrikeEvent(gameStatus);
         if (getActualCardColor(pandingResultCard) == CARD_COLOR.RED) {
             useStrikeEvent.cantShan = true;
