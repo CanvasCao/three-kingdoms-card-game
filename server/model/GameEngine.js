@@ -82,7 +82,7 @@ class GameEngine {
         this.gameStatus.players[action.originId].removeCards(action.cards);
 
         // BASIC
-        if ([BASIC_CARDS_CONFIG.SHA.CN, BASIC_CARDS_CONFIG.LEI_SHA.CN, BASIC_CARDS_CONFIG.HUO_SHA.CN].includes(action.actualCard.CN)
+        if ([BASIC_CARDS_CONFIG.SHA.key, BASIC_CARDS_CONFIG.LEI_SHA.key, BASIC_CARDS_CONFIG.HUO_SHA.key].includes(action.actualCard.key)
         ) {
             strikeEvent.generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse(this.gameStatus,
                 {
@@ -91,7 +91,7 @@ class GameEngine {
                     cards: action.cards,
                     actualCard: action.actualCard
                 });
-        } else if (action.actualCard.CN == BASIC_CARDS_CONFIG.TAO.CN) {
+        } else if (action.actualCard.key == BASIC_CARDS_CONFIG.TAO.key) {
             actionHandler.setStatusByTaoAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
         }
@@ -100,37 +100,37 @@ class GameEngine {
             actionHandler.setStatusByEquipmentAction(this.gameStatus);
         }
         // DELAY SCROLL
-        else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.SHAN_DIAN.CN) {
+        else if (action.actualCard.key == SCROLL_CARDS_CONFIG.SHAN_DIAN.key) {
             actionHandler.setStatusByShanDianAction(this.gameStatus, this.gameStatus);
-        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.LE_BU_SI_SHU.CN) {
+        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.LE_BU_SI_SHU.key) {
             actionHandler.setStatusByLeBuSiShuAction(this.gameStatus, this.gameStatus);
         }
         // SCROLL
-        else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.CN) {
+        else if (action.actualCard.key == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.key) {
             actionHandler.setStatusByWuZhongShengYouAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
-        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.GUO_HE_CHAI_QIAO.CN) {
+        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.GUO_HE_CHAI_QIAO.key) {
             actionHandler.setStatusByGuoHeChaiQiaoAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
-        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.CN) {
+        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.key) {
             actionHandler.setStatusByShunShouQianYangAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
-        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
+        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.key) {
             actionHandler.setStatusByTaoYuanJieYiAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
-        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.CN) {
+        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.key) {
             actionHandler.setStatusByNanManRuQinAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
-        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.CN) {
+        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.key) {
             actionHandler.setStatusByWanJianQiFaAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
-        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.JUE_DOU.CN) {
+        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.JUE_DOU.key) {
             actionHandler.setStatusByJueDouAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
-        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.CN) {
+        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.key) {
             actionHandler.setStatusByJieDaoShaRenAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
-        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_GU_FENG_DENG.CN) {
+        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.WU_GU_FENG_DENG.key) {
             actionHandler.setStatusByWuGuFengDengAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
         }
@@ -144,12 +144,12 @@ class GameEngine {
     }
 
     handleResponse(response) {
-        if (this.gameStatus.taoResponses.length > 0 && response?.actualCard?.CN == BASIC_CARDS_CONFIG.SHAN.CN) {
+        if (this.gameStatus.taoResponses.length > 0 && response?.actualCard?.key == BASIC_CARDS_CONFIG.SHAN.key) {
             throw new Error("求桃的时候不能出闪")
         }
 
         const responseType = getResponseType(this.gameStatus);
-        const skillName = this.gameStatus?.skillResponse?.skillName
+        const skillNameKey = this.gameStatus?.skillResponse?.skillNameKey
         switch (responseType) {
             case RESPONSE_TYPE_CONFIG.TAO:
                 responseCardHandler.setStatusByTaoResponse(this.gameStatus, response);
@@ -164,20 +164,20 @@ class GameEngine {
                 responseCardHandler.setStatusByWuxieResponse(this.gameStatus, response);
                 break;
             case RESPONSE_TYPE_CONFIG.WEAPON:
-                if (this.gameStatus.weaponResponses[0].weaponCardName == EQUIPMENT_CARDS_CONFIG.QING_LONG_YAN_YUE_DAO.CN) {
+                if (this.gameStatus.weaponResponses[0].weaponCardKey == EQUIPMENT_CARDS_CONFIG.QING_LONG_YAN_YUE_DAO.key) {
                     responseCardHandler.setStatusByQingLongYanYueDaoResponse(this.gameStatus, response);
                 }
                 break
             case RESPONSE_TYPE_CONFIG.SCROLL:
                 const curScrollResponse = this.gameStatus.scrollResponses[0];
-                if (curScrollResponse.actualCard.CN === SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.CN ||
-                    curScrollResponse.actualCard.CN === SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.CN
+                if (curScrollResponse.actualCard.key === SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.key ||
+                    curScrollResponse.actualCard.key === SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.key
                 ) {
                     responseCardHandler.setStatusByNanManOrWanJianResponse(this.gameStatus, response);
-                } else if (curScrollResponse.actualCard.CN === SCROLL_CARDS_CONFIG.JUE_DOU.CN
+                } else if (curScrollResponse.actualCard.key === SCROLL_CARDS_CONFIG.JUE_DOU.key
                 ) {
                     responseCardHandler.setStatusByJueDouResponse(this.gameStatus, response);
-                } else if (curScrollResponse.actualCard.CN === SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.CN) {
+                } else if (curScrollResponse.actualCard.key === SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.key) {
                     responseCardHandler.setStatusByJieDaoResponse(this.gameStatus, response);
                 }
                 break
@@ -197,18 +197,17 @@ class GameEngine {
         emitNotifyPlayPublicCard(
             this.gameStatus,
             response,
-            responseType == RESPONSE_TYPE_CONFIG.SKILL ? skillName : undefined
+            responseType == RESPONSE_TYPE_CONFIG.SKILL ? skillNameKey : undefined
         );
     }
 
     handleThrowCards(data) {
         throwHandler.handleThrowCards(this.gameStatus, data)
+        emitRefreshStatus(this.gameStatus);
+        emitNotifyThrowPlayPublicCard(this.gameStatus, data);
 
         tryGoToNextPlayOrResponseOrThrowTurn(this.gameStatus);
-
         emitRefreshStatus(this.gameStatus);
-
-        emitNotifyThrowPlayPublicCard(this.gameStatus, data);
     }
 
     handleCardBoardAction(data) {

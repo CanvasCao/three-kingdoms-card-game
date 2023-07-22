@@ -23,7 +23,7 @@ const {v4: uuidv4} = require('uuid');
 //                 "eventTimingName": "AFTER_SPECIFYING_TARGET",
 //                 "eventTimingSkills": [
 //                     {
-//                         "skillName": "铁骑",
+//                         "skillNameKey": "铁骑",
 //                         "playerId": "a2511baa-80f8-4e6b-be63-317e902bfa9d",
 //                         "chooseToReleaseSkill": false
 //                          releaseTargetIds: [],
@@ -39,7 +39,7 @@ const {v4: uuidv4} = require('uuid');
 
 const configSkillToSkillResponseSkill = (configSkill, playerId) => {
     return {
-        skillName: configSkill.name,
+        skillNameKey: configSkill.nameKey,
         playerId,
         chooseToReleaseSkill: undefined,
         done: false,
@@ -130,19 +130,19 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
     // 杀 相关技能
     else if (eventTimingName == USE_EVENT_TIMING.WHEN_BECOMING_TARGET) {
         const eventSkillsForPlayer = TIMING_SKILLS[targetHeroId]
-            .filter((skill) => skill.triggerTiming == eventTimingName && skill.triggerCardName == CARD_CONFIG.SHA.CN)
+            .filter((skill) => skill.triggerTiming == eventTimingName && skill.triggerCardName == CARD_CONFIG.SHA.key)
             .map((skill) => configSkillToSkillResponseSkill(skill, targetPlayerId))
         eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
     } else if (eventTimingName == USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET) {
         const eventSkillsForPlayer = TIMING_SKILLS[originHeroId]
-            .filter((skill) => skill.triggerTiming == eventTimingName && skill.triggerCardName == CARD_CONFIG.SHA.CN)
+            .filter((skill) => skill.triggerTiming == eventTimingName && skill.triggerCardName == CARD_CONFIG.SHA.key)
             .map((skill) => configSkillToSkillResponseSkill(skill, originPlayerId))
         eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
 
         // 雌雄双股剑
         // if (originPlayer.gender !== targetPlayer.gender) {
         //     eventTimingSkills = eventTimingSkills.concat({
-        //         skillName: '雌雄双股剑',
+        //         skillNameKey: '雌雄双股剑',
         //         playerId: originPlayer.playerId,
         //         chooseToReleaseSkill: undefined,
         //     })

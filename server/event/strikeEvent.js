@@ -98,8 +98,8 @@ const setStatusWhenUseStrikeEventDone = (gameStatus) => {
     useStrikeEvent.done = true;
     // 杀会取消的情况 仁王盾
     if (getActualCardColor(action.actualCard) == CARD_COLOR.BLACK &&
-        targetPlayer.shieldCard?.CN == EQUIPMENT_CARDS_CONFIG.REN_WANG_DUN.CN &&
-        originPlayer.weaponCard?.CN != EQUIPMENT_CARDS_CONFIG.QIN_GANG_JIAN.CN) {
+        targetPlayer.shieldCard?.key == EQUIPMENT_CARDS_CONFIG.REN_WANG_DUN.key &&
+        originPlayer.weaponCard?.key != EQUIPMENT_CARDS_CONFIG.QIN_GANG_JIAN.key) {
     } else if (useStrikeEvent.cantShan) {
         generateDamageEventThenSetNextDamageEventSkillToSkillResponse(gameStatus, {
             damageCards: useStrikeEvent.cards,

@@ -3,11 +3,8 @@ class Card {
         this.huase = card.huase;
         this.number = card.number;
         this.key = card.key;
-        this.KEY = card.KEY;
         this.cardId = card.cardId;
         this.cardNumDesc = card.cardNumDesc;
-        this.CN = card.CN;
-        this.EN = card.EN;
         this.type = card.type;
         this.attribute = card.attribute;
 

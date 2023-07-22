@@ -20,17 +20,17 @@ const {getCards} = require("../utils/cardUtils");
 const {findAllEventSkillsByTimingName} = require("./utils");
 const {last} = require("lodash");
 
-const generatePandingEventThenSetNextPandingEventSkillToSkillResponse = (gameStatus, originId, pandingContent) => {
+const generatePandingEventThenSetNextPandingEventSkillToSkillResponse = (gameStatus, originId, pandingNameKey) => {
     const pandingResultCard = getCards(gameStatus, 1)
     gameStatus.pandingEvent = {
         originId,
         eventTimingsWithSkills: [],
         done: false,
-        pandingContent,
+        pandingNameKey,
         pandingResultCard,
     }
 
-    emitNotifyPandingPlayPublicCard(gameStatus, pandingResultCard, gameStatus.players[originId], pandingContent);
+    emitNotifyPandingPlayPublicCard(gameStatus, pandingResultCard, gameStatus.players[originId], pandingNameKey);
     setNextPandingEventSkillToSkillResponse(gameStatus);
 }
 
@@ -83,18 +83,18 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
     const pandingResultCard = pandingEvent.pandingResultCard;
     const currentPlayer = getCurrentPlayer(gameStatus);
 
-    if (pandingEvent.pandingContent == SKILL_NAMES.SHU006.TIE_JI.CN) {
+    if (pandingEvent.pandingNameKey == SKILL_NAMES.SHU006.TIE_JI.key) {
         const useStrikeEvent = findOnGoingUseStrikeEvent(gameStatus);
         if (getActualCardColor(pandingResultCard) == CARD_COLOR.RED) {
             useStrikeEvent.cantShan = true;
         }
-    } else if (pandingEvent.pandingContent == CARD_CONFIG.LE_BU_SI_SHU.CN ||
-        pandingEvent.pandingContent == CARD_CONFIG.SHAN_DIAN.CN) {
+    } else if (pandingEvent.pandingNameKey == CARD_CONFIG.LE_BU_SI_SHU.key ||
+        pandingEvent.pandingNameKey == CARD_CONFIG.SHAN_DIAN.key) {
         const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus);
         const pandingActualCard = nextNeedPandingSign.actualCard;
         const pandingCard = nextNeedPandingSign.card;
 
-        if (pandingEvent.pandingContent == CARD_CONFIG.LE_BU_SI_SHU.CN) {
+        if (pandingEvent.pandingNameKey == CARD_CONFIG.LE_BU_SI_SHU.key) {
             currentPlayer.removePandingSign(nextNeedPandingSign);
             throwCards(gameStatus, pandingActualCard);
             if (pandingResultCard.huase !== CARD_HUASE.HONGTAO) {
@@ -143,8 +143,8 @@ const executeNextOnePandingCard = (gameStatus) => {
 
     const pandingCard = nextNeedPandingSign.card;
     const pandingActualCard = nextNeedPandingSign.actualCard;
-    const isPandingLebusishu = pandingActualCard.CN == DELAY_SCROLL_CARDS_CONFIG.LE_BU_SI_SHU.CN;
-    const isPandingShandian = pandingActualCard.CN == DELAY_SCROLL_CARDS_CONFIG.SHAN_DIAN.CN;
+    const isPandingLebusishu = pandingActualCard.key == DELAY_SCROLL_CARDS_CONFIG.LE_BU_SI_SHU.key;
+    const isPandingShandian = pandingActualCard.key == DELAY_SCROLL_CARDS_CONFIG.SHAN_DIAN.key;
 
     // 判定未生效 需要跳过
     if (nextNeedPandingSign.isEffect === false) {
@@ -157,7 +157,7 @@ const executeNextOnePandingCard = (gameStatus) => {
     }
     // 判定生效 开始判定
     else if (nextNeedPandingSign.isEffect === true) {
-        generatePandingEventThenSetNextPandingEventSkillToSkillResponse(gameStatus, currentPlayer.playerId, pandingCard.CN)
+        generatePandingEventThenSetNextPandingEventSkillToSkillResponse(gameStatus, currentPlayer.playerId, pandingCard.key)
     }
 }
 

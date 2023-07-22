@@ -5,7 +5,7 @@ const {ADD_TO_PUBLIC_CARD_TYPE} = require("../config/emitConfig");
 const {omit} = require("lodash")
 
 // TO PUBLIC EMIT
-const emitNotifyPlayPublicCard = (gameStatus, behaviour, skillName) => {
+const emitNotifyPlayPublicCard = (gameStatus, behaviour, skillNameKey) => {
     // behaviour is action/response
     if (!behaviour) {
         throw new Error("need behaviour")
@@ -21,19 +21,19 @@ const emitNotifyPlayPublicCard = (gameStatus, behaviour, skillName) => {
             targetId: behaviour.targetId,
             cards: behaviour.cards,
             type: ADD_TO_PUBLIC_CARD_TYPE.PLAY,
-            skillName
+            skillNameKey
         });
     }
 }
 
-const emitNotifyPandingPlayPublicCard = (gameStatus, pandingResultCard, player, pandingName) => {
+const emitNotifyPandingPlayPublicCard = (gameStatus, pandingResultCard, player, pandingNameKey) => {
     const io = gameStatus.io;
     const roomId = gameStatus.roomId;
     io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PUBLIC_CARD, {
         cards: [pandingResultCard],
         fromId: CARD_LOCATION.PAIDUI,
         pandingPlayerId: player.playerId,
-        pandingName,
+        pandingNameKey,
         type: ADD_TO_PUBLIC_CARD_TYPE.PANDING
     });
 }

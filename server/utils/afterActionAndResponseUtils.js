@@ -65,7 +65,7 @@ const trySettleNextScroll = (gameStatus) => {
         if (hasWuxiePlayers.length > 0) {
             generateWuxieSimultaneousResponseByScroll(gameStatus)
         } else { // 没人有无懈可击直接生效
-            setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, gameStatus.scrollResponses[0].actualCard.CN);
+            setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, gameStatus.scrollResponses[0].actualCard.key);
         }
     }
 };

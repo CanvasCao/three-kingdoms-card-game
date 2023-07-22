@@ -54,12 +54,12 @@ const responseCardHandler = {
             if (shanResponse.cardNumber == 0) {
                 clearShanResponse(gameStatus);
 
-                // if (targetPlayer?.weaponCard?.CN == EQUIPMENT_CARDS_CONFIG.QING_LONG_YAN_YUE_DAO.CN) {
+                // if (targetPlayer?.weaponCard?.key == EQUIPMENT_CARDS_CONFIG.QING_LONG_YAN_YUE_DAO.key) {
                 //     gameStatus.weaponResponses = [
                 //         {
                 //             originId: shanResponse.targetId,
                 //             targetId: shanResponse.originId,
-                //             weaponCardName: CARD_CONFIG.QING_LONG_YAN_YUE_DAO.CN,
+                //             weaponCardKey: CARD_CONFIG.QING_LONG_YAN_YUE_DAO.key,
                 //         }
                 //     ];
                 // }
@@ -80,20 +80,20 @@ const responseCardHandler = {
 
     setStatusBySkillResponse: (gameStatus, response) => {
         const skillResponse = gameStatus.skillResponse;
-        const skillName = gameStatus.skillResponse.skillName;
+        const skillNameKey = gameStatus.skillResponse.skillNameKey;
         const originPlayer = gameStatus.players[response.originId];
 
         const chooseToReleaseSkill = response.chooseToResponse;
         gameStatus.skillResponse.chooseToReleaseSkill = chooseToReleaseSkill;
 
-        if (skillName == SKILL_NAMES.SHU006.TIE_JI.CN) {
+        if (skillNameKey == SKILL_NAMES.SHU006.TIE_JI.key) {
             const onGoingUseStrikeEventSkill = findOnGoingUseStrikeEventSkill(gameStatus);
             onGoingUseStrikeEventSkill.done = true;
             delete gameStatus.skillResponse
             if (chooseToReleaseSkill) {
-                pandingEvent.generatePandingEventThenSetNextPandingEventSkillToSkillResponse(gameStatus, skillResponse.playerId, skillName);
+                pandingEvent.generatePandingEventThenSetNextPandingEventSkillToSkillResponse(gameStatus, skillResponse.playerId, skillNameKey);
             }
-        } else if (skillName == SKILL_NAMES.WEI002.FAN_KUI.CN) {
+        } else if (skillNameKey == SKILL_NAMES.WEI002.FAN_KUI.key) {
             const onGoingDamageEventSkill = findOnGoingDamageEventSkill(gameStatus);
 
             if (!chooseToReleaseSkill) {
@@ -109,7 +109,7 @@ const responseCardHandler = {
                 // onGoingDamageEventSkill.done = true;
                 // 不能删除 gameStatus.skillResponse
             }
-        } else if (skillName == SKILL_NAMES.WEI002.GUI_CAI.CN) {
+        } else if (skillNameKey == SKILL_NAMES.WEI002.GUI_CAI.key) {
             const onGoingPandingEventSkill = findOnGoingPandingEventSkill(gameStatus);
             const onGoingPandingEvent = findOnGoingPandingEvent(gameStatus)
 
@@ -127,7 +127,7 @@ const responseCardHandler = {
                 delete gameStatus.skillResponse
                 originPlayer.removeCards(response.cards);
             }
-        } else if (skillName == SKILL_NAMES.WU006.LIU_LI.CN) {
+        } else if (skillNameKey == SKILL_NAMES.WU006.LIU_LI.key) {
             const onGoingUseStrikeEvent = findOnGoingUseStrikeEvent(gameStatus);
             const onGoingUseStrikeEventSkill = findOnGoingUseStrikeEventSkill(gameStatus);
 

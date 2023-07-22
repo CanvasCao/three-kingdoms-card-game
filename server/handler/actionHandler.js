@@ -88,8 +88,8 @@ const actionHandler = {
 
         // targetIds 只有顺和拆 桃园 originId targetIds的值和action一样
         if (action.targetIds) {
-            if (action.actualCard.CN == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.CN ||
-                action.actualCard.CN == SCROLL_CARDS_CONFIG.GUO_HE_CHAI_QIAO.CN) {
+            if (action.actualCard.key == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.key ||
+                action.actualCard.key == SCROLL_CARDS_CONFIG.GUO_HE_CHAI_QIAO.key) {
                 gameStatus.scrollResponses = action.targetIds.map((targetId) => {
                     return {
                         originId: action.originId,
@@ -100,7 +100,7 @@ const actionHandler = {
                         isEffect: undefined,
                     }
                 })
-            } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.CN) {
+            } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.key) {
                 gameStatus.scrollResponses = [{
                     originId: action.targetIds[0],
                     targetId: action.targetIds[1],
@@ -111,7 +111,7 @@ const actionHandler = {
                 }]
             }
         } else if (action.targetId) {
-            if (action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.CN) {
+            if (action.actualCard.key == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.key) {
                 gameStatus.scrollResponses = [{
                     originId: action.originId,
                     targetId: action.targetId,
@@ -120,7 +120,7 @@ const actionHandler = {
                     actualCard: action.actualCard,
                     isEffect: undefined,
                 }]
-            } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.JUE_DOU.CN) {
+            } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.JUE_DOU.key) {
                 // 决斗originId targetId的值相反
                 gameStatus.scrollResponses = [{
                     originId: action.targetId,
@@ -131,7 +131,7 @@ const actionHandler = {
                     isEffect: undefined,
                 }]
             }
-        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.CN) {
+        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.key) {
             const players = getAllAlivePlayersStartFromFirstLocation(gameStatus, getCurrentPlayer(gameStatus).location)
             gameStatus.scrollResponses = players.filter((p) => p.currentBlood < p.maxBlood).map((player) => {
                 return {
@@ -142,8 +142,8 @@ const actionHandler = {
                     isEffect: undefined,
                 }
             })
-        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.CN ||
-            action.actualCard.CN == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.CN) {
+        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.key ||
+            action.actualCard.key == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.key) {
             const currentPlayer = getCurrentPlayer(gameStatus);
             const firstLocation = currentPlayer.location;
             const players = getAllAlivePlayersStartFromFirstLocation(gameStatus, firstLocation)
@@ -159,7 +159,7 @@ const actionHandler = {
                 }
             })
             gameStatus.scrollResponses = scrollResponses
-        } else if (action.actualCard.CN == SCROLL_CARDS_CONFIG.WU_GU_FENG_DENG.CN) {
+        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.WU_GU_FENG_DENG.key) {
             const currentPlayer = getCurrentPlayer(gameStatus);
             const firstLocation = currentPlayer.location;
             const players = getAllAlivePlayersStartFromFirstLocation(gameStatus, firstLocation)
