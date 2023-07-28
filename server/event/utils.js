@@ -1,3 +1,4 @@
+const {EQUIPMENT_CARDS_CONFIG} = require("../config/cardConfig");
 const {DAMAGE_EVENT_TIMING} = require("../config/eventConfig");
 const {CARD_CONFIG} = require("../config/cardConfig");
 const {USE_EVENT_TIMING} = require("../config/eventConfig");
@@ -115,7 +116,7 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
     if (eventTimingName == PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT) {
         const allPlayers = getAllAlivePlayersStartFromFirstLocation(gameStatus, gameStatus.players[originId].location)
         allPlayers.forEach((player) => {
-            const eventSkillsForPlayer = TIMING_SKILLS[player.heroId]
+            const eventSkillsForPlayer = (TIMING_SKILLS[player.heroId] || [])
                 .filter((skill) => skill.triggerTiming == eventTimingName)
                 .map((skill) => configSkillToSkillResponseSkill(skill, player.playerId))
             eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
@@ -129,29 +130,28 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
 
     // 杀 相关技能
     else if (eventTimingName == USE_EVENT_TIMING.WHEN_BECOMING_TARGET) {
-        const eventSkillsForPlayer = TIMING_SKILLS[targetHeroId]
+        const eventSkillsForPlayer = (TIMING_SKILLS[targetHeroId] || [])
             .filter((skill) => skill.triggerTiming == eventTimingName && skill.triggerCardName == CARD_CONFIG.SHA.key)
             .map((skill) => configSkillToSkillResponseSkill(skill, targetPlayerId))
         eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
     } else if (eventTimingName == USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET) {
-        const eventSkillsForPlayer = TIMING_SKILLS[originHeroId]
+        const eventSkillsForPlayer = (TIMING_SKILLS[originHeroId] || [])
             .filter((skill) => skill.triggerTiming == eventTimingName && skill.triggerCardName == CARD_CONFIG.SHA.key)
             .map((skill) => configSkillToSkillResponseSkill(skill, originPlayerId))
         eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
 
         // 雌雄双股剑
         // if (originPlayer.gender !== targetPlayer.gender) {
-        //     eventTimingSkills = eventTimingSkills.concat({
-        //         skillNameKey: '雌雄双股剑',
-        //         playerId: originPlayer.playerId,
-        //         chooseToReleaseSkill: undefined,
-        //     })
+        //     const skill = configSkillToSkillResponseSkill(
+        //         {nameKey: EQUIPMENT_CARDS_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key},
+        //         originPlayer.playerId)
+        //     eventTimingSkills = eventTimingSkills.concat(skill)
         // }
     }
 
     // 伤害
     else if (eventTimingName == DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE) {
-        const eventSkillsForPlayer = TIMING_SKILLS[targetHeroId]
+        const eventSkillsForPlayer = (TIMING_SKILLS[targetHeroId] || [])
             .filter((skill) => skill.triggerTiming == eventTimingName)
             .filter((skill) => {
                 // 如果技能需要来源

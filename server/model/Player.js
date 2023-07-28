@@ -11,7 +11,7 @@ class Player {
         this.playerName = player.playerName;
 
         // TODO
-        this.canSelectHeroIds = ["WEI002", "SHU006", "WU006"]
+        this.canSelectHeroIds = ["WEI002", "SHU006", "WU006", "SHU003"]
 
         // cards
         this.cards = [];
@@ -37,12 +37,11 @@ class Player {
         this.isDead = false;
     }
 
-    setPlayerConfig(config){
-        this.maxBlood = config.maxBlood;
+    setPlayerConfig(config) {
+        for (const key in config) {
+            this[key] = config[key]
+        }
         this.currentBlood = process.env.NODE_ENV == 'production' ? config.maxBlood : 2;
-        this.heroName = config.heroName;
-        this.kingdom = config.kingdom;
-        this.skills = config.skills;
     }
 
     // Card

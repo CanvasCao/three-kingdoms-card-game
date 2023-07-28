@@ -21,6 +21,11 @@ const SKILL_NAMES = {
         }
     },
 
+    "SHU003": {
+        PAO_XIAO: {
+            key: 'PAO_XIAO',
+        },
+    },
     "SHU006": {
         MA_SHU: {
             key: 'MA_SHU',
