@@ -122,7 +122,7 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
             eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
         })
     } else if (eventTimingName == PANDING_EVENT_TIMING.AFTER_PANDING_TAKE_EFFECT) {
-        const eventSkillsForPlayer = TIMING_SKILLS[originHeroId]
+        const eventSkillsForPlayer = (TIMING_SKILLS[originHeroId] || [])
             .filter((skill) => skill.triggerTiming == eventTimingName)
             .map((skill) => configSkillToSkillResponseSkill(skill, originPlayer.playerId))
         eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
