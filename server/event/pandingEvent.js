@@ -20,7 +20,7 @@ const {getCards} = require("../utils/cardUtils");
 const {findAllEventSkillsByTimingName} = require("./utils");
 const {last} = require("lodash");
 
-const generatePandingEventThenSetNextPandingEventSkillToSkillResponse = (gameStatus, originId, pandingNameKey) => {
+const generatePandingEventThenSetNextPandingEventSkillToSkillResponse = (gameStatus, {originId, pandingNameKey}) => {
     const pandingResultCard = getCards(gameStatus, 1)
     gameStatus.pandingEvent = {
         originId,
@@ -56,7 +56,7 @@ const setNextPandingEventSkillToSkillResponse = (gameStatus) => {
     }
 
     if (last(eventTimingsWithSkills).eventTimingName == PANDING_EVENT_TIMINGS[timingIndex]) {
-        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus,eventTimingsWithSkills)
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
@@ -157,7 +157,10 @@ const executeNextOnePandingCard = (gameStatus) => {
     }
     // 判定生效 开始判定
     else if (nextNeedPandingSign.isEffect === true) {
-        generatePandingEventThenSetNextPandingEventSkillToSkillResponse(gameStatus, currentPlayer.playerId, pandingCard.key)
+        generatePandingEventThenSetNextPandingEventSkillToSkillResponse(gameStatus, {
+            originId: currentPlayer.playerId,
+            pandingNameKey: pandingCard.key
+        })
     }
 }
 

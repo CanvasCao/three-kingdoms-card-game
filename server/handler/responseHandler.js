@@ -1,12 +1,9 @@
 const strikeEvent = require("../event/strikeEvent");
-const pandingEvent = require("../event/pandingEvent");
-const {findOnGoingDamageEventSkill} = require("../event/utils");
+const {handleShu006TieJiResponse} = require("./skills/SHU006");
+const {handleWu006LiuLiResponse} = require("./skills/WU006");
+const {handleWei002GuiCaiResponse,handleWei002FanKuiResponse} = require("./skills/WEI002");
 const {generateDamageEventThenSetNextDamageEventSkillToSkillResponse} = require("../event/damageEvent");
-const {findOnGoingUseStrikeEvent} = require("../event/utils");
 const {SKILL_NAMES} = require("../config/skillsConfig");
-const {findOnGoingPandingEvent} = require("../event/utils");
-const {findOnGoingPandingEventSkill} = require("../event/utils");
-const {findOnGoingUseStrikeEventSkill} = require("../event/utils");
 const {setStatusWhenPlayerDie} = require("../utils/dieUtils");
 const {cloneDeep} = require("lodash");
 const {
@@ -79,76 +76,21 @@ const responseCardHandler = {
     },
 
     setStatusBySkillResponse: (gameStatus, response) => {
-        const skillResponse = gameStatus.skillResponse;
         const skillNameKey = gameStatus.skillResponse.skillNameKey;
-        const originPlayer = gameStatus.players[response.originId];
-
         const chooseToReleaseSkill = response.chooseToResponse;
         gameStatus.skillResponse.chooseToReleaseSkill = chooseToReleaseSkill;
+        if (!chooseToReleaseSkill) {
+            delete gameStatus.skillResponse
+        }
 
         if (skillNameKey == SKILL_NAMES.SHU006.TIE_JI.key) {
-            const onGoingUseStrikeEventSkill = findOnGoingUseStrikeEventSkill(gameStatus);
-            onGoingUseStrikeEventSkill.done = true;
-            delete gameStatus.skillResponse
-            if (chooseToReleaseSkill) {
-                pandingEvent.generatePandingEventThenSetNextPandingEventSkillToSkillResponse(gameStatus, skillResponse.playerId, skillNameKey);
-            }
+            handleShu006TieJiResponse(gameStatus, response)
         } else if (skillNameKey == SKILL_NAMES.WEI002.FAN_KUI.key) {
-            const onGoingDamageEventSkill = findOnGoingDamageEventSkill(gameStatus);
-
-            if (!chooseToReleaseSkill) {
-                onGoingDamageEventSkill.done = true;
-                delete gameStatus.skillResponse
-                return
-            }
-
-            if (onGoingDamageEventSkill.chooseToReleaseSkill === undefined) {
-                onGoingDamageEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
-            } else {
-                // 在CardBoard
-                // onGoingDamageEventSkill.done = true;
-                // 不能删除 gameStatus.skillResponse
-            }
+            handleWei002FanKuiResponse(gameStatus, response)
         } else if (skillNameKey == SKILL_NAMES.WEI002.GUI_CAI.key) {
-            const onGoingPandingEventSkill = findOnGoingPandingEventSkill(gameStatus);
-            const onGoingPandingEvent = findOnGoingPandingEvent(gameStatus)
-
-            if (!chooseToReleaseSkill) {
-                onGoingPandingEventSkill.done = true;
-                delete gameStatus.skillResponse
-                return
-            }
-            if (onGoingPandingEventSkill.chooseToReleaseSkill === undefined) {
-                onGoingPandingEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
-            } else {
-                onGoingPandingEvent.pandingResultCard = response.cards[0]
-                onGoingPandingEventSkill.releaseCards = response.cards // 最后结算弃牌的时候需要 每次弃每次改判的牌
-                onGoingPandingEventSkill.done = true;
-                delete gameStatus.skillResponse
-                originPlayer.removeCards(response.cards);
-            }
+            handleWei002GuiCaiResponse(gameStatus, response)
         } else if (skillNameKey == SKILL_NAMES.WU006.LIU_LI.key) {
-            const onGoingUseStrikeEvent = findOnGoingUseStrikeEvent(gameStatus);
-            const onGoingUseStrikeEventSkill = findOnGoingUseStrikeEventSkill(gameStatus);
-
-            if (!chooseToReleaseSkill) {
-                onGoingUseStrikeEventSkill.done = true;
-                delete gameStatus.skillResponse
-                return
-            }
-
-            if (onGoingUseStrikeEventSkill.chooseToReleaseSkill === undefined) {
-                onGoingUseStrikeEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
-            } else {
-                onGoingUseStrikeEventSkill.releaseTargetIds = response.skillTargetIds
-                onGoingUseStrikeEventSkill.releaseCards = response.cards // 最后结算弃牌的时候需要
-                onGoingUseStrikeEventSkill.done = true;
-
-                onGoingUseStrikeEvent.targetId = response.skillTargetIds[0];
-
-                delete gameStatus.skillResponse
-                originPlayer.removeCards(response.cards);
-            }
+            handleWu006LiuLiResponse(gameStatus, response)
         }
     },
 
