@@ -1,3 +1,4 @@
+const {emitNotifyAddLines} = require("../../utils/emitUtils");
 const {throwCards} = require("../../utils/cardUtils");
 const {findOnGoingUseStrikeEventSkill} = require("../../event/utils");
 const {findOnGoingUseStrikeEvent} = require("../../event/utils");
@@ -19,6 +20,11 @@ const handleWu006LiuLiResponse = (gameStatus, response) => {
     } else {
         originPlayer.removeCards(response.cards);
         throwCards(gameStatus, response.cards);
+
+        emitNotifyAddLines(gameStatus, {
+            fromId: onGoingUseStrikeEvent.targetId,
+            toIds: response.skillTargetIds
+        });
 
         onGoingUseStrikeEvent.targetId = response.skillTargetIds[0];
 

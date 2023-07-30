@@ -117,14 +117,13 @@ const emitNotifyPickWuGuCard = (gameStatus, data) => {
 }
 
 // LINES
-const emitNotifyAddLines = (gameStatus, behavior) => {
+const emitNotifyAddLines = (gameStatus, {fromId, toIds, actualCard}) => {
     const io = gameStatus.io;
     const roomId = gameStatus.roomId;
     io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_LINES, {
-        fromId: behavior.originId,
-        toIds: behavior.targetId ? [behavior.targetId] : behavior.targetIds,
-        cards: behavior.cards,
-        actualCard: behavior.actualCard,
+        fromId,
+        toIds,
+        actualCard,
     });
 }
 

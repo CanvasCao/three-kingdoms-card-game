@@ -1,3 +1,5 @@
+const {findOnGoingDamageEvent} = require("../../event/utils");
+const {emitNotifyAddLines} = require("../../utils/emitUtils");
 const {throwCards} = require("../../utils/cardUtils");
 const {findOnGoingPandingEvent} = require("../../event/utils");
 const {findOnGoingPandingEventSkill} = require("../../event/utils");
@@ -5,6 +7,7 @@ const {findOnGoingDamageEventSkill} = require("../../event/utils");
 
 const handleWei002FanKuiResponse = (gameStatus, response) => {
     const chooseToReleaseSkill = response.chooseToResponse;
+    const onGoingDamageEvent = findOnGoingDamageEvent(gameStatus);
     const onGoingDamageEventSkill = findOnGoingDamageEventSkill(gameStatus);
 
     if (!chooseToReleaseSkill) {
@@ -14,6 +17,10 @@ const handleWei002FanKuiResponse = (gameStatus, response) => {
 
     if (onGoingDamageEventSkill.chooseToReleaseSkill === undefined) {
         onGoingDamageEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
+        emitNotifyAddLines(gameStatus, {
+            fromId: onGoingDamageEvent.targetId,
+            toIds: [onGoingDamageEvent.originId],
+        });
     } else {
         // 在CardBoard
         // onGoingDamageEventSkill.done = true;

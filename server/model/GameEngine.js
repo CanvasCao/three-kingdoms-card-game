@@ -140,7 +140,11 @@ class GameEngine {
         emitRefreshStatus(this.gameStatus);
 
         emitNotifyPlayPublicCard(this.gameStatus, action);
-        emitNotifyAddLines(this.gameStatus, action);
+        emitNotifyAddLines(this.gameStatus, {
+            fromId: action.originId,
+            toIds: action.targetId ? [action.targetId] : action.targetIds,
+            actualCard: action.actualCard
+        });
     }
 
     handleResponse(response) {
