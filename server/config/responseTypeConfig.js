@@ -3,7 +3,6 @@ const RESPONSE_TYPE_CONFIG = {
     SHAN: "SHAN",
     SKILL: "SKILL",
     WUXIE: "WUXIE",
-    WEAPON: "WEAPON",
     SCROLL: "SCROLL"
 }
 
