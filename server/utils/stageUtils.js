@@ -1,13 +1,11 @@
 const {executeNextOnePandingCard} = require("../event/pandingEvent");
 const {STAGE_NAMES, STAGE_NAME} = require("../config/gameConfig");
 const {isNil} = require("lodash");
-const {emitNotifyDrawCards} = require("./emitUtils");
 const {getCurrentPlayer, getAllHasWuxiePlayers} = require("./playerUtils");
 const {setCurrentLocationToNextLocation} = require("./locationUtils");
 const {generateWuxieSimultaneousResponseByPandingCard} = require("./wuxieUtils");
 const {clearAllResponses} = require("./responseUtils");
 const {getNextNeedExecutePandingSign} = require("./pandingUtils");
-const {getCards} = require("./cardUtils");
 
 const setGameStatusStage = (gameStatus) => {
     gameStatus.stage = {
@@ -89,7 +87,6 @@ const ifAnyPlayerNeedToResponse = (gameStatus) => {
         gameStatus.skillResponse ||
         gameStatus.taoResponses.length > 0 ||
         gameStatus.scrollResponses.length > 0 ||
-        gameStatus.weaponResponses.length > 0 ||
         gameStatus.wuxieSimultaneousResponse.hasWuxiePlayerIds.length > 0
     ) {
         return true

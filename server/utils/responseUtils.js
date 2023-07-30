@@ -16,10 +16,6 @@ const clearNextScrollResponse = (gameStatus) => {
     gameStatus.scrollResponses.shift();
 }
 
-const clearNextWeaponResponse = (gameStatus) => {
-    gameStatus.weaponResponses.shift();
-}
-
 const clearWuxieSimultaneousResponse = (gameStatus) => {
     gameStatus.wuxieSimultaneousResponse = {
         hasWuxiePlayerIds: [],
@@ -33,7 +29,6 @@ const clearAllResponses = (gameStatus) => {
     gameStatus.skillResponse = undefined;
     gameStatus.taoResponses = [];
     gameStatus.scrollResponses = [];
-    gameStatus.weaponResponses = [];
 }
 
 const getResponseType = (gameStatus) => {
@@ -45,8 +40,6 @@ const getResponseType = (gameStatus) => {
         return RESPONSE_TYPE_CONFIG.SKILL;
     } else if (gameStatus.wuxieSimultaneousResponse?.hasWuxiePlayerIds?.length > 0) {
         return RESPONSE_TYPE_CONFIG.WUXIE;
-    } else if (gameStatus.weaponResponses.length > 0) {
-        return RESPONSE_TYPE_CONFIG.WEAPON;
     } else if (gameStatus.scrollResponses.length > 0) {
         return RESPONSE_TYPE_CONFIG.SCROLL;
     }
@@ -56,7 +49,6 @@ exports.clearNextTaoResponse = clearNextTaoResponse;
 exports.clearShanResponse = clearShanResponse;
 exports.clearSkillResponse = clearSkillResponse;
 exports.clearNextScrollResponse = clearNextScrollResponse;
-exports.clearNextWeaponResponse = clearNextWeaponResponse;
 exports.clearWuxieSimultaneousResponse = clearWuxieSimultaneousResponse;
 exports.clearAllResponses = clearAllResponses;
 exports.getResponseType = getResponseType;

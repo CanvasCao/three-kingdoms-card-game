@@ -52,16 +52,6 @@ const responseCardHandler = {
             shanResponse.cardNumber--; // 吕布需要两个杀
             if (shanResponse.cardNumber == 0) {
                 clearShanResponse(gameStatus);
-
-                // if (targetPlayer?.weaponCard?.key == EQUIPMENT_CARDS_CONFIG.QING_LONG_YAN_YUE_DAO.key) {
-                //     gameStatus.weaponResponses = [
-                //         {
-                //             originId: shanResponse.targetId,
-                //             targetId: shanResponse.originId,
-                //             weaponCardKey: CARD_CONFIG.QING_LONG_YAN_YUE_DAO.key,
-                //         }
-                //     ];
-                // }
             } else {
                 // do nothing
             }

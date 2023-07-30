@@ -9,7 +9,6 @@ const tryFindNextSkillResponse = (gameStatus) => {
     if (gameStatus.shanResponse ||
         gameStatus.skillResponse ||
         gameStatus.taoResponses.length > 0 ||
-        gameStatus.weaponResponses.length > 0 ||
         gameStatus.wuxieSimultaneousResponse.hasWuxiePlayerIds.length > 0
         // gameStatus.scrollResponses.length > 0 || // 结算万箭齐发和南蛮入侵过程中 会放技能
     ) {
@@ -53,7 +52,6 @@ const trySettleNextScroll = (gameStatus) => {
     if (gameStatus.shanResponse ||
         gameStatus.skillResponse ||
         gameStatus.taoResponses.length > 0 ||
-        gameStatus.weaponResponses.length > 0 ||
         gameStatus.wuxieSimultaneousResponse.hasWuxiePlayerIds.length > 0
         // gameStatus.scrollResponses.length > 0 ||
     ) {

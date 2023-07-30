@@ -58,7 +58,6 @@ class GameEngine {
             },
 
             // 其他
-            weaponResponses: [],
             wugufengdengCards: [],
             tieSuoTempStorage: [],
 
@@ -167,11 +166,6 @@ class GameEngine {
             case RESPONSE_TYPE_CONFIG.WUXIE:
                 responseCardHandler.setStatusByWuxieResponse(this.gameStatus, response);
                 break;
-            case RESPONSE_TYPE_CONFIG.WEAPON:
-                if (this.gameStatus.weaponResponses[0].weaponCardKey == EQUIPMENT_CARDS_CONFIG.QING_LONG_YAN_YUE_DAO.key) {
-                    responseCardHandler.setStatusByQingLongYanYueDaoResponse(this.gameStatus, response);
-                }
-                break
             case RESPONSE_TYPE_CONFIG.SCROLL:
                 const curScrollResponse = this.gameStatus.scrollResponses[0];
                 if (curScrollResponse.actualCard.key === SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.key ||
