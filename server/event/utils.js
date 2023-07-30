@@ -141,12 +141,13 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
         eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
 
         // 雌雄双股剑
-        // if (originPlayer.gender !== targetPlayer.gender) {
-        //     const skill = configSkillToSkillResponseSkill(
-        //         {nameKey: EQUIPMENT_CARDS_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key},
-        //         originPlayer.playerId)
-        //     eventTimingSkills = eventTimingSkills.concat(skill)
-        // }
+        if (originPlayer.weaponCard.key === CARD_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key &&
+            originPlayer.gender !== targetPlayer.gender) {
+            const skill = configSkillToSkillResponseSkill(
+                {nameKey: EQUIPMENT_CARDS_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key},
+                originPlayer.playerId)
+            eventTimingSkills = eventTimingSkills.concat(skill)
+        }
     }
 
     // 伤害

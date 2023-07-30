@@ -1,3 +1,5 @@
+const {emitNotifyDrawCards} = require("../utils/emitUtils");
+const {getCards} = require("../utils/cardUtils");
 const {EQUIPMENT_CARDS_CONFIG, EQUIPMENT_TYPE, CARD_HUASE} = require("../config/cardConfig");
 const {Card} = require("./Card");
 const {differenceBy} = require("lodash/array");
@@ -45,6 +47,12 @@ class Player {
     }
 
     // Card
+    drawCards(gameStatus, number = 2) {
+        const cards = getCards(gameStatus, number)
+        this.addCards(cards);
+        emitNotifyDrawCards(gameStatus, cards, this)
+    }
+
     addCards(cards) {
         if (!cards) {
             return

@@ -1,7 +1,9 @@
 const strikeEvent = require("../event/strikeEvent");
+const {handleCiXiongShuangGuJianResponse} = require("./skills/weapon");
+const {CARD_CONFIG} = require("../config/cardConfig");
 const {handleShu006TieJiResponse} = require("./skills/SHU006");
 const {handleWu006LiuLiResponse} = require("./skills/WU006");
-const {handleWei002GuiCaiResponse,handleWei002FanKuiResponse} = require("./skills/WEI002");
+const {handleWei002GuiCaiResponse, handleWei002FanKuiResponse} = require("./skills/WEI002");
 const {generateDamageEventThenSetNextDamageEventSkillToSkillResponse} = require("../event/damageEvent");
 const {SKILL_NAMES} = require("../config/skillsConfig");
 const {setStatusWhenPlayerDie} = require("../utils/dieUtils");
@@ -91,6 +93,8 @@ const responseCardHandler = {
             handleWei002GuiCaiResponse(gameStatus, response)
         } else if (skillNameKey == SKILL_NAMES.WU006.LIU_LI.key) {
             handleWu006LiuLiResponse(gameStatus, response)
+        } else if (skillNameKey == CARD_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key) {
+            handleCiXiongShuangGuJianResponse(gameStatus, response)
         }
     },
 

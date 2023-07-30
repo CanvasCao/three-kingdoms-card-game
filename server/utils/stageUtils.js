@@ -69,9 +69,7 @@ const tryGoToNextPlayOrResponseOrThrowTurn = (gameStatus) => {
             tryGoToNextPlayOrResponseOrThrowTurn(gameStatus); // 如果还有别的判定牌会再一次回到这里
         }
     } else if (currentStageName == STAGE_NAME.DRAW) {
-        const cards = getCards(gameStatus, 2)
-        currentPlayer.addCards(cards)
-        emitNotifyDrawCards(gameStatus, cards, currentPlayer)
+        currentPlayer.drawCards(gameStatus)
         goToNextStage(gameStatus);
     } else if (currentStageName == STAGE_NAME.PLAY) {
         if (currentPlayer.skipPlay) {

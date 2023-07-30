@@ -64,10 +64,8 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
         const curScrollResponse = gameStatus.scrollResponses[0]
         if (isScrollEffected) {// 生效
             if (curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.key) {
-                const cards = getCards(gameStatus, 2)
                 const player = getCurrentPlayer(gameStatus)
-                player.addCards(cards);
-                emitNotifyDrawCards(gameStatus, cards, player)
+                player.drawCards(gameStatus);
                 clearNextScrollResponse(gameStatus);
             } else if (curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.key) {
                 gameStatus.players[curScrollResponse.originId].addBlood();

@@ -123,11 +123,7 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
 
 const handlePandingEventEnd = (gameStatus) => {
     const pandingEvent = gameStatus.pandingEvent;
-
-    const allChangePandingCards = pandingEvent.eventTimingsWithSkills[0].eventTimingSkills
-        .map(s => s.releaseCards?.[0])
-        .filter(Boolean)
-    throwCards(gameStatus, [...allChangePandingCards, pandingEvent.pandingResultCard]);
+    throwCards(gameStatus, pandingEvent.pandingResultCard);
     delete gameStatus.pandingEvent;
 }
 
