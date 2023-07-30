@@ -51,6 +51,20 @@ const USE_EVENT_TIMINGS = [
     // USE_EVENT_TIMING.AFTER_TAKE_EFFECT, // 生成伤害和铁索连环事件 此事件进入弃牌堆
 ]
 
+// https://gltjk.com/sanguosha/rules/flow/play.html
+const PLAY_EVENT_TIMING = {
+    // a.武将技能：【护驾】、【激将】 b.【八卦阵】。
+    "WHEN_NEED_PLAY": "WHEN_NEED_PLAY",
+
+    // a.武将技能：【涯角】、【龙胆②（阵）】、【雷击】。
+    "WHEN_PLAYING": "WHEN_PLAYING",
+}
+
+const PLAY_EVENT_TIMINGS = [
+    PLAY_EVENT_TIMING.WHEN_NEED_PLAY, // a.武将技能：【护驾】、【激将】 b.【八卦阵】。
+    PLAY_EVENT_TIMING.WHEN_PLAYING,  // a.武将技能：【涯角】、【龙胆②（阵）】、【雷击】。
+]
+
 // https://gltjk.com/sanguosha/rules/flow/judge.html
 const PANDING_EVENT_TIMING = {
     //【咒缚】
@@ -101,6 +115,8 @@ const DAMAGE_EVENT_TIMINGS = [
 
 exports.USE_EVENT_TIMING = USE_EVENT_TIMING;
 exports.USE_EVENT_TIMINGS = USE_EVENT_TIMINGS;
+exports.PLAY_EVENT_TIMING = PLAY_EVENT_TIMING;
+exports.PLAY_EVENT_TIMINGS = PLAY_EVENT_TIMINGS;
 exports.PANDING_EVENT_TIMING = PANDING_EVENT_TIMING;
 exports.PANDING_EVENT_TIMINGS = PANDING_EVENT_TIMINGS;
 exports.DAMAGE_EVENT_TIMING = DAMAGE_EVENT_TIMING;

@@ -78,6 +78,21 @@ const findOnGoingUseStrikeEventSkill = (gameStatus) => {
     return onGoingUseStrikeEventSkill
 }
 
+// playEvent
+const findOnGoingPlayEvent = (gameStatus) => {
+    const playEvent = gameStatus?.playEvents.find((event) => !event.done)
+    return playEvent
+}
+
+const findOnGoingPlayEventSkill = (gameStatus) => {
+    const playEvent = findOnGoingUseStrikeEvent(gameStatus)
+    const eventTimingsWithSkills = playEvent?.eventTimingsWithSkills;
+    const eventTiming = eventTimingsWithSkills.find((et) => et.eventTimingSkills.some((s) => s.done === false))
+
+    const onGoingPlayEventSkill = eventTiming?.eventTimingSkills.find((s) => s.done === false)
+    return onGoingPlayEventSkill
+}
+
 // PandingEvent
 const findOnGoingPandingEvent = (gameStatus) => {
     return gameStatus?.pandingEvent
@@ -141,12 +156,14 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
         eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
 
         // 雌雄双股剑
-        if (originPlayer.weaponCard.key === CARD_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key &&
-            originPlayer.gender !== targetPlayer.gender) {
-            const skill = configSkillToSkillResponseSkill(
-                {nameKey: EQUIPMENT_CARDS_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key},
-                originPlayer.playerId)
-            eventTimingSkills = eventTimingSkills.concat(skill)
+        if (originPlayer.weaponCard) {
+            if (originPlayer.weaponCard.key === CARD_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key &&
+                originPlayer.gender !== targetPlayer.gender) {
+                const skill = configSkillToSkillResponseSkill(
+                    {nameKey: EQUIPMENT_CARDS_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key},
+                    originPlayer.playerId)
+                eventTimingSkills = eventTimingSkills.concat(skill)
+            }
         }
     }
 
@@ -176,10 +193,12 @@ exports.findAllEventSkillsByTimingName = findAllEventSkillsByTimingName;
 exports.findOnGoingUseStrikeEvent = findOnGoingUseStrikeEvent;
 exports.findOnGoingPandingEvent = findOnGoingPandingEvent;
 exports.findOnGoingDamageEvent = findOnGoingDamageEvent;
+exports.findOnGoingPlayEvent = findOnGoingPlayEvent;
 
 exports.findOnGoingUseStrikeEventSkill = findOnGoingUseStrikeEventSkill;
 exports.findOnGoingPandingEventSkill = findOnGoingPandingEventSkill;
 exports.findOnGoingDamageEventSkill = findOnGoingDamageEventSkill;
+exports.findOnGoingPlayEventSkill = findOnGoingPlayEventSkill;
 
 exports.setEventSkillResponse = setEventSkillResponse;
 exports.findNextUnDoneSkillInLastEventTimingsWithSkills = findNextUnDoneSkillInLastEventTimingsWithSkills;
