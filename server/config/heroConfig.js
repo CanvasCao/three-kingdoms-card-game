@@ -1,6 +1,6 @@
 const {SKILL_NAMES} = require("./skillsConfig");
 
-const HERO_CONFIG = {
+const HERO_STATIC_CONFIG = {
     WEI001: {
         maxBlood: 4,
         gender: 1
@@ -13,7 +13,6 @@ const HERO_CONFIG = {
     // SHU
     SHU003: {
         maxBlood: 4,
-        shaLimitTimes: 100,
         gender: 1
     },
     SHU006: {
@@ -26,6 +25,13 @@ const HERO_CONFIG = {
         maxBlood: 3,
         gender: 0
     },
+}
+
+// 武将技能切换和失效的时候 删除
+const HERO_SKILL_PROPS_CONFIG = {
+    SHU003: {
+        shaLimitTimes: 100,
+    }
 }
 
 const extractEnglishLetters = (inputString) => {
@@ -46,7 +52,8 @@ const getHeroConfig = (heroId) => {
     const kingdom = extractEnglishLetters(heroId) || "QUN"
 
     return {
-        ...HERO_CONFIG[heroId],
+        ...HERO_STATIC_CONFIG[heroId],
+        ...HERO_SKILL_PROPS_CONFIG[heroId],
         kingdom,
         skills,
     }
