@@ -1,9 +1,10 @@
 const pandingEvent = require("../../event/pandingEvent");
-const {findOnGoingUseStrikeEventSkill} = require("../../event/utils");
+const {ALL_EVENTS_KEY_CONFIG} = require("../../config/eventConfig");
+const {findOnGoingEventSkill} = require("../../event/utils");
 const handleShu006TieJiResponse = (gameStatus, response) => {
     const chooseToReleaseSkill = response.chooseToResponse;
 
-    const onGoingUseStrikeEventSkill = findOnGoingUseStrikeEventSkill(gameStatus);
+    const onGoingUseStrikeEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS);
     onGoingUseStrikeEventSkill.done = true;
 
     if (chooseToReleaseSkill) {

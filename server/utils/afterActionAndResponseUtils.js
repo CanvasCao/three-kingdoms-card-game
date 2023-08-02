@@ -1,3 +1,4 @@
+const {setNextPlayEventSkillToSkillResponse} = require("../event/playEvent");
 const {setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect} = require("./wuxieUtils");
 const {generateWuxieSimultaneousResponseByScroll} = require("./wuxieUtils");
 const {getAllHasWuxiePlayers} = require("./playerUtils");
@@ -25,6 +26,13 @@ const tryFindNextSkillResponse = (gameStatus) => {
 
     if (gameStatus.damageEvent) {
         setNextDamageEventSkillToSkillResponse(gameStatus)
+        if (gameStatus.skillResponse) {
+            return;
+        }
+    }
+
+    if (gameStatus.playEvents) {
+        setNextPlayEventSkillToSkillResponse(gameStatus)
         if (gameStatus.skillResponse) {
             return;
         }

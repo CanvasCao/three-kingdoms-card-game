@@ -1,3 +1,5 @@
+const {PLAY_EVENT_TIMING} = require("../config/eventConfig");
+const {ALL_EVENTS_KEY_CONFIG} = require("../config/eventConfig");
 const {EQUIPMENT_CARDS_CONFIG} = require("../config/cardConfig");
 const {DAMAGE_EVENT_TIMING} = require("../config/eventConfig");
 const {CARD_CONFIG} = require("../config/cardConfig");
@@ -63,58 +65,19 @@ const findNextUnDoneSkillInLastEventTimingsWithSkills = (gameStatus, eventTiming
 }
 
 
-// UseStrikeEvent
-const findOnGoingUseStrikeEvent = (gameStatus) => {
-    const useStrikeEvent = gameStatus?.useStrikeEvents.find((event) => !event.done)
-    return useStrikeEvent
+const findOnGoingEvent = (gameStatus, eventKey) => {
+    if ([ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS, ALL_EVENTS_KEY_CONFIG.PLAY_EVENTS].includes(eventKey)) {
+        return gameStatus?.[eventKey].find((event) => !event.done)
+    }
+    return gameStatus?.[eventKey]
 }
 
-const findOnGoingUseStrikeEventSkill = (gameStatus) => {
-    const useStrikeEvent = findOnGoingUseStrikeEvent(gameStatus)
-    const eventTimingsWithSkills = useStrikeEvent?.eventTimingsWithSkills;
+const findOnGoingEventSkill = (gameStatus, eventKey) => {
+    const event = findOnGoingEvent(gameStatus, eventKey)
+    const eventTimingsWithSkills = event?.eventTimingsWithSkills;
     const eventTiming = eventTimingsWithSkills.find((et) => et.eventTimingSkills.some((s) => s.done === false))
 
-    const onGoingUseStrikeEventSkill = eventTiming?.eventTimingSkills.find((s) => s.done === false)
-    return onGoingUseStrikeEventSkill
-}
-
-// playEvent
-const findOnGoingPlayEvent = (gameStatus) => {
-    const playEvent = gameStatus?.playEvents.find((event) => !event.done)
-    return playEvent
-}
-
-const findOnGoingPlayEventSkill = (gameStatus) => {
-    const playEvent = findOnGoingUseStrikeEvent(gameStatus)
-    const eventTimingsWithSkills = playEvent?.eventTimingsWithSkills;
-    const eventTiming = eventTimingsWithSkills.find((et) => et.eventTimingSkills.some((s) => s.done === false))
-
-    const onGoingPlayEventSkill = eventTiming?.eventTimingSkills.find((s) => s.done === false)
-    return onGoingPlayEventSkill
-}
-
-// PandingEvent
-const findOnGoingPandingEvent = (gameStatus) => {
-    return gameStatus?.pandingEvent
-}
-
-const findOnGoingPandingEventSkill = (gameStatus) => {
-    const eventTiming = gameStatus?.pandingEvent?.eventTimingsWithSkills.find((et) => et.eventTimingSkills.some((s) => s.done === false))
-
-    const onGoingPandingEventSkill = eventTiming?.eventTimingSkills.find((s) => s.done === false)
-    return onGoingPandingEventSkill
-}
-
-// damage
-const findOnGoingDamageEvent = (gameStatus) => {
-    return gameStatus?.damageEvent
-}
-
-const findOnGoingDamageEventSkill = (gameStatus) => {
-    const eventTiming = gameStatus?.damageEvent?.eventTimingsWithSkills.find((et) => et.eventTimingSkills.some((s) => s.done === false))
-
-    const onGoingDamageEventSkill = eventTiming?.eventTimingSkills.find((s) => s.done === false)
-    return onGoingDamageEventSkill
+    return eventTiming?.eventTimingSkills.find((s) => s.done === false)
 }
 
 // AllEventSkills
@@ -125,6 +88,7 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
     const targetPlayerId = targetPlayer?.playerId;
 
     let eventTimingSkills = [];
+
     // 判定 相关技能
     if (eventTimingName == PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT) {
         const allPlayers = getAllAlivePlayersStartFromFirstLocation(gameStatus, gameStatus.players[originId].location)
@@ -158,7 +122,7 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
             if (originPlayer.weaponCard.key === CARD_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key &&
                 originPlayer.gender !== targetPlayer.gender) {
                 const skill = configSkillToSkillResponseSkill(
-                    {nameKey: EQUIPMENT_CARDS_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key},
+                    {key: EQUIPMENT_CARDS_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key},
                     originPlayer.playerId)
                 eventTimingSkills = eventTimingSkills.concat(skill)
             }
@@ -181,6 +145,19 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
         eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
     }
 
+    // 使用牌
+    else if (eventTimingName == PLAY_EVENT_TIMING.WHEN_NEED_PLAY) {
+        // 八卦
+        if (originPlayer?.shieldCard?.key == CARD_CONFIG.BA_GUA_ZHEN.key &&
+            targetPlayer?.weaponCard?.key !== CARD_CONFIG.QIN_GANG_JIAN.key
+        ) {
+            const skill = configSkillToSkillResponseSkill(
+                {key: EQUIPMENT_CARDS_CONFIG.BA_GUA_ZHEN.key},
+                originPlayer.playerId)
+            eventTimingSkills = eventTimingSkills.concat(skill)
+        }
+    }
+
     return eventTimingSkills;
 }
 
@@ -188,15 +165,8 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
 exports.configSkillToEventSkill = configSkillToSkillResponseSkill;
 exports.findAllEventSkillsByTimingName = findAllEventSkillsByTimingName;
 
-exports.findOnGoingUseStrikeEvent = findOnGoingUseStrikeEvent;
-exports.findOnGoingPandingEvent = findOnGoingPandingEvent;
-exports.findOnGoingDamageEvent = findOnGoingDamageEvent;
-exports.findOnGoingPlayEvent = findOnGoingPlayEvent;
-
-exports.findOnGoingUseStrikeEventSkill = findOnGoingUseStrikeEventSkill;
-exports.findOnGoingPandingEventSkill = findOnGoingPandingEventSkill;
-exports.findOnGoingDamageEventSkill = findOnGoingDamageEventSkill;
-exports.findOnGoingPlayEventSkill = findOnGoingPlayEventSkill;
+exports.findOnGoingEvent = findOnGoingEvent;
+exports.findOnGoingEventSkill = findOnGoingEventSkill;
 
 exports.setEventSkillResponse = setEventSkillResponse;
 exports.findNextUnDoneSkillInLastEventTimingsWithSkills = findNextUnDoneSkillInLastEventTimingsWithSkills;

@@ -1,14 +1,13 @@
-const {findOnGoingDamageEvent} = require("../../event/utils");
+const {ALL_EVENTS_KEY_CONFIG} = require("../../config/eventConfig");
+const {findOnGoingEvent} = require("../../event/utils");
+const {findOnGoingEventSkill} = require("../../event/utils");
 const {emitNotifyAddLines} = require("../../utils/emitUtils");
 const {throwCards} = require("../../utils/cardUtils");
-const {findOnGoingPandingEvent} = require("../../event/utils");
-const {findOnGoingPandingEventSkill} = require("../../event/utils");
-const {findOnGoingDamageEventSkill} = require("../../event/utils");
 
 const handleWei002FanKuiResponse = (gameStatus, response) => {
     const chooseToReleaseSkill = response.chooseToResponse;
-    const onGoingDamageEvent = findOnGoingDamageEvent(gameStatus);
-    const onGoingDamageEventSkill = findOnGoingDamageEventSkill(gameStatus);
+    const onGoingDamageEvent = findOnGoingEvent(gameStatus,ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
+    const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus,ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
 
     if (!chooseToReleaseSkill) {
         onGoingDamageEventSkill.done = true;
@@ -32,8 +31,8 @@ const handleWei002GuiCaiResponse = (gameStatus, response) => {
     const chooseToReleaseSkill = response.chooseToResponse;
     const originPlayer = gameStatus.players[response.originId];
 
-    const onGoingPandingEventSkill = findOnGoingPandingEventSkill(gameStatus);
-    const onGoingPandingEvent = findOnGoingPandingEvent(gameStatus)
+    const onGoingPandingEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.PANDING_EVENT);
+    const onGoingPandingEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.PANDING_EVENT)
 
     if (!chooseToReleaseSkill) {
         onGoingPandingEventSkill.done = true;

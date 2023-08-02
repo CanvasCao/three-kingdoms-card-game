@@ -1,3 +1,6 @@
+const {clearShanResponse} = require("../utils/responseUtils");
+const {ALL_EVENTS_KEY_CONFIG} = require("../config/eventConfig");
+const {findOnGoingEvent} = require("./utils");
 const {CARD_ATTRIBUTE} = require("../config/cardConfig");
 const {generateDamageEventThenSetNextDamageEventSkillToSkillResponse} = require("./damageEvent");
 const {findNextUnDoneSkillInLastEventTimingsWithSkills} = require("./utils");
@@ -13,7 +16,6 @@ const {SKILL_CONFIG} = require("../config/skillsConfig");
 const {setEventSkillResponse} = require("./utils");
 const {CARD_COLOR} = require("../config/cardConfig");
 const {getActualCardColor} = require("../utils/cardUtils");
-const {findOnGoingUseStrikeEvent} = require("./utils");
 const {emitNotifyPandingPlayPublicCard} = require("../utils/emitUtils");
 const {throwCards} = require("../utils/cardUtils");
 const {getCards} = require("../utils/cardUtils");
@@ -68,10 +70,18 @@ const setNextPandingEventSkillToSkillResponse = (gameStatus) => {
             if (eventTimingSkills.length > 0) {
                 setEventSkillResponse(gameStatus, eventTimingSkills[0])
                 return;
-            } else { // 判定结束
-                setStatusBasedOnPandingResult(gameStatus);
-                handlePandingEventEnd(gameStatus);
             }
+        }
+    }
+
+    if (last(eventTimingsWithSkills).eventTimingName == PANDING_EVENT_TIMINGS[timingIndex + 1]) {
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)
+        if (unDoneSkill) {
+            setEventSkillResponse(gameStatus, unDoneSkill)
+            return;
+        } else {
+            setStatusBasedOnPandingResult(gameStatus);
+            handlePandingEventEnd(gameStatus);
         }
     }
 }
@@ -84,7 +94,7 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
     const currentPlayer = getCurrentPlayer(gameStatus);
 
     if (pandingEvent.pandingNameKey == SKILL_CONFIG.SHU006_TIE_JI.key) {
-        const useStrikeEvent = findOnGoingUseStrikeEvent(gameStatus);
+        const useStrikeEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS);
         if (getActualCardColor(pandingResultCard) == CARD_COLOR.RED) {
             useStrikeEvent.cantShan = true;
         }
@@ -117,6 +127,12 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
             } else {
                 moveShandianToNextPlayer(gameStatus, nextNeedPandingSign)
             }
+        }
+    } else if (pandingEvent.pandingNameKey === CARD_CONFIG.BA_GUA_ZHEN.key) {
+        const playEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.PLAY_EVENTS);
+        if (getActualCardColor(pandingResultCard) == CARD_COLOR.RED) {
+            playEvent.playStatus = true;
+            clearShanResponse(gameStatus)
         }
     }
 }

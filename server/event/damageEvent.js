@@ -117,8 +117,6 @@ const setStatusWhenDamageEventDone = (gameStatus) => {
 
 const handleDamageEventEnd = (gameStatus) => {
     const damageEvent = gameStatus.damageEvent;
-
-    // throwCards(gameStatus, [...allChangePandingCards, pandingEvent.pandingResultCard]);
     delete gameStatus.damageEvent;
 }
 

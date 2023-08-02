@@ -1,4 +1,7 @@
 const strikeEvent = require("../event/strikeEvent");
+const {findOnGoingEventSkill} = require("../event/utils");
+const {findOnGoingEvent} = require("../event/utils");
+const {handleBaGuaZhenResponse} = require("./skills/shield");
 const {handleCiXiongShuangGuJianResponse} = require("./skills/weapon");
 const {CARD_CONFIG} = require("../config/cardConfig");
 const {handleShu006TieJiResponse} = require("./skills/SHU006");
@@ -16,11 +19,11 @@ const {
     clearShanResponse,
     clearNextTaoResponse,
     clearNextScrollResponse,
-    clearNextWeaponResponse
 } = require("../utils/responseUtils");
 const {throwCards} = require("../utils/cardUtils")
 const {getAllHasWuxiePlayers, getCurrentPlayer} = require("../utils/playerUtils")
 const {emitNotifyJieDaoWeaponOwnerChange} = require("../utils/emitUtils")
+const {ALL_EVENTS_KEY_CONFIG} = require("../config/eventConfig")
 
 // export type EmitResponseData = {
 //     chooseToResponse: boolean,
@@ -47,16 +50,13 @@ const responseCardHandler = {
         const responseTargetPlayer = gameStatus.players[shanResponse.targetId];
         responseOriginPlayer.removeCards(response.cards);
         throwCards(gameStatus, response.cards);
+        clearShanResponse(gameStatus);
 
+        const onGoingPlayEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.PLAY_EVENTS);
         if (response.chooseToResponse) { // 出闪了
-            shanResponse.cardNumber--; // 吕布需要两个杀
-            if (shanResponse.cardNumber == 0) {
-                clearShanResponse(gameStatus);
-            } else {
-                // do nothing
-            }
+            onGoingPlayEvent.playStatus = true
         } else { // 没出闪
-            clearShanResponse(gameStatus);
+            onGoingPlayEvent.playStatus = false
             generateDamageEventThenSetNextDamageEventSkillToSkillResponse(gameStatus, {
                 damageCards: action.cards,
                 damageActualCard: action.actualCard, // 渠道
@@ -85,6 +85,8 @@ const responseCardHandler = {
             handleWu006LiuLiResponse(gameStatus, response)
         } else if (skillNameKey == CARD_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key) {
             handleCiXiongShuangGuJianResponse(gameStatus, response)
+        } else if (skillNameKey == CARD_CONFIG.BA_GUA_ZHEN.key) {
+            handleBaGuaZhenResponse(gameStatus, response)
         }
     },
 
@@ -239,21 +241,21 @@ const responseCardHandler = {
         clearNextScrollResponse(gameStatus);
     },
 
-    // 武器
-    setStatusByQingLongYanYueDaoResponse: (gameStatus, response) => {
-        if (response.chooseToResponse) {
-            const action = gameStatus.action;
-            clearNextWeaponResponse(gameStatus);
-            gameStatus.shanResponse = {
-                originId: action.targetIds[0],
-                targetId: action.originId,
-                cardNumber: 1,
-            }
-        } else {
-            clearNextWeaponResponse(gameStatus);
-            clearShanResponse(gameStatus)
-        }
-    }
+    // // 武器
+    // setStatusByQingLongYanYueDaoResponse: (gameStatus, response) => {
+    //     if (response.chooseToResponse) {
+    //         const action = gameStatus.action;
+    //         clearNextWeaponResponse(gameStatus);
+    //         gameStatus.shanResponse = {
+    //             originId: action.targetIds[0],
+    //             targetId: action.originId,
+    //             cardNumber: 1,
+    //         }
+    //     } else {
+    //         clearNextWeaponResponse(gameStatus);
+    //         clearShanResponse(gameStatus)
+    //     }
+    // }
 }
 
 exports.responseCardHandler = responseCardHandler;

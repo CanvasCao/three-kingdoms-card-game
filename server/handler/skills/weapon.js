@@ -1,13 +1,14 @@
-const {findOnGoingUseStrikeEvent} = require("../../event/utils");
-const {findOnGoingUseStrikeEventSkill} = require("../../event/utils");
+const {findOnGoingEvent} = require("../../event/utils");
+const {findOnGoingEventSkill} = require("../../event/utils");
+const {ALL_EVENTS_KEY_CONFIG} = require("../../config/eventConfig");
 const {throwCards} = require("../../utils/cardUtils")
 
 const handleCiXiongShuangGuJianResponse = (gameStatus, response) => {
     const chooseToReleaseSkill = response.chooseToResponse;
     const originPlayer = gameStatus.players[response.originId];
 
-    const onGoingUseStrikeEvent = findOnGoingUseStrikeEvent(gameStatus);
-    const onGoingUseStrikeEventSkill = findOnGoingUseStrikeEventSkill(gameStatus);
+    const onGoingUseStrikeEvent = findOnGoingEvent(gameStatus,ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS);
+    const onGoingUseStrikeEventSkill = findOnGoingEventSkill(gameStatus,ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS);
 
     if (!chooseToReleaseSkill) {
         if (onGoingUseStrikeEventSkill.chooseToReleaseSkill === undefined) {
