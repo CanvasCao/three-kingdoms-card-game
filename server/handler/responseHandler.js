@@ -5,7 +5,7 @@ const {handleShu006TieJiResponse} = require("./skills/SHU006");
 const {handleWu006LiuLiResponse} = require("./skills/WU006");
 const {handleWei002GuiCaiResponse, handleWei002FanKuiResponse} = require("./skills/WEI002");
 const {generateDamageEventThenSetNextDamageEventSkillToSkillResponse} = require("../event/damageEvent");
-const {SKILL_NAMES} = require("../config/skillsConfig");
+const {SKILL_CONFIG} = require("../config/skillsConfig");
 const {setStatusWhenPlayerDie} = require("../utils/dieUtils");
 const {cloneDeep} = require("lodash");
 const {
@@ -75,13 +75,13 @@ const responseCardHandler = {
             delete gameStatus.skillResponse
         }
 
-        if (skillNameKey == SKILL_NAMES.SHU006.TIE_JI.key) {
+        if (skillNameKey == SKILL_CONFIG.SHU006_TIE_JI.key) {
             handleShu006TieJiResponse(gameStatus, response)
-        } else if (skillNameKey == SKILL_NAMES.WEI002.FAN_KUI.key) {
+        } else if (skillNameKey == SKILL_CONFIG.WEI002_FAN_KUI.key) {
             handleWei002FanKuiResponse(gameStatus, response)
-        } else if (skillNameKey == SKILL_NAMES.WEI002.GUI_CAI.key) {
+        } else if (skillNameKey == SKILL_CONFIG.WEI002_GUI_CAI.key) {
             handleWei002GuiCaiResponse(gameStatus, response)
-        } else if (skillNameKey == SKILL_NAMES.WU006.LIU_LI.key) {
+        } else if (skillNameKey == SKILL_CONFIG.WU006_LIU_LI.key) {
             handleWu006LiuLiResponse(gameStatus, response)
         } else if (skillNameKey == CARD_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key) {
             handleCiXiongShuangGuJianResponse(gameStatus, response)

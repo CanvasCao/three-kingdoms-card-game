@@ -9,7 +9,7 @@ const {CARD_HUASE} = require("../config/cardConfig");
 const {getCurrentPlayer} = require("../utils/playerUtils");
 const {getNextNeedExecutePandingSign} = require("../utils/pandingUtils");
 const {CARD_CONFIG} = require("../config/cardConfig");
-const {SKILL_NAMES} = require("../config/skillsConfig");
+const {SKILL_CONFIG} = require("../config/skillsConfig");
 const {setEventSkillResponse} = require("./utils");
 const {CARD_COLOR} = require("../config/cardConfig");
 const {getActualCardColor} = require("../utils/cardUtils");
@@ -83,7 +83,7 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
     const pandingResultCard = pandingEvent.pandingResultCard;
     const currentPlayer = getCurrentPlayer(gameStatus);
 
-    if (pandingEvent.pandingNameKey == SKILL_NAMES.SHU006.TIE_JI.key) {
+    if (pandingEvent.pandingNameKey == SKILL_CONFIG.SHU006_TIE_JI.key) {
         const useStrikeEvent = findOnGoingUseStrikeEvent(gameStatus);
         if (getActualCardColor(pandingResultCard) == CARD_COLOR.RED) {
             useStrikeEvent.cantShan = true;

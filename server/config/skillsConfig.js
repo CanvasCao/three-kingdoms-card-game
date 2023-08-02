@@ -3,78 +3,60 @@ const {PANDING_EVENT_TIMING} = require("./eventConfig");
 const {CARD_CONFIG} = require("./cardConfig");
 const {USE_EVENT_TIMING} = require("./eventConfig");
 
-const SKILL_NAMES = {
-    "WEI001": {
-        JIAN_XIONG: {
-            key: 'JIAN_XIONG',
-        },
-        HU_JIA: {
-            key: 'HU_JIA',
-        }
+const SKILL_CONFIG = {
+    WEI001_JIAN_XIONG: {
+        key: 'WEI001_JIAN_XIONG',
     },
-    "WEI002": {
-        FAN_KUI: {
-            key: 'FAN_KUI',
-        },
-        GUI_CAI: {
-            key: 'GUI_CAI',
-        }
+    WEI001_HU_JIA: {
+        key: 'WEI001_HU_JIA',
+    },
+    WEI002_FAN_KUI: {
+        key: 'WEI002_FAN_KUI',
+    },
+    WEI002_GUI_CAI: {
+        key: 'WEI002_GUI_CAI',
     },
 
-    "SHU003": {
-        PAO_XIAO: {
-            key: 'PAO_XIAO',
-        },
+    SHU003_PAO_XIAO: {
+        key: 'SHU003_PAO_XIAO',
     },
-    "SHU006": {
-        MA_SHU: {
-            key: 'MA_SHU',
-        },
-        TIE_JI: {
-            key: 'TIE_JI',
-        },
+    SHU006_MA_SHU: {
+        key: 'SHU006_MA_SHU',
+    },
+    SHU006_TIE_JI: {
+        key: 'SHU006_TIE_JI',
     },
 
-
-    "WU006": {
-        GUO_SE: {
-            key: 'GUO_SE',
-        },
-        LIU_LI: {
-            key: 'LIU_LI',
-        },
+    WU006_GUO_SE: {
+        key: 'WU006_GUO_SE',
     },
-
-}
-const realTimingSkills = {
-    WEI002: [
-        {
-            nameKey: SKILL_NAMES.WEI002.FAN_KUI.key,
-            triggerTiming: DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE,
-            needOrigin: true,
-            needOriginHasCards: true,
-        },
-        {
-            nameKey: SKILL_NAMES.WEI002.GUI_CAI.key,
-            triggerTiming: PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT,
-        }
-    ],
-    SHU006: [
-        {
-            nameKey: SKILL_NAMES.SHU006.TIE_JI.key,
-            triggerTiming: USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET,
-            triggerCardName: CARD_CONFIG.SHA.key,
-        }
-    ],
-    WU006: [
-        {
-            nameKey: SKILL_NAMES.WU006.LIU_LI.key,
-            triggerTiming: USE_EVENT_TIMING.WHEN_BECOMING_TARGET,
-            triggerCardName: CARD_CONFIG.SHA.key,
-        }
-    ],
+    WU006_LIU_LI: {
+        key: 'WU006_LIU_LI',
+    },
 }
 
-const TIMING_SKILLS = realTimingSkills;
-exports.TIMING_SKILLS = TIMING_SKILLS;
-exports.SKILL_NAMES = SKILL_NAMES;
+const TIMING_SKILLS_CONFIG = {
+    WEI002_FAN_KUI: {
+        key:"WEI002_FAN_KUI",
+        triggerTiming: DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE,
+        needOrigin: true,
+        needOriginHasCards: true,
+    },
+    WEI002_GUI_CAI: {
+        key:"WEI002_GUI_CAI",
+        triggerTiming: PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT,
+    },
+    SHU006_TIE_JI: {
+        key:"SHU006_TIE_JI",
+        triggerTiming: USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET,
+        triggerCardName: CARD_CONFIG.SHA.key,
+    },
+    WU006_LIU_LI: {
+        key:"WU006_LIU_LI",
+        triggerTiming: USE_EVENT_TIMING.WHEN_BECOMING_TARGET,
+        triggerCardName: CARD_CONFIG.SHA.key,
+    },
+}
+
+exports.TIMING_SKILLS_CONFIG = TIMING_SKILLS_CONFIG;
+exports.SKILL_CONFIG = SKILL_CONFIG;

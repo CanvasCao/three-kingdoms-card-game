@@ -1,4 +1,4 @@
-const {SKILL_NAMES} = require("./skillsConfig");
+const {SKILL_CONFIG} = require("./skillsConfig");
 
 const HERO_STATIC_CONFIG = {
     WEI001: {
@@ -34,6 +34,14 @@ const HERO_SKILL_PROPS_CONFIG = {
     }
 }
 
+const HERO_SKILLS_CONFIG = {
+    WEI001: [SKILL_CONFIG.WEI001_JIAN_XIONG, SKILL_CONFIG.WEI001_HU_JIA],
+    WEI002: [SKILL_CONFIG.WEI002_FAN_KUI, SKILL_CONFIG.WEI002_GUI_CAI],
+    SHU003: [SKILL_CONFIG.SHU003_PAO_XIAO],
+    SHU006: [SKILL_CONFIG.SHU006_MA_SHU, SKILL_CONFIG.SHU006_TIE_JI],
+    WU006: [SKILL_CONFIG.WU006_GUO_SE, SKILL_CONFIG.WU006_LIU_LI],
+}
+
 const extractEnglishLetters = (inputString) => {
     let result = '';
     for (let i = 0; i < inputString.length; i++) {
@@ -48,14 +56,11 @@ const extractEnglishLetters = (inputString) => {
 }
 
 const getHeroConfig = (heroId) => {
-    const skills = Object.keys(SKILL_NAMES[heroId]).map(key => SKILL_NAMES[heroId][key]);
-    const kingdom = extractEnglishLetters(heroId) || "QUN"
-
     return {
         ...HERO_STATIC_CONFIG[heroId],
         ...HERO_SKILL_PROPS_CONFIG[heroId],
-        kingdom,
-        skills,
+        kingdom: extractEnglishLetters(heroId) || "QUN",
+        skills: HERO_SKILLS_CONFIG[heroId] || [],
     }
 }
 
