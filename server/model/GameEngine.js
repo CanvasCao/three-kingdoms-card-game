@@ -169,14 +169,7 @@ class GameEngine {
                 break;
             case RESPONSE_TYPE_CONFIG.SCROLL:
                 const curScrollResponse = this.gameStatus.scrollResponses[0];
-                if (curScrollResponse.actualCard.key === SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.key ||
-                    curScrollResponse.actualCard.key === SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.key
-                ) {
-                    responseCardHandler.setStatusByNanManOrWanJianResponse(this.gameStatus, response);
-                } else if (curScrollResponse.actualCard.key === SCROLL_CARDS_CONFIG.JUE_DOU.key
-                ) {
-                    responseCardHandler.setStatusByJueDouResponse(this.gameStatus, response);
-                } else if (curScrollResponse.actualCard.key === SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.key) {
+                if (curScrollResponse.actualCard.key === SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.key) {
                     responseCardHandler.setStatusByJieDaoResponse(this.gameStatus, response);
                 }
                 break

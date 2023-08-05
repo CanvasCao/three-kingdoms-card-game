@@ -33,7 +33,7 @@ const tryFindNextSkillResponse = (gameStatus) => {
 
     if (gameStatus.responseCardEvents) {
         setNextResponseCardEventSkill(gameStatus)
-        if (gameStatus.skillResponse) {
+        if (gameStatus.cardResponse || gameStatus.skillResponse) {
             return;
         }
     }

@@ -1,4 +1,7 @@
 const strikeEvent = require("../event/strikeEvent");
+const {USE_OR_PLAY_CONFIG} = require("../config/eventConfig");
+const {ALL_SHA_CARD_KEYS} = require("../config/cardConfig");
+const {generateResponseCardEventThenSetNextResponseCardEventSkill} = require("../event/responseCardEvent");
 const {findOnGoingEvent} = require("../event/utils");
 const {handleBaGuaZhenResponse} = require("./skills/shield");
 const {handleCiXiongShuangGuJianResponse} = require("./skills/weapon");
@@ -49,16 +52,22 @@ const responseCardHandler = {
         const responseTargetPlayer = gameStatus.players[cardResponse.targetId];
         responseOriginPlayer.removeCards(response.cards);
         throwCards(gameStatus, response.cards);
-        clearCardResponse(gameStatus);
 
         const onGoingResponseCardEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.RESPONSE_CARD_EVENTS);
-        if (response.chooseToResponse) { // 出闪了
+        if (response.chooseToResponse) {
             onGoingResponseCardEvent.playStatus = true
-        } else { // 没出闪
-            onGoingResponseCardEvent.playStatus = false
-            gameStatus.responseCardEvents.forEach(e => {
-                e.done = true;
-            })
+
+            if (cardResponse.actionCardKey == CARD_CONFIG.JUE_DOU.key) { // 决斗出杀之后 需要互换目标
+                generateResponseCardEventThenSetNextResponseCardEventSkill(gameStatus, {
+                    originId: cardResponse.targetId,
+                    targetId: cardResponse.originId,
+                    actionCardKey: cardResponse.actionCardKey,
+                    responseCardKeys: ALL_SHA_CARD_KEYS,
+                    useOrPlay: USE_OR_PLAY_CONFIG.PLAY
+                })
+            }
+        } else {
+            delete gameStatus.responseCardEvents;
             generateDamageEventThenSetNextDamageEventSkill(gameStatus, {
                 damageCards: action.cards,
                 damageActualCard: action.actualCard, // 渠道
@@ -67,6 +76,7 @@ const responseCardHandler = {
                 targetId: cardResponse.originId
             })
         }
+        clearCardResponse(gameStatus);
     },
 
     setStatusBySkillResponse: (gameStatus, response) => {
@@ -165,51 +175,6 @@ const responseCardHandler = {
                 // 锦囊开始结算
                 setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, "setStatusByWuxieResponse 没出无懈可击")
             }
-        }
-    },
-
-    setStatusByNanManOrWanJianResponse: (gameStatus, response) => {
-        const action = gameStatus.action;
-        const originId = response.originId;
-        const originPlayer = gameStatus.players[originId];
-        const curScrollResponse = gameStatus.scrollResponses[0];
-
-        if (response.chooseToResponse) {
-            clearNextScrollResponse(gameStatus);
-            originPlayer.removeCards(response.cards);
-        } else {
-            clearNextScrollResponse(gameStatus);
-            generateDamageEventThenSetNextDamageEventSkill(gameStatus, {
-                damageCards: action.cards,
-                damageActualCard: action.actualCard, // 渠道
-                damageAttribute: undefined,// 属性
-                originId: curScrollResponse.targetId,// 来源
-                targetId: curScrollResponse.originId
-            })
-        }
-    },
-
-    setStatusByJueDouResponse: (gameStatus, response) => {
-        const action = gameStatus.action;
-        const curScrollResponse = gameStatus.scrollResponses[0];
-
-        if (response.chooseToResponse) {
-            gameStatus.players[curScrollResponse.originId].removeCards(response.cards);
-
-            // 决斗出杀之后 需要互换目标
-            const oriTargetId = curScrollResponse.targetId;
-            const oriOriginId = curScrollResponse.originId;
-            curScrollResponse.targetId = oriOriginId;
-            curScrollResponse.originId = oriTargetId;
-        } else {
-            clearNextScrollResponse(gameStatus);
-            generateDamageEventThenSetNextDamageEventSkill(gameStatus, {
-                damageCards: action.cards,
-                damageActualCard: action.actualCard, // 渠道
-                damageAttribute: undefined,// 属性
-                originId: curScrollResponse.targetId,// 来源
-                targetId: curScrollResponse.originId
-            })
         }
     },
 

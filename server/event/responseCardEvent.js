@@ -78,7 +78,8 @@ const setNextResponseCardEventSkill = (gameStatus) => {
                     return;
                 }
             } else if (responseCardEvent.playStatus === false) {
-                eventTimingsWithSkills.push({eventTimingName, eventTimingSkills: []})
+                // handle card res的时候已经把responseCardEvents删除了
+                console.log('Should not into responseCardEvent.playStatus === false')
             } else if (responseCardEvent.playStatus === undefined) {
                 // 等待前端响应
                 gameStatus.cardResponse = {
@@ -99,18 +100,18 @@ const setNextResponseCardEventSkill = (gameStatus) => {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
         } else {
-            setStatusWhenPlayEventDone(gameStatus);
-            handlePlayEventEnd(gameStatus);
+            setStatusWhenResponseCardEventDone(gameStatus);
+            handleResponseCardEventEnd(gameStatus);
         }
     }
 }
 
-const setStatusWhenPlayEventDone = (gameStatus) => {
-    const playEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.RESPONSE_CARD_EVENTS);
-    playEvent.done = true;
+const setStatusWhenResponseCardEventDone = (gameStatus) => {
+    const responseCardEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.RESPONSE_CARD_EVENTS);
+    responseCardEvent.done = true;
 }
 
-const handlePlayEventEnd = (gameStatus) => {
+const handleResponseCardEventEnd = (gameStatus) => {
     if (gameStatus.responseCardEvents.every((e) => e.done)) {
         delete gameStatus.responseCardEvents;
     } else {

@@ -73,7 +73,9 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
                 gameStatus.players[curScrollResponse.originId].addBlood();
                 clearNextScrollResponse(gameStatus);
             } else if (curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.key ||
-                curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.key) {
+                curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.key ||
+                curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.JUE_DOU.key
+            ) {
                 generateResponseCardEventThenSetNextResponseCardEventSkill(gameStatus, {
                     originId: curScrollResponse.originId,
                     targetId: curScrollResponse.targetId,
