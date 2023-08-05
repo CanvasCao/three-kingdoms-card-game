@@ -8,7 +8,7 @@ const handleShu006TieJiResponse = (gameStatus, response) => {
     onGoingUseStrikeEventSkill.done = true;
 
     if (chooseToReleaseSkill) {
-        pandingEvent.generatePandingEventThenSetNextPandingEventSkillToSkillResponse(gameStatus, {
+        pandingEvent.generatePandingEventThenSetNextPandingEventSkill(gameStatus, {
             originId: onGoingUseStrikeEventSkill.playerId,
             pandingNameKey: onGoingUseStrikeEventSkill.skillNameKey
         });

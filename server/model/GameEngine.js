@@ -45,7 +45,7 @@ class GameEngine {
             action: {},
 
             // 基础牌
-            shanResponse: undefined,
+            cardResponse: undefined,
             taoResponses: [],
 
             skillResponse: undefined,
@@ -83,13 +83,14 @@ class GameEngine {
         // BASIC
         if ([BASIC_CARDS_CONFIG.SHA.key, BASIC_CARDS_CONFIG.LEI_SHA.key, BASIC_CARDS_CONFIG.HUO_SHA.key].includes(action.actualCard.key)
         ) {
-            strikeEvent.generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse(this.gameStatus,
+            strikeEvent.generateUseStrikeEventsThenSetNextStrikeEventSkill(this.gameStatus,
                 {
                     originId: action.originId,
                     targetIds: action.targetIds,
                     cards: action.cards,
                     actualCard: action.actualCard
                 });
+            throwCards(this.gameStatus, action.cards);
         } else if (action.actualCard.key == BASIC_CARDS_CONFIG.TAO.key) {
             actionHandler.setStatusByTaoAction(this.gameStatus);
             throwCards(this.gameStatus, action.cards);
@@ -157,8 +158,8 @@ class GameEngine {
             case RESPONSE_TYPE_CONFIG.TAO:
                 responseCardHandler.setStatusByTaoResponse(this.gameStatus, response);
                 break;
-            case RESPONSE_TYPE_CONFIG.SHAN:
-                responseCardHandler.setStatusByShanResponse(this.gameStatus, response);
+            case RESPONSE_TYPE_CONFIG.CARD:
+                responseCardHandler.setStatusByCardResponse(this.gameStatus, response);
                 break;
             case RESPONSE_TYPE_CONFIG.SKILL:
                 responseCardHandler.setStatusBySkillResponse(this.gameStatus, response);

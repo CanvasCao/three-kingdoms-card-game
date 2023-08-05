@@ -1,5 +1,4 @@
 const strikeEvent = require("../event/strikeEvent");
-const {findOnGoingEventSkill} = require("../event/utils");
 const {findOnGoingEvent} = require("../event/utils");
 const {handleBaGuaZhenResponse} = require("./skills/shield");
 const {handleCiXiongShuangGuJianResponse} = require("./skills/weapon");
@@ -7,7 +6,7 @@ const {CARD_CONFIG} = require("../config/cardConfig");
 const {handleShu006TieJiResponse} = require("./skills/SHU006");
 const {handleWu006LiuLiResponse} = require("./skills/WU006");
 const {handleWei002GuiCaiResponse, handleWei002FanKuiResponse} = require("./skills/WEI002");
-const {generateDamageEventThenSetNextDamageEventSkillToSkillResponse} = require("../event/damageEvent");
+const {generateDamageEventThenSetNextDamageEventSkill} = require("../event/damageEvent");
 const {SKILL_CONFIG} = require("../config/skillsConfig");
 const {setStatusWhenPlayerDie} = require("../utils/dieUtils");
 const {cloneDeep} = require("lodash");
@@ -16,7 +15,7 @@ const {
     resetHasWuxiePlayerIdsAndPushChainAfterValidatedWuxie
 } = require("../utils/wuxieUtils");
 const {
-    clearShanResponse,
+    clearCardResponse,
     clearNextTaoResponse,
     clearNextScrollResponse,
 } = require("../utils/responseUtils");
@@ -43,26 +42,29 @@ const {ALL_EVENTS_KEY_CONFIG} = require("../config/eventConfig")
 // }
 
 const responseCardHandler = {
-    setStatusByShanResponse: (gameStatus, response) => {
-        const shanResponse = gameStatus.shanResponse;
+    setStatusByCardResponse: (gameStatus, response) => {
+        const cardResponse = gameStatus.cardResponse;
         const action = gameStatus.action;
-        const responseOriginPlayer = gameStatus.players[shanResponse.originId];
-        const responseTargetPlayer = gameStatus.players[shanResponse.targetId];
+        const responseOriginPlayer = gameStatus.players[cardResponse.originId];
+        const responseTargetPlayer = gameStatus.players[cardResponse.targetId];
         responseOriginPlayer.removeCards(response.cards);
         throwCards(gameStatus, response.cards);
-        clearShanResponse(gameStatus);
+        clearCardResponse(gameStatus);
 
-        const onGoingPlayEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.PLAY_EVENTS);
+        const onGoingResponseCardEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.RESPONSE_CARD_EVENTS);
         if (response.chooseToResponse) { // 出闪了
-            onGoingPlayEvent.playStatus = true
+            onGoingResponseCardEvent.playStatus = true
         } else { // 没出闪
-            onGoingPlayEvent.playStatus = false
-            generateDamageEventThenSetNextDamageEventSkillToSkillResponse(gameStatus, {
+            onGoingResponseCardEvent.playStatus = false
+            gameStatus.responseCardEvents.forEach(e => {
+                e.done = true;
+            })
+            generateDamageEventThenSetNextDamageEventSkill(gameStatus, {
                 damageCards: action.cards,
                 damageActualCard: action.actualCard, // 渠道
                 damageAttribute: action.actualCard?.attribute,// 属性
-                originId: shanResponse.targetId,// 来源
-                targetId: shanResponse.originId
+                originId: cardResponse.targetId,// 来源
+                targetId: cardResponse.originId
             })
         }
     },
@@ -177,7 +179,7 @@ const responseCardHandler = {
             originPlayer.removeCards(response.cards);
         } else {
             clearNextScrollResponse(gameStatus);
-            generateDamageEventThenSetNextDamageEventSkillToSkillResponse(gameStatus, {
+            generateDamageEventThenSetNextDamageEventSkill(gameStatus, {
                 damageCards: action.cards,
                 damageActualCard: action.actualCard, // 渠道
                 damageAttribute: undefined,// 属性
@@ -201,7 +203,7 @@ const responseCardHandler = {
             curScrollResponse.originId = oriTargetId;
         } else {
             clearNextScrollResponse(gameStatus);
-            generateDamageEventThenSetNextDamageEventSkillToSkillResponse(gameStatus, {
+            generateDamageEventThenSetNextDamageEventSkill(gameStatus, {
                 damageCards: action.cards,
                 damageActualCard: action.actualCard, // 渠道
                 damageAttribute: undefined,// 属性
@@ -218,7 +220,7 @@ const responseCardHandler = {
             const BPlayer = gameStatus.players[curScrollResponse.targetId]
             gameStatus.players[APlayer.playerId].removeCards(response.cards);
 
-            strikeEvent.generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse(gameStatus,
+            strikeEvent.generateUseStrikeEventsThenSetNextStrikeEventSkill(gameStatus,
                 {
                     originId: APlayer.playerId,
                     targetIds: [BPlayer.playerId],
@@ -246,14 +248,14 @@ const responseCardHandler = {
     //     if (response.chooseToResponse) {
     //         const action = gameStatus.action;
     //         clearNextWeaponResponse(gameStatus);
-    //         gameStatus.shanResponse = {
+    //         gameStatus.cardResponse = {
     //             originId: action.targetIds[0],
     //             targetId: action.originId,
     //             cardNumber: 1,
     //         }
     //     } else {
     //         clearNextWeaponResponse(gameStatus);
-    //         clearShanResponse(gameStatus)
+    //         clearCardResponse(gameStatus)
     //     }
     // }
 }

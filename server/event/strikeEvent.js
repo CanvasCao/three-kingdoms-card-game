@@ -1,11 +1,12 @@
-const {generatePlayEventThenSetNextPlayEventSkillToSkillResponse} = require("./playEvent");
+const {USE_OR_PLAY_CONFIG} = require("../config/eventConfig");
+const {CARD_CONFIG} = require("../config/cardConfig");
+const {generateResponseCardEventThenSetNextResponseCardEventSkill} = require("./responseCardEvent");
 const {findOnGoingEvent} = require("./utils");
 const {ALL_EVENTS_KEY_CONFIG} = require("../config/eventConfig");
-const {generateDamageEventThenSetNextDamageEventSkillToSkillResponse} = require("./damageEvent");
+const {generateDamageEventThenSetNextDamageEventSkill} = require("./damageEvent");
 const {findNextUnDoneSkillInLastEventTimingsWithSkills} = require("./utils");
 const {setEventSkillResponse} = require("./utils");
-const {throwCards} = require("../utils/cardUtils");
-const {findAllEventSkillsByTimingName} = require("./utils");
+const {findAllEventSkillsByTimingNameAndActionCard} = require("./utils");
 const {EQUIPMENT_CARDS_CONFIG} = require("../config/cardConfig");
 const {CARD_COLOR} = require("../config/cardConfig");
 const {getActualCardColor} = require("../utils/cardUtils");
@@ -13,7 +14,7 @@ const {USE_EVENT_TIMINGS} = require("../config/eventConfig");
 const {last} = require("lodash");
 const {getCurrentPlayer, getAllAlivePlayersStartFromFirstLocation} = require("../utils/playerUtils");
 
-const generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse = (gameStatus, {originId, targetIds, cards, actualCard}) => {
+const generateUseStrikeEventsThenSetNextStrikeEventSkill = (gameStatus, {originId, targetIds, cards, actualCard}) => {
     const targetPlayers = getAllAlivePlayersStartFromFirstLocation(gameStatus, getCurrentPlayer(gameStatus).location)
         .filter(p => targetIds.includes(p.playerId))
     const originPlayer = gameStatus.players[originId];
@@ -34,24 +35,22 @@ const generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse = (gameS
         }
     })
 
-    setNextStrikeEventSkillToSkillResponse(gameStatus);
+    setNextStrikeEventSkill(gameStatus);
 }
 
-const setNextStrikeEventSkillToSkillResponse = (gameStatus) => {
+const setNextStrikeEventSkill = (gameStatus) => {
     const useStrikeEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS)
 
     if (!useStrikeEvent) {
         return
     }
 
-    const eventTimingsWithSkills = useStrikeEvent.eventTimingsWithSkills;
-    const originId = useStrikeEvent.originId
-    const targetId = useStrikeEvent.targetId;
-
+    const {eventTimingsWithSkills, originId, targetId, actualCard} = useStrikeEvent;
+    const actionCardKey = actualCard?.key;
     let timingIndex = 0;
     if (eventTimingsWithSkills.length == 0) {
         const eventTimingName = USE_EVENT_TIMINGS[timingIndex]
-        const eventTimingSkills = findAllEventSkillsByTimingName(gameStatus, {eventTimingName, originId, targetId})
+        const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, actionCardKey, originId, targetId})
         eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
 
         if (eventTimingSkills.length > 0) {
@@ -67,7 +66,7 @@ const setNextStrikeEventSkillToSkillResponse = (gameStatus) => {
             return;
         } else {
             const eventTimingName = USE_EVENT_TIMINGS[timingIndex + 1]
-            const eventTimingSkills = findAllEventSkillsByTimingName(gameStatus, {eventTimingName, originId, targetId})
+            const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, actionCardKey, originId, targetId})
             eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
 
             if (eventTimingSkills.length > 0) {
@@ -103,7 +102,7 @@ const setStatusWhenUseStrikeEventDone = (gameStatus) => {
         targetPlayer.shieldCard?.key == EQUIPMENT_CARDS_CONFIG.REN_WANG_DUN.key &&
         originPlayer.weaponCard?.key != EQUIPMENT_CARDS_CONFIG.QIN_GANG_JIAN.key) {
     } else if (useStrikeEvent.cantShan) {
-        generateDamageEventThenSetNextDamageEventSkillToSkillResponse(gameStatus, {
+        generateDamageEventThenSetNextDamageEventSkill(gameStatus, {
             damageCards: useStrikeEvent.cards,
             damageActualCard: useStrikeEvent.actualCard, // 渠道
             damageAttribute: useStrikeEvent.actualCard?.attribute,// 属性
@@ -111,9 +110,12 @@ const setStatusWhenUseStrikeEventDone = (gameStatus) => {
             targetId
         })
     } else {
-        generatePlayEventThenSetNextPlayEventSkillToSkillResponse(gameStatus, {
+        generateResponseCardEventThenSetNextResponseCardEventSkill(gameStatus, {
             originId: useStrikeEvent.targetId,
             targetId: useStrikeEvent.originId,
+            actionCardKey: gameStatus.action?.actualCard?.key,
+            responseCardKeys: [CARD_CONFIG.SHAN.key],
+            useOrPlay: USE_OR_PLAY_CONFIG.USE
         })
     }
 }
@@ -121,12 +123,10 @@ const setStatusWhenUseStrikeEventDone = (gameStatus) => {
 const handleUseStrikeEventEnd = (gameStatus) => {
     if (gameStatus.useStrikeEvents.every((e) => e.done)) {
         delete gameStatus.useStrikeEvents;
-        const action = gameStatus.action;
-        throwCards(gameStatus, action.cards);
     } else {
-        setNextStrikeEventSkillToSkillResponse(gameStatus)
+        setNextStrikeEventSkill(gameStatus)
     }
 }
 
-exports.generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse = generateUseStrikeEventsThenSetNextStrikeEventSkillToSkillResponse;
-exports.setNextStrikeEventSkillToSkillResponse = setNextStrikeEventSkillToSkillResponse;
+exports.generateUseStrikeEventsThenSetNextStrikeEventSkill = generateUseStrikeEventsThenSetNextStrikeEventSkill;
+exports.setNextStrikeEventSkill = setNextStrikeEventSkill;

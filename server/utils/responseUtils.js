@@ -1,7 +1,7 @@
 const {RESPONSE_TYPE_CONFIG} = require("../config/responseTypeConfig");
 
-const clearShanResponse = (gameStatus) => {
-    gameStatus.shanResponse = undefined;
+const clearCardResponse = (gameStatus) => {
+    gameStatus.cardResponse = undefined;
 }
 
 const clearSkillResponse = (gameStatus) => {
@@ -25,7 +25,7 @@ const clearWuxieSimultaneousResponse = (gameStatus) => {
 
 const clearAllResponses = (gameStatus) => {
     clearWuxieSimultaneousResponse(gameStatus);
-    gameStatus.shanResponse = undefined;
+    gameStatus.cardResponse = undefined;
     gameStatus.skillResponse = undefined;
     gameStatus.taoResponses = [];
     gameStatus.scrollResponses = [];
@@ -34,8 +34,8 @@ const clearAllResponses = (gameStatus) => {
 const getResponseType = (gameStatus) => {
     if (gameStatus.taoResponses.length > 0) {
         return RESPONSE_TYPE_CONFIG.TAO;
-    } else if (gameStatus.shanResponse) {
-        return RESPONSE_TYPE_CONFIG.SHAN;
+    } else if (gameStatus.cardResponse) {
+        return RESPONSE_TYPE_CONFIG.CARD;
     } else if (gameStatus.skillResponse) {
         return RESPONSE_TYPE_CONFIG.SKILL;
     } else if (gameStatus.wuxieSimultaneousResponse?.hasWuxiePlayerIds?.length > 0) {
@@ -46,7 +46,7 @@ const getResponseType = (gameStatus) => {
 }
 
 exports.clearNextTaoResponse = clearNextTaoResponse;
-exports.clearShanResponse = clearShanResponse;
+exports.clearCardResponse = clearCardResponse;
 exports.clearSkillResponse = clearSkillResponse;
 exports.clearNextScrollResponse = clearNextScrollResponse;
 exports.clearWuxieSimultaneousResponse = clearWuxieSimultaneousResponse;

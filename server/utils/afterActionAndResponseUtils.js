@@ -1,13 +1,13 @@
-const {setNextPlayEventSkillToSkillResponse} = require("../event/playEvent");
+const {setNextResponseCardEventSkill} = require("../event/responseCardEvent");
 const {setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect} = require("./wuxieUtils");
 const {generateWuxieSimultaneousResponseByScroll} = require("./wuxieUtils");
 const {getAllHasWuxiePlayers} = require("./playerUtils");
-const {setNextDamageEventSkillToSkillResponse} = require("../event/damageEvent");
-const {setNextStrikeEventSkillToSkillResponse} = require("../event/strikeEvent");
-const {setNextPandingEventSkillToSkillResponse} = require("../event/pandingEvent");
+const {setNextDamageEventSkill} = require("../event/damageEvent");
+const {setNextStrikeEventSkill} = require("../event/strikeEvent");
+const {setNextPandingEventSkill} = require("../event/pandingEvent");
 
 const tryFindNextSkillResponse = (gameStatus) => {
-    if (gameStatus.shanResponse ||
+    if (gameStatus.cardResponse ||
         gameStatus.skillResponse ||
         gameStatus.taoResponses.length > 0 ||
         gameStatus.wuxieSimultaneousResponse.hasWuxiePlayerIds.length > 0
@@ -18,28 +18,28 @@ const tryFindNextSkillResponse = (gameStatus) => {
 
     // 响应判定技能后
     if (gameStatus.pandingEvent) {
-        setNextPandingEventSkillToSkillResponse(gameStatus)
+        setNextPandingEventSkill(gameStatus)
         if (gameStatus.skillResponse) {
             return;
         }
     }
 
     if (gameStatus.damageEvent) {
-        setNextDamageEventSkillToSkillResponse(gameStatus)
+        setNextDamageEventSkill(gameStatus)
         if (gameStatus.skillResponse) {
             return;
         }
     }
 
-    if (gameStatus.playEvents) {
-        setNextPlayEventSkillToSkillResponse(gameStatus)
+    if (gameStatus.responseCardEvents) {
+        setNextResponseCardEventSkill(gameStatus)
         if (gameStatus.skillResponse) {
             return;
         }
     }
 
     if (gameStatus.useStrikeEvents) {
-        setNextStrikeEventSkillToSkillResponse(gameStatus)
+        setNextStrikeEventSkill(gameStatus)
         if (gameStatus.skillResponse) {
             return;
         }
@@ -57,7 +57,7 @@ const tryFindNextSkillResponse = (gameStatus) => {
 
 // event的优先级 高于结算锦囊
 const trySettleNextScroll = (gameStatus) => {
-    if (gameStatus.shanResponse ||
+    if (gameStatus.cardResponse ||
         gameStatus.skillResponse ||
         gameStatus.taoResponses.length > 0 ||
         gameStatus.wuxieSimultaneousResponse.hasWuxiePlayerIds.length > 0

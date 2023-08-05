@@ -3,7 +3,7 @@ const USE_EVENT_TIMING = {
     //【丈八蛇矛】、【朱雀羽扇①】、【倾国】、【断粮①】、【急袭】、【奇策】、【慎断】的转化效果、【武圣】、【武圣（阵）】、【龙胆】
     "WHEN_SELECTING_CARD_AND_TARGET": "WHEN_SELECTING_CARD_AND_TARGET",
 
-    //【集智】
+    //【集智】【雷击】
     "WHEN_USING": "WHEN_USING",
 
     //【奋威】
@@ -112,11 +112,18 @@ const DAMAGE_EVENT_TIMINGS = [
     // DAMAGE_EVENT_TIMING.WHEN_SETTLEMENT_ENDS,
 ]
 
+// 不和timing一一对应
+// 和gameStatus.events 对应
 const ALL_EVENTS_KEY_CONFIG = {
     USE_STRIKE_EVENTS: "useStrikeEvents",
-    PLAY_EVENTS: "playEvents",
+    RESPONSE_CARD_EVENTS: "responseCardEvents",
     PANDING_EVENT: "pandingEvent",
     DAMAGE_EVENT: "damageEvent",
+}
+
+const USE_OR_PLAY_CONFIG = {
+    USE: "USE",
+    PLAY: "PLAY"
 }
 
 exports.USE_EVENT_TIMING = USE_EVENT_TIMING;
@@ -129,6 +136,7 @@ exports.DAMAGE_EVENT_TIMING = DAMAGE_EVENT_TIMING;
 exports.DAMAGE_EVENT_TIMINGS = DAMAGE_EVENT_TIMINGS;
 
 exports.ALL_EVENTS_KEY_CONFIG = ALL_EVENTS_KEY_CONFIG;
+exports.USE_OR_PLAY_CONFIG = USE_OR_PLAY_CONFIG;
 
 
 

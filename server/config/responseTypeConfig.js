@@ -1,6 +1,6 @@
 const RESPONSE_TYPE_CONFIG = {
     TAO: "TAO",
-    SHAN: "SHAN",
+    CARD: "CARD",
     SKILL: "SKILL",
     WUXIE: "WUXIE",
     SCROLL: "SCROLL"

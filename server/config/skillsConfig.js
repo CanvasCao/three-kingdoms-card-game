@@ -49,12 +49,10 @@ const TIMING_SKILLS_CONFIG = {
     SHU006_TIE_JI: {
         key: "SHU006_TIE_JI",
         triggerTiming: USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET,
-        triggerCardName: CARD_CONFIG.SHA.key,
     },
     WU006_LIU_LI: {
         key: "WU006_LIU_LI",
         triggerTiming: USE_EVENT_TIMING.WHEN_BECOMING_TARGET,
-        triggerCardName: CARD_CONFIG.SHA.key,
     },
 }
 

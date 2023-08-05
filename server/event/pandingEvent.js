@@ -1,8 +1,8 @@
-const {clearShanResponse} = require("../utils/responseUtils");
+const {clearCardResponse} = require("../utils/responseUtils");
 const {ALL_EVENTS_KEY_CONFIG} = require("../config/eventConfig");
 const {findOnGoingEvent} = require("./utils");
 const {CARD_ATTRIBUTE} = require("../config/cardConfig");
-const {generateDamageEventThenSetNextDamageEventSkillToSkillResponse} = require("./damageEvent");
+const {generateDamageEventThenSetNextDamageEventSkill} = require("./damageEvent");
 const {findNextUnDoneSkillInLastEventTimingsWithSkills} = require("./utils");
 const {PANDING_EVENT_TIMINGS} = require("../config/eventConfig");
 const {DELAY_SCROLL_CARDS_CONFIG} = require("../config/cardConfig");
@@ -19,10 +19,10 @@ const {getActualCardColor} = require("../utils/cardUtils");
 const {emitNotifyPandingPlayPublicCard} = require("../utils/emitUtils");
 const {throwCards} = require("../utils/cardUtils");
 const {getCards} = require("../utils/cardUtils");
-const {findAllEventSkillsByTimingName} = require("./utils");
+const {findAllEventSkillsByTimingNameAndActionCard} = require("./utils");
 const {last} = require("lodash");
 
-const generatePandingEventThenSetNextPandingEventSkillToSkillResponse = (gameStatus, {originId, pandingNameKey}) => {
+const generatePandingEventThenSetNextPandingEventSkill = (gameStatus, {originId, pandingNameKey}) => {
     const pandingResultCard = getCards(gameStatus, 1)
     gameStatus.pandingEvent = {
         originId,
@@ -33,10 +33,10 @@ const generatePandingEventThenSetNextPandingEventSkillToSkillResponse = (gameSta
     }
 
     emitNotifyPandingPlayPublicCard(gameStatus, pandingResultCard, gameStatus.players[originId], pandingNameKey);
-    setNextPandingEventSkillToSkillResponse(gameStatus);
+    setNextPandingEventSkill(gameStatus);
 }
 
-const setNextPandingEventSkillToSkillResponse = (gameStatus) => {
+const setNextPandingEventSkill = (gameStatus) => {
     const pandingEvent = gameStatus.pandingEvent;
     if (!pandingEvent) {
         return;
@@ -48,7 +48,7 @@ const setNextPandingEventSkillToSkillResponse = (gameStatus) => {
     let timingIndex = 0;
     if (eventTimingsWithSkills.length == 0) {
         const eventTimingName = PANDING_EVENT_TIMINGS[timingIndex] // BEFORE_PANDING_TAKE_EFFECT
-        const eventTimingSkills = findAllEventSkillsByTimingName(gameStatus, {eventTimingName, originId})
+        const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, originId})
         pandingEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
 
         if (eventTimingSkills.length > 0) {
@@ -64,7 +64,7 @@ const setNextPandingEventSkillToSkillResponse = (gameStatus) => {
             return;
         } else {
             const eventTimingName = PANDING_EVENT_TIMINGS[timingIndex + 1] // AFTER_PANDING_TAKE_EFFECT
-            const eventTimingSkills = findAllEventSkillsByTimingName(gameStatus, {eventTimingName, originId})
+            const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, originId})
             pandingEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
 
             if (eventTimingSkills.length > 0) {
@@ -116,7 +116,7 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
                 currentPlayer.removePandingSign(nextNeedPandingSign);
                 throwCards(gameStatus, pandingActualCard);
 
-                generateDamageEventThenSetNextDamageEventSkillToSkillResponse(gameStatus, {
+                generateDamageEventThenSetNextDamageEventSkill(gameStatus, {
                     damageCards: [pandingCard],
                     damageActualCard: pandingActualCard, // 渠道
                     damageAttribute: CARD_ATTRIBUTE.LIGHTNING,// 属性
@@ -129,10 +129,10 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
             }
         }
     } else if (pandingEvent.pandingNameKey === CARD_CONFIG.BA_GUA_ZHEN.key) {
-        const playEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.PLAY_EVENTS);
+        const playEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.RESPONSE_CARD_EVENTS);
         if (getActualCardColor(pandingResultCard) == CARD_COLOR.RED) {
             playEvent.playStatus = true;
-            clearShanResponse(gameStatus)
+            clearCardResponse(gameStatus)
         }
     }
 }
@@ -169,7 +169,7 @@ const executeNextOnePandingCard = (gameStatus) => {
     }
     // 判定生效 开始判定
     else if (nextNeedPandingSign.isEffect === true) {
-        generatePandingEventThenSetNextPandingEventSkillToSkillResponse(gameStatus, {
+        generatePandingEventThenSetNextPandingEventSkill(gameStatus, {
             originId: currentPlayer.playerId,
             pandingNameKey: pandingCard.key
         })
@@ -177,6 +177,6 @@ const executeNextOnePandingCard = (gameStatus) => {
 }
 
 
-exports.generatePandingEventThenSetNextPandingEventSkillToSkillResponse = generatePandingEventThenSetNextPandingEventSkillToSkillResponse;
-exports.setNextPandingEventSkillToSkillResponse = setNextPandingEventSkillToSkillResponse;
+exports.generatePandingEventThenSetNextPandingEventSkill = generatePandingEventThenSetNextPandingEventSkill;
+exports.setNextPandingEventSkill = setNextPandingEventSkill;
 exports.executeNextOnePandingCard = executeNextOnePandingCard;

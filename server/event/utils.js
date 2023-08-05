@@ -1,3 +1,4 @@
+const {ALL_SHA_CARD_KEYS} = require("../config/cardConfig");
 const {PLAY_EVENT_TIMING} = require("../config/eventConfig");
 const {ALL_EVENTS_KEY_CONFIG} = require("../config/eventConfig");
 const {EQUIPMENT_CARDS_CONFIG} = require("../config/cardConfig");
@@ -40,7 +41,7 @@ const {v4: uuidv4} = require('uuid');
 //     }
 // ]
 
-const configSkillToSkillResponseSkill = (configSkill, playerId) => {
+const configTimingSkillToResponseSkill = (configSkill, playerId) => {
     return {
         skillNameKey: configSkill.key,
         playerId,
@@ -66,7 +67,7 @@ const findNextUnDoneSkillInLastEventTimingsWithSkills = (gameStatus, eventTiming
 
 
 const findOnGoingEvent = (gameStatus, eventKey) => {
-    if ([ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS, ALL_EVENTS_KEY_CONFIG.PLAY_EVENTS].includes(eventKey)) {
+    if ([ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS, ALL_EVENTS_KEY_CONFIG.RESPONSE_CARD_EVENTS].includes(eventKey)) {
         return gameStatus?.[eventKey].find((event) => !event.done)
     }
     return gameStatus?.[eventKey]
@@ -74,14 +75,15 @@ const findOnGoingEvent = (gameStatus, eventKey) => {
 
 const findOnGoingEventSkill = (gameStatus, eventKey) => {
     const event = findOnGoingEvent(gameStatus, eventKey)
-    const eventTimingsWithSkills = event?.eventTimingsWithSkills;
-    const eventTiming = eventTimingsWithSkills.find((et) => et.eventTimingSkills.some((s) => s.done === false))
+    const eventTiming = event?.eventTimingsWithSkills
+        .find((et) => et.eventTimingSkills
+            .some((s) => s.done === false))
 
     return eventTiming?.eventTimingSkills.find((s) => s.done === false)
 }
 
 // AllEventSkills
-const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, targetId}) => {
+const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingName, actionCardKey, originId, targetId}) => {
     const originPlayer = gameStatus.players[originId];
     const originPlayerId = originPlayer?.playerId;
     const targetPlayer = gameStatus.players?.[targetId];
@@ -95,37 +97,36 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
         allPlayers.forEach((player) => {
             const eventSkillsForPlayer = player.skills.map((skill) => TIMING_SKILLS_CONFIG[skill.key])
                 .filter((skill) => skill && skill.triggerTiming == eventTimingName)
-                .map((skill) => configSkillToSkillResponseSkill(skill, player.playerId))
+                .map((skill) => configTimingSkillToResponseSkill(skill, player.playerId))
             eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
         })
     } else if (eventTimingName == PANDING_EVENT_TIMING.AFTER_PANDING_TAKE_EFFECT) {
         const eventSkillsForPlayer = originPlayer.skills.map((skill) => TIMING_SKILLS_CONFIG[skill.key])
             .filter((skill) => skill && skill.triggerTiming == eventTimingName)
-            .map((skill) => configSkillToSkillResponseSkill(skill, originPlayer.playerId))
+            .map((skill) => configTimingSkillToResponseSkill(skill, originPlayer.playerId))
         eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
     }
 
     // 杀 相关技能
-    else if (eventTimingName == USE_EVENT_TIMING.WHEN_BECOMING_TARGET) {
+    else if (eventTimingName == USE_EVENT_TIMING.WHEN_BECOMING_TARGET && ALL_SHA_CARD_KEYS.includes(actionCardKey)) {
         const eventSkillsForPlayer = targetPlayer.skills.map((skill) => TIMING_SKILLS_CONFIG[skill.key])
-            .filter((skill) => skill && skill.triggerTiming == eventTimingName && skill.triggerCardName == CARD_CONFIG.SHA.key)
-            .map((skill) => configSkillToSkillResponseSkill(skill, targetPlayerId))
+            .filter((skill) => skill && skill.triggerTiming == eventTimingName)
+            .map((skill) => configTimingSkillToResponseSkill(skill, targetPlayerId))
         eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
-    } else if (eventTimingName == USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET) {
+    } else if (eventTimingName == USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET && ALL_SHA_CARD_KEYS.includes(actionCardKey)) {
         const eventSkillsForPlayer = originPlayer.skills.map((skill) => TIMING_SKILLS_CONFIG[skill.key])
-            .filter((skill) => skill && skill.triggerTiming == eventTimingName && skill.triggerCardName == CARD_CONFIG.SHA.key)
-            .map((skill) => configSkillToSkillResponseSkill(skill, originPlayerId))
+            .filter((skill) => skill && skill.triggerTiming == eventTimingName)
+            .map((skill) => configTimingSkillToResponseSkill(skill, originPlayerId))
         eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
 
         // 雌雄双股剑
-        if (originPlayer.weaponCard) {
-            if (originPlayer.weaponCard.key === CARD_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key &&
-                originPlayer.gender !== targetPlayer.gender) {
-                const skill = configSkillToSkillResponseSkill(
-                    {key: EQUIPMENT_CARDS_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key},
-                    originPlayer.playerId)
-                eventTimingSkills = eventTimingSkills.concat(skill)
-            }
+        if (originPlayer.weaponCard &&
+            originPlayer.weaponCard.key === CARD_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key &&
+            originPlayer.gender !== targetPlayer.gender) {
+            const skill = configTimingSkillToResponseSkill(
+                {key: EQUIPMENT_CARDS_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key},
+                originPlayer.playerId)
+            eventTimingSkills = eventTimingSkills.concat(skill)
         }
     }
 
@@ -141,17 +142,18 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
                 // 如果需要技能来源有卡牌技能需要来源
                 return skill.needOriginHasCards ? originPlayer.hasAnyHandCardsOrEquipmentCards() : true
             })
-            .map((skill) => configSkillToSkillResponseSkill(skill, targetPlayerId))
+            .map((skill) => configTimingSkillToResponseSkill(skill, targetPlayerId))
         eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
     }
 
     // 使用牌
-    else if (eventTimingName == PLAY_EVENT_TIMING.WHEN_NEED_PLAY) {
+    else if (eventTimingName == PLAY_EVENT_TIMING.WHEN_NEED_PLAY &&
+        [CARD_CONFIG.WAN_JIAN_QI_FA.key, ...ALL_SHA_CARD_KEYS].includes(actionCardKey)) {
         // 八卦
         if (originPlayer?.shieldCard?.key == CARD_CONFIG.BA_GUA_ZHEN.key &&
             targetPlayer?.weaponCard?.key !== CARD_CONFIG.QIN_GANG_JIAN.key
         ) {
-            const skill = configSkillToSkillResponseSkill(
+            const skill = configTimingSkillToResponseSkill(
                 {key: EQUIPMENT_CARDS_CONFIG.BA_GUA_ZHEN.key},
                 originPlayer.playerId)
             eventTimingSkills = eventTimingSkills.concat(skill)
@@ -162,8 +164,8 @@ const findAllEventSkillsByTimingName = (gameStatus, {eventTimingName, originId, 
 }
 
 
-exports.configSkillToEventSkill = configSkillToSkillResponseSkill;
-exports.findAllEventSkillsByTimingName = findAllEventSkillsByTimingName;
+exports.configTimingSkillToResponseSkill = configTimingSkillToResponseSkill;
+exports.findAllEventSkillsByTimingNameAndActionCard = findAllEventSkillsByTimingNameAndActionCard;
 
 exports.findOnGoingEvent = findOnGoingEvent;
 exports.findOnGoingEventSkill = findOnGoingEventSkill;

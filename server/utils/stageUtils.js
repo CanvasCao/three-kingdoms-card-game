@@ -83,7 +83,7 @@ const tryGoToNextPlayOrResponseOrThrowTurn = (gameStatus) => {
 }
 
 const ifAnyPlayerNeedToResponse = (gameStatus) => {
-    if (gameStatus.shanResponse ||
+    if (gameStatus.cardResponse ||
         gameStatus.skillResponse ||
         gameStatus.taoResponses.length > 0 ||
         gameStatus.scrollResponses.length > 0 ||

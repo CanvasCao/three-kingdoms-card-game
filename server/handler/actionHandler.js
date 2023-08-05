@@ -67,11 +67,7 @@ const actionHandler = {
         //
         // 2.1 出杀
         // scrollResponses=[]
-        // shanResponse = {
-        //     originId: B,
-        //     targetId: A,
-        //     cardNumber: 1,
-        // }
+        // generateUseStrikeEventsThenSetNextStrikeEventSkill
         //
         // 2.2 不出杀
         // scrollResponses=[]
@@ -211,22 +207,22 @@ const actionHandler = {
         const equipmentType = equipmentCard.equipmentType;
         if (equipmentType == EQUIPMENT_TYPE.PLUS_HORSE) {
             if (originPlayer.plusHorseCard) {
-                throwCards(gameStatus, equipmentCard);
+                throwCards(gameStatus, originPlayer.plusHorseCard);
             }
             originPlayer.plusHorseCard = equipmentCard;
         } else if (equipmentType == EQUIPMENT_TYPE.MINUS_HORSE) {
             if (originPlayer.minusHorseCard) {
-                throwCards(gameStatus, equipmentCard);
+                throwCards(gameStatus, originPlayer.minusHorseCard);
             }
             originPlayer.minusHorseCard = equipmentCard;
         } else if (equipmentType == EQUIPMENT_TYPE.WEAPON) {
             if (originPlayer.weaponCard) {
-                throwCards(gameStatus, equipmentCard);
+                throwCards(gameStatus, originPlayer.weaponCard);
             }
             originPlayer.weaponCard = equipmentCard;
         } else if (equipmentType == EQUIPMENT_TYPE.SHIELD) {
             if (originPlayer.shieldCard) {
-                throwCards(gameStatus, equipmentCard);
+                throwCards(gameStatus, originPlayer.shieldCard);
             }
             originPlayer.shieldCard = equipmentCard;
         }

@@ -1,9 +1,11 @@
+const {ALL_SHA_CARD_KEYS} = require("../config/cardConfig");
+const {USE_OR_PLAY_CONFIG} = require("../config/eventConfig");
+const {CARD_CONFIG} = require("../config/cardConfig");
+const {generateResponseCardEventThenSetNextResponseCardEventSkill} = require("../event/responseCardEvent");
 const {STAGE_NAMES, STAGE_NAME} = require("../config/gameConfig");
-const {emitNotifyDrawCards} = require("./emitUtils");
 const {getNextNeedExecutePandingSign} = require("./pandingUtils");
 const {SCROLL_CARDS_CONFIG} = require("../config/cardConfig");
 const {getAllHasWuxiePlayers, getCurrentPlayer} = require("./playerUtils");
-const {getCards} = require("./cardUtils");
 const {clearNextScrollResponse, clearWuxieSimultaneousResponse} = require("./responseUtils");
 
 const generateWuxieSimultaneousResponseByScroll = (gameStatus) => {
@@ -70,6 +72,18 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
             } else if (curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.key) {
                 gameStatus.players[curScrollResponse.originId].addBlood();
                 clearNextScrollResponse(gameStatus);
+            } else if (curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.key ||
+                curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.key) {
+                generateResponseCardEventThenSetNextResponseCardEventSkill(gameStatus, {
+                    originId: curScrollResponse.originId,
+                    targetId: curScrollResponse.targetId,
+                    actionCardKey: curScrollResponse.actualCard.key,
+                    responseCardKeys: curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.key ?
+                        [CARD_CONFIG.SHAN.key] :
+                        ALL_SHA_CARD_KEYS,
+                    useOrPlay: USE_OR_PLAY_CONFIG.PLAY
+                })
+                clearNextScrollResponse(gameStatus);
             } else {
                 curScrollResponse.isEffect = true;
             }
@@ -78,18 +92,6 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
         }
     }
     clearWuxieSimultaneousResponse(gameStatus); // 生效后清空WuxieResponse
-
-
-    // 无懈可击失效以后 下一个人的锦囊需要继续求无懈可击
-    if (gameStatus.scrollResponses.length > 0 && gameStatus.scrollResponses[0].isEffect === undefined
-    ) {
-        const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
-        if (hasWuxiePlayers.length > 0) {
-            generateWuxieSimultaneousResponseByScroll(gameStatus)
-        } else { // 没人有无懈可击直接生效
-            setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, gameStatus.scrollResponses[0].actualCard.key);
-        }
-    }
 }
 
 const resetHasWuxiePlayerIdsAndPushChainAfterValidatedWuxie = (gameStatus, response) => {

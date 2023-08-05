@@ -5,8 +5,8 @@ const _clearDeadPlayerInAllResponse = (gameStatus, player) => {
         delete gameStatus.skillResponse
     }
 
-    if (gameStatus.shanResponse?.originId == player.playerId) {
-        delete gameStatus.shanResponse
+    if (gameStatus.cardResponse?.originId == player.playerId) {
+        delete gameStatus.cardResponse
     }
 
     // AOE
