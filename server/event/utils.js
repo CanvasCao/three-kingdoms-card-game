@@ -131,7 +131,20 @@ const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingNam
     }
 
     // 伤害
-    else if (eventTimingName == DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE) {
+    else if (eventTimingName == DAMAGE_EVENT_TIMING.WHEN_CAUSE_DAMAGE &&
+        [...ALL_SHA_CARD_KEYS].includes(actionCardKey)
+    ) {
+        // 雌雄双股剑
+        if (originPlayer.weaponCard &&
+            originPlayer.weaponCard.key === CARD_CONFIG.QI_LIN_GONG.key &&
+            (targetPlayer.plusHorseCard || targetPlayer.minusHorseCard)
+        ) {
+            const skill = configTimingSkillToResponseSkill(
+                {key: EQUIPMENT_CARDS_CONFIG.QI_LIN_GONG.key},
+                originPlayer.playerId)
+            eventTimingSkills = eventTimingSkills.concat(skill)
+        }
+    } else if (eventTimingName == DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE) {
         const eventSkillsForPlayer = targetPlayer.skills.map((skill) => TIMING_SKILLS_CONFIG[skill.key])
             .filter((skill) => skill && skill.triggerTiming == eventTimingName)
             .filter((skill) => {

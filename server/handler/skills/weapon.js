@@ -35,4 +35,23 @@ const handleCiXiongShuangGuJianResponse = (gameStatus, response) => {
     }
 }
 
+const handleQiLinGongResponse = (gameStatus, response) => {
+    const chooseToReleaseSkill = response.chooseToResponse;
+    const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus,ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
+
+    if (!chooseToReleaseSkill) {
+        onGoingDamageEventSkill.done = true;
+        return
+    }
+
+    if (onGoingDamageEventSkill.chooseToReleaseSkill === undefined) {
+        onGoingDamageEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
+    } else {
+        // 在CardBoard
+        // onGoingDamageEventSkill.done = true;
+        // 不能删除 gameStatus.skillResponse
+    }
+}
+
 exports.handleCiXiongShuangGuJianResponse = handleCiXiongShuangGuJianResponse;
+exports.handleQiLinGongResponse = handleQiLinGongResponse;

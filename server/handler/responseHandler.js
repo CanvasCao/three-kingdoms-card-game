@@ -1,4 +1,5 @@
 const strikeEvent = require("../event/strikeEvent");
+const {handleQiLinGongResponse} = require("./skills/weapon");
 const {USE_OR_PLAY_CONFIG} = require("../config/eventConfig");
 const {ALL_SHA_CARD_KEYS} = require("../config/cardConfig");
 const {generateResponseCardEventThenSetNextResponseCardEventSkill} = require("../event/responseCardEvent");
@@ -97,6 +98,8 @@ const responseCardHandler = {
             handleWu006LiuLiResponse(gameStatus, response)
         } else if (skillNameKey == CARD_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key) {
             handleCiXiongShuangGuJianResponse(gameStatus, response)
+        } else if (skillNameKey == CARD_CONFIG.QI_LIN_GONG.key) {
+            handleQiLinGongResponse(gameStatus, response)
         } else if (skillNameKey == CARD_CONFIG.BA_GUA_ZHEN.key) {
             handleBaGuaZhenResponse(gameStatus, response)
         }

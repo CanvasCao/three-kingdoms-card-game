@@ -14,9 +14,9 @@ const cardBoardHandler = {
             gameStatus.players[originId].addCards(card);
         }
 
-        // 反馈
+        // 反馈 麒麟弓
         if (gameStatus.skillResponse) {
-            const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus,ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
+            const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
             onGoingDamageEventSkill.done = true;
             clearSkillResponse(gameStatus);
         }

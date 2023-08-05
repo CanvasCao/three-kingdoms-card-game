@@ -42,8 +42,7 @@ const setNextPandingEventSkill = (gameStatus) => {
         return;
     }
 
-    const originId = pandingEvent.originId;
-    const eventTimingsWithSkills = pandingEvent.eventTimingsWithSkills;
+    const {originId, eventTimingsWithSkills} = pandingEvent;
 
     let timingIndex = 0;
     if (eventTimingsWithSkills.length == 0) {

@@ -37,8 +37,9 @@ const setNextDamageEventSkill = (gameStatus) => {
         return;
     }
 
-    const originId = damageEvent.originId;
-    const targetId = damageEvent.targetId;
+    const {originId, targetId, damageActualCard} = damageEvent;
+    const actionCardKey = damageActualCard?.key
+
     const originPlayer = gameStatus.players[originId]
     const targetPlayer = gameStatus.players[targetId]
 
@@ -47,7 +48,7 @@ const setNextDamageEventSkill = (gameStatus) => {
     let timingIndex = 0;
     if (eventTimingsWithSkills.length == 0) {
         const eventTimingName = DAMAGE_EVENT_TIMINGS[timingIndex] // WHEN_CAUSE_DAMAGE
-        const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, originId})
+        const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, actionCardKey, originId, targetId})
         damageEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
 
         if (eventTimingSkills.length > 0) {
