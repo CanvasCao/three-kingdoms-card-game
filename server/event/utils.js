@@ -128,6 +128,15 @@ const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingNam
                 originPlayer.playerId)
             eventTimingSkills = eventTimingSkills.concat(skill)
         }
+    } else if (eventTimingName == USE_EVENT_TIMING.BEFORE_TAKE_EFFECT && ALL_SHA_CARD_KEYS.includes(actionCardKey)) {
+        // 贯石斧
+        if (originPlayer.weaponCard &&
+            originPlayer.weaponCard.key === CARD_CONFIG.GUAN_SHI_FU.key) {
+            const skill = configTimingSkillToResponseSkill(
+                {key: EQUIPMENT_CARDS_CONFIG.GUAN_SHI_FU.key},
+                originPlayer.playerId)
+            eventTimingSkills = eventTimingSkills.concat(skill)
+        }
     }
 
     // 伤害

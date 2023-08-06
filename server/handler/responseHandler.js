@@ -1,4 +1,5 @@
 const strikeEvent = require("../event/strikeEvent");
+const {handleGuanShiFuResponse} = require("./skills/weapon");
 const {handleQiLinGongResponse} = require("./skills/weapon");
 const {USE_OR_PLAY_CONFIG} = require("../config/eventConfig");
 const {ALL_SHA_CARD_KEYS} = require("../config/cardConfig");
@@ -56,9 +57,12 @@ const responseCardHandler = {
 
         const onGoingResponseCardEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.RESPONSE_CARD_EVENTS);
         if (response.chooseToResponse) {
-            onGoingResponseCardEvent.playStatus = true
+            onGoingResponseCardEvent.responseStatus = true // 雷击
 
-            if (cardResponse.actionCardKey == CARD_CONFIG.JUE_DOU.key) { // 决斗出杀之后 需要互换目标
+            if (ALL_SHA_CARD_KEYS.includes(cardResponse.actionCardKey)) {
+                const onGoingUseStrikeEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS);
+                onGoingUseStrikeEvent.dodgeStatus = true; // 【贯石斧】、【青龙偃月刀】 猛进
+            } else if (cardResponse.actionCardKey == CARD_CONFIG.JUE_DOU.key) { // 决斗出杀之后 需要互换目标
                 generateResponseCardEventThenSetNextResponseCardEventSkill(gameStatus, {
                     originId: cardResponse.targetId,
                     targetId: cardResponse.originId,
@@ -68,7 +72,9 @@ const responseCardHandler = {
                 })
             }
         } else {
-            delete gameStatus.responseCardEvents;
+            if (ALL_SHA_CARD_KEYS.includes(cardResponse.actionCardKey)) {
+                delete gameStatus.useStrikeEvents;
+            }
             generateDamageEventThenSetNextDamageEventSkill(gameStatus, {
                 damageCards: action.cards,
                 damageActualCard: action.actualCard, // 渠道
@@ -76,6 +82,7 @@ const responseCardHandler = {
                 originId: cardResponse.targetId,// 来源
                 targetId: cardResponse.originId
             })
+            delete gameStatus.responseCardEvents;// 吕布无双的情况下删除所有的responseCardEvents
         }
         clearCardResponse(gameStatus);
     },
@@ -102,6 +109,8 @@ const responseCardHandler = {
             handleQiLinGongResponse(gameStatus, response)
         } else if (skillNameKey == CARD_CONFIG.BA_GUA_ZHEN.key) {
             handleBaGuaZhenResponse(gameStatus, response)
+        }else if (skillNameKey == CARD_CONFIG.GUAN_SHI_FU.key) {
+            handleGuanShiFuResponse(gameStatus, response)
         }
     },
 

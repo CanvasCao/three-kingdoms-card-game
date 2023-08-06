@@ -128,9 +128,9 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
             }
         }
     } else if (pandingEvent.pandingNameKey === CARD_CONFIG.BA_GUA_ZHEN.key) {
-        const playEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.RESPONSE_CARD_EVENTS);
+        const responseCardEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.RESPONSE_CARD_EVENTS);
         if (getActualCardColor(pandingResultCard) == CARD_COLOR.RED) {
-            playEvent.playStatus = true;
+            responseCardEvent.responseStatus = true; // 雷击
             clearCardResponse(gameStatus)
         }
     }

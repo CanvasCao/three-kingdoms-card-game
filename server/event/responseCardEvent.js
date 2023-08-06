@@ -26,7 +26,7 @@ const generateResponseCardEventThenSetNextResponseCardEventSkill = (gameStatus, 
             actionCardKey,
             responseCardKeys,
             useOrPlay,
-            playStatus: undefined,
+            responseStatus: undefined,
             eventTimingsWithSkills: [],
             done: false,
         }
@@ -64,7 +64,16 @@ const setNextResponseCardEventSkill = (gameStatus) => {
         } else {
             const eventTimingName = PLAY_EVENT_TIMINGS[timingIndex + 1]
 
-            if (responseCardEvent.playStatus === true) {  // 使用以后
+            if (responseCardEvent.responseStatus === undefined) { // 没有决定是否响应 等待前端响应
+                gameStatus.cardResponse = {
+                    originId,
+                    targetId,
+                    cardNumber,
+                    actionCardKey,
+                    responseCardKeys,
+                }
+                return;
+            } else if (responseCardEvent.responseStatus === true) {  // 使用以后 雷击
                 const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {
                     eventTimingName,
                     actionCardKey,
@@ -77,19 +86,9 @@ const setNextResponseCardEventSkill = (gameStatus) => {
                     setEventSkillResponse(gameStatus, eventTimingSkills[0])
                     return;
                 }
-            } else if (responseCardEvent.playStatus === false) {
+            } else if (responseCardEvent.responseStatus === false) {
                 // handle card res的时候已经把responseCardEvents删除了
-                console.log('Should not into responseCardEvent.playStatus === false')
-            } else if (responseCardEvent.playStatus === undefined) {
-                // 等待前端响应
-                gameStatus.cardResponse = {
-                    originId,
-                    targetId,
-                    cardNumber,
-                    actionCardKey,
-                    responseCardKeys,
-                }
-                return;
+                console.log('Should not into responseCardEvent.responseStatus === false')
             }
         }
     }

@@ -116,7 +116,6 @@ const setStatusWhenDamageEventDone = (gameStatus) => {
 }
 
 const handleDamageEventEnd = (gameStatus) => {
-    const damageEvent = gameStatus.damageEvent;
     delete gameStatus.damageEvent;
 }
 
