@@ -1,8 +1,8 @@
+const {DAMAGE_EVENT_TIMING} = require("../config/eventConfig");
 const {generateQiuTaoResponses} = require("../utils/taoUtils");
 const {findNextUnDoneSkillInLastEventTimingsWithSkills} = require("./utils");
 const {setEventSkillResponse} = require("./utils");
 const {findAllEventSkillsByTimingNameAndActionCard} = require("./utils");
-const {DAMAGE_EVENT_TIMINGS} = require("../config/eventConfig");
 const {last} = require("lodash");
 
 const generateDamageEventThenSetNextDamageEventSkill = (gameStatus, {
@@ -45,9 +45,8 @@ const setNextDamageEventSkill = (gameStatus) => {
 
     const eventTimingsWithSkills = damageEvent.eventTimingsWithSkills;
 
-    let timingIndex = 0;
     if (eventTimingsWithSkills.length == 0) {
-        const eventTimingName = DAMAGE_EVENT_TIMINGS[timingIndex] // WHEN_CAUSE_DAMAGE
+        const eventTimingName = DAMAGE_EVENT_TIMING.WHEN_CAUSE_DAMAGE // 【麒麟弓】、【寒冰剑】
         const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, actionCardKey, originId, targetId})
         damageEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
 
@@ -57,13 +56,13 @@ const setNextDamageEventSkill = (gameStatus) => {
         }
     }
 
-    if (last(eventTimingsWithSkills).eventTimingName == DAMAGE_EVENT_TIMINGS[timingIndex]) {
+    if (last(eventTimingsWithSkills).eventTimingName == DAMAGE_EVENT_TIMING.WHEN_CAUSE_DAMAGE) {
         const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
         } else {
-            const eventTimingName = DAMAGE_EVENT_TIMINGS[timingIndex + 1] // WHEN_TAKE_DAMAGE
+            const eventTimingName = DAMAGE_EVENT_TIMING.WHEN_TAKE_DAMAGE //【天香】
             const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, targetId})
             damageEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
 
@@ -78,13 +77,13 @@ const setNextDamageEventSkill = (gameStatus) => {
         }
     }
 
-    if (last(eventTimingsWithSkills).eventTimingName == DAMAGE_EVENT_TIMINGS[timingIndex + 1]) {
+    if (last(eventTimingsWithSkills).eventTimingName == DAMAGE_EVENT_TIMING.WHEN_TAKE_DAMAGE) {
         const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
         } else {
-            const eventTimingName = DAMAGE_EVENT_TIMINGS[timingIndex + 2] // AFTER_CAUSE_DAMAGE
+            const eventTimingName = DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE // 【奸雄】、【反馈】、【刚烈】、【遗计】
             const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, targetId, originId})
             damageEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
 
@@ -95,7 +94,7 @@ const setNextDamageEventSkill = (gameStatus) => {
         }
     }
 
-    if (last(eventTimingsWithSkills).eventTimingName == DAMAGE_EVENT_TIMINGS[timingIndex + 2]) {
+    if (last(eventTimingsWithSkills).eventTimingName == DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE) {
         const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)

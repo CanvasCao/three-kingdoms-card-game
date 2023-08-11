@@ -143,7 +143,9 @@ const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingNam
     else if (eventTimingName == DAMAGE_EVENT_TIMING.WHEN_CAUSE_DAMAGE &&
         [...ALL_SHA_CARD_KEYS].includes(actionCardKey)
     ) {
-        // 雌雄双股剑
+        // 寒冰箭
+
+        // 麒麟弓
         if (originPlayer.weaponCard &&
             originPlayer.weaponCard.key === CARD_CONFIG.QI_LIN_GONG.key &&
             (targetPlayer.plusHorseCard || targetPlayer.minusHorseCard)
