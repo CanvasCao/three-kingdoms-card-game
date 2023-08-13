@@ -174,7 +174,7 @@ const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingNam
             })
             .filter((skill) => {
                 // 如果需要技能来源有卡牌技能需要来源
-                return skill.needOriginHasCards ? originPlayer.hasAnyHandCardsOrEquipmentCards() : true
+                return skill.needOriginHasCards ? originPlayer.hasAnyCards() : true
             })
             .map((skill) => configTimingSkillToResponseSkill(skill, targetPlayerId))
         eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)

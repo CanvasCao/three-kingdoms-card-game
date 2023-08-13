@@ -2,6 +2,7 @@ const RESPONSE_TYPE_CONFIG = {
     TAO: "TAO",
     CARD: "CARD",
     SKILL: "SKILL",
+    CARD_BOARD: "CARD_BOARD",
     WUXIE: "WUXIE",
     SCROLL: "SCROLL"
 }

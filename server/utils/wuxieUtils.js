@@ -86,6 +86,18 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
                     useOrPlay: USE_OR_PLAY_CONFIG.PLAY
                 })
                 clearNextScrollResponse(gameStatus);
+            } else if (curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.key ||
+                curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.GUO_HE_CHAI_QIAO.key
+            ) {
+                const targetPlayer = gameStatus.players[curScrollResponse.targetId]
+                if (targetPlayer.hasAnyCards()) {
+                    gameStatus.cardBoardResponses = [{
+                        originId: curScrollResponse.originId,
+                        targetId: curScrollResponse.targetId,
+                        cardBoardContentKey: curScrollResponse.actualCard.key
+                    }]
+                }
+                clearNextScrollResponse(gameStatus);
             } else {
                 curScrollResponse.isEffect = true;
             }

@@ -1,3 +1,4 @@
+const {SKILL_CONFIG} = require("../../config/skillsConfig");
 const {ALL_EVENTS_KEY_CONFIG} = require("../../config/eventConfig");
 const {findOnGoingEvent} = require("../../event/utils");
 const {findOnGoingEventSkill} = require("../../event/utils");
@@ -6,8 +7,8 @@ const {throwCards} = require("../../utils/cardUtils");
 
 const handleWei002FanKuiResponse = (gameStatus, response) => {
     const chooseToReleaseSkill = response.chooseToResponse;
-    const onGoingDamageEvent = findOnGoingEvent(gameStatus,ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
-    const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus,ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
+    const onGoingDamageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
+    const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
 
     if (!chooseToReleaseSkill) {
         onGoingDamageEventSkill.done = true;
@@ -20,8 +21,12 @@ const handleWei002FanKuiResponse = (gameStatus, response) => {
             fromId: onGoingDamageEvent.targetId,
             toIds: [onGoingDamageEvent.originId],
         });
+        gameStatus.cardBoardResponses = [{
+            originId: onGoingDamageEvent.targetId,
+            targetId: onGoingDamageEvent.originId,
+            cardBoardContentKey: SKILL_CONFIG.WEI002_FAN_KUI.key
+        }]
     } else {
-        // 在CardBoard
         // onGoingDamageEventSkill.done = true;
         // 不能删除 gameStatus.skillResponse
     }

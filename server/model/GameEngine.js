@@ -48,7 +48,11 @@ class GameEngine {
             cardResponse: undefined,
             taoResponses: [],
 
+            // skill
             skillResponse: undefined,
+
+            // cardBoard
+            cardBoardResponses: [],
 
             // 锦囊
             scrollResponses: [],

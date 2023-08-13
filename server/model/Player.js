@@ -62,11 +62,11 @@ class Player {
         this.cards = this.cards.concat(addingCards)
     }
 
-    hasAnyCards() {
-        return this.hasAnyHandCardsOrEquipmentCards() || this.pandingSigns?.length > 0
+    hasAnyCardsOrPandingCards() {
+        return this.hasAnyCards() || this.pandingSigns?.length > 0
     }
 
-    hasAnyHandCardsOrEquipmentCards() {
+    hasAnyCards() {
         return this.cards.length ||
             this.plusHorseCard ||
             this.minusHorseCard ||

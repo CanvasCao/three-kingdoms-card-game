@@ -1,6 +1,4 @@
-const {USE_OR_PLAY_CONFIG} = require("../../config/eventConfig");
-const {CARD_CONFIG} = require("../../config/cardConfig");
-const {generateResponseCardEventThenSetNextResponseCardEventSkill} = require("../../event/responseCardEvent");
+const {EQUIPMENT_CARDS_CONFIG} = require("../../config/cardConfig");
 const {generateDamageEventThenSetNextDamageEventSkill} = require("../../event/damageEvent");
 const {findOnGoingEvent} = require("../../event/utils");
 const {findOnGoingEventSkill} = require("../../event/utils");
@@ -42,6 +40,7 @@ const handleCiXiongShuangGuJianResponse = (gameStatus, response) => {
 const handleQiLinGongResponse = (gameStatus, response) => {
     const chooseToReleaseSkill = response.chooseToResponse;
     const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
+    const onGoingDamageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
 
     if (!chooseToReleaseSkill) {
         onGoingDamageEventSkill.done = true;
@@ -50,6 +49,12 @@ const handleQiLinGongResponse = (gameStatus, response) => {
 
     if (onGoingDamageEventSkill.chooseToReleaseSkill === undefined) {
         onGoingDamageEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
+
+        gameStatus.cardBoardResponses = [{
+            originId: onGoingDamageEvent.originId,
+            targetId: onGoingDamageEvent.targetId,
+            cardBoardContentKey: EQUIPMENT_CARDS_CONFIG.QI_LIN_GONG.key
+        }]
     } else {
         // 在CardBoard
         // onGoingDamageEventSkill.done = true;
@@ -109,7 +114,7 @@ const handleQingLongYanYueDaoResponse = (gameStatus, response) => {
 
         // onGoingUseStrikeEvent 阶段重置
         onGoingUseStrikeEvent.dodgeStatus = undefined;
-        onGoingUseStrikeEvent.eventTimingsWithSkills=[ onGoingUseStrikeEvent.eventTimingsWithSkills[0]]; // 只保留第一个元素
+        onGoingUseStrikeEvent.eventTimingsWithSkills = [onGoingUseStrikeEvent.eventTimingsWithSkills[0]]; // 只保留第一个元素
         onGoingUseStrikeEvent.cards = response.cards;
         onGoingUseStrikeEvent.actualCard = response.actualCard;
     }

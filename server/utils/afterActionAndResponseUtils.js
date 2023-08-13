@@ -10,13 +10,13 @@ const tryFindNextSkillResponse = (gameStatus) => {
     if (gameStatus.cardResponse ||
         gameStatus.skillResponse ||
         gameStatus.taoResponses.length > 0 ||
+        gameStatus.cardBoardResponses.length > 0 ||
         gameStatus.wuxieSimultaneousResponse.hasWuxiePlayerIds.length > 0
         // gameStatus.scrollResponses.length > 0 || // 结算万箭齐发和南蛮入侵过程中 会放技能
     ) {
         return;
     }
 
-    // 响应判定技能后
     if (gameStatus.pandingEvent) {
         setNextPandingEventSkill(gameStatus)
         if (gameStatus.skillResponse) {
@@ -60,6 +60,7 @@ const trySettleNextScroll = (gameStatus) => {
     if (gameStatus.cardResponse ||
         gameStatus.skillResponse ||
         gameStatus.taoResponses.length > 0 ||
+        gameStatus.cardBoardResponses.length > 0 ||
         gameStatus.wuxieSimultaneousResponse.hasWuxiePlayerIds.length > 0
         // gameStatus.scrollResponses.length > 0 ||
     ) {

@@ -1,9 +1,9 @@
+const {clearNextCardBoardResponse} = require("../utils/responseUtils");
 const {ALL_EVENTS_KEY_CONFIG} = require("../config/eventConfig");
 const {findOnGoingEventSkill} = require("../event/utils");
 const {clearSkillResponse} = require("../utils/responseUtils");
 const {CARD_BOARD_ACTION_TYPE} = require("../config/cardBoardConfig");
 const {throwCards} = require("../utils/cardUtils")
-const {clearNextScrollResponse} = require("../utils/responseUtils")
 const cardBoardHandler = {
     handleCardBoard(gameStatus, data) {
         const {card, originId, targetId, type} = data;
@@ -17,13 +17,13 @@ const cardBoardHandler = {
         // 反馈 麒麟弓
         if (gameStatus.skillResponse) {
             const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
-            onGoingDamageEventSkill.done = true;
+            if (onGoingDamageEventSkill) {
+                onGoingDamageEventSkill.done = true;
+            }
             clearSkillResponse(gameStatus);
         }
         // 顺拆
-        else {
-            clearNextScrollResponse(gameStatus)
-        }
+        clearNextCardBoardResponse(gameStatus)
     }
 }
 
