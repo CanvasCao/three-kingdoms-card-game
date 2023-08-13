@@ -128,9 +128,15 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
             }
         }
     } else if (pandingEvent.pandingNameKey === CARD_CONFIG.BA_GUA_ZHEN.key) {
-        const responseCardEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.RESPONSE_CARD_EVENTS);
         if (getActualCardColor(pandingResultCard) == CARD_COLOR.RED) {
+            const responseCardEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.RESPONSE_CARD_EVENTS);
             responseCardEvent.responseStatus = true; // 雷击
+
+            const onGoingUseStrikeEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS);
+            if (onGoingUseStrikeEvent) {
+                onGoingUseStrikeEvent.dodgeStatus = true; // 【贯石斧】、【青龙偃月刀】 猛进
+            }
+
             clearCardResponse(gameStatus)
         }
     }
