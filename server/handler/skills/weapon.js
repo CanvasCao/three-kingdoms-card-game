@@ -1,3 +1,6 @@
+const {USE_OR_PLAY_CONFIG} = require("../../config/eventConfig");
+const {CARD_CONFIG} = require("../../config/cardConfig");
+const {generateResponseCardEventThenSetNextResponseCardEventSkill} = require("../../event/responseCardEvent");
 const {generateDamageEventThenSetNextDamageEventSkill} = require("../../event/damageEvent");
 const {findOnGoingEvent} = require("../../event/utils");
 const {findOnGoingEventSkill} = require("../../event/utils");
@@ -84,6 +87,35 @@ const handleGuanShiFuResponse = (gameStatus, response) => {
     }
 }
 
+const handleQingLongYanYueDaoResponse = (gameStatus, response) => {
+    const chooseToReleaseSkill = response.chooseToResponse;
+    const originPlayer = gameStatus.players[response.originId];
+    const onGoingUseStrikeEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS);
+    const onGoingUseStrikeEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS);
+
+    if (!chooseToReleaseSkill) {
+        onGoingUseStrikeEventSkill.done = true;
+        return
+    }
+
+    if (onGoingUseStrikeEventSkill.chooseToReleaseSkill === undefined) {
+        onGoingUseStrikeEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
+    } else {
+        originPlayer.removeCards(response.cards);
+        throwCards(gameStatus, response.cards);
+
+        onGoingUseStrikeEventSkill.done = true;
+        delete gameStatus.skillResponse;
+
+        // onGoingUseStrikeEvent 阶段重置
+        onGoingUseStrikeEvent.dodgeStatus = undefined;
+        onGoingUseStrikeEvent.eventTimingsWithSkills=[ onGoingUseStrikeEvent.eventTimingsWithSkills[0]]; // 只保留第一个元素
+        onGoingUseStrikeEvent.cards = response.cards;
+        onGoingUseStrikeEvent.actualCard = response.actualCard;
+    }
+}
+
 exports.handleCiXiongShuangGuJianResponse = handleCiXiongShuangGuJianResponse;
 exports.handleQiLinGongResponse = handleQiLinGongResponse;
 exports.handleGuanShiFuResponse = handleGuanShiFuResponse;
+exports.handleQingLongYanYueDaoResponse = handleQingLongYanYueDaoResponse;

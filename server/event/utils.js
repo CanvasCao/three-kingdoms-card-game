@@ -124,8 +124,7 @@ const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingNam
             originPlayer.weaponCard.key === CARD_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key &&
             originPlayer.gender !== targetPlayer.gender) {
             const skill = configTimingSkillToResponseSkill(
-                {key: EQUIPMENT_CARDS_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key},
-                originPlayer.playerId)
+                {key: EQUIPMENT_CARDS_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key}, originPlayer.playerId)
             eventTimingSkills = eventTimingSkills.concat(skill)
         }
     } else if (eventTimingName == USE_EVENT_TIMING.BEFORE_TAKE_EFFECT && ALL_SHA_CARD_KEYS.includes(actionCardKey)) {
@@ -133,8 +132,19 @@ const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingNam
         if (originPlayer.weaponCard &&
             originPlayer.weaponCard.key === CARD_CONFIG.GUAN_SHI_FU.key) {
             const skill = configTimingSkillToResponseSkill(
-                {key: EQUIPMENT_CARDS_CONFIG.GUAN_SHI_FU.key},
-                originPlayer.playerId)
+                {key: EQUIPMENT_CARDS_CONFIG.GUAN_SHI_FU.key}, originPlayer.playerId)
+            eventTimingSkills = eventTimingSkills.concat(skill)
+        }
+
+        // 青龙偃月刀
+        if (originPlayer.weaponCard &&
+            originPlayer.weaponCard.key === CARD_CONFIG.QING_LONG_YAN_YUE_DAO.key) {
+            const skill = configTimingSkillToResponseSkill(
+                {key: EQUIPMENT_CARDS_CONFIG.QING_LONG_YAN_YUE_DAO.key}, originPlayer.playerId)
+
+            // 前端直接显示是否发动青龙偃月刀 对xx继续出杀？
+            // 而不是 是否发动青龙偃月刀
+            skill.chooseToReleaseSkill = true;
             eventTimingSkills = eventTimingSkills.concat(skill)
         }
     }

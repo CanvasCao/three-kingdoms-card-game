@@ -1,4 +1,5 @@
 const strikeEvent = require("../event/strikeEvent");
+const {handleQingLongYanYueDaoResponse} = require("./skills/weapon");
 const {handleGuanShiFuResponse} = require("./skills/weapon");
 const {handleQiLinGongResponse} = require("./skills/weapon");
 const {USE_OR_PLAY_CONFIG} = require("../config/eventConfig");
@@ -111,6 +112,8 @@ const responseCardHandler = {
             handleBaGuaZhenResponse(gameStatus, response)
         }else if (skillNameKey == CARD_CONFIG.GUAN_SHI_FU.key) {
             handleGuanShiFuResponse(gameStatus, response)
+        }else if (skillNameKey == CARD_CONFIG.QING_LONG_YAN_YUE_DAO.key) {
+            handleQingLongYanYueDaoResponse(gameStatus, response)
         }
     },
 
