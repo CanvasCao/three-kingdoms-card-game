@@ -72,6 +72,14 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
             } else if (curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.key) {
                 gameStatus.players[curScrollResponse.originId].addBlood();
                 clearNextScrollResponse(gameStatus);
+
+                // 不写递归的算法
+                if (getAllHasWuxiePlayers(gameStatus).length == 0) {
+                    gameStatus.scrollResponses.forEach(res => {
+                        gameStatus.players[res.originId].addBlood();
+                    })
+                    gameStatus.scrollResponses = [];
+                }
             } else if (curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.key ||
                 curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.key ||
                 curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.JUE_DOU.key
