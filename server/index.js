@@ -2,14 +2,12 @@
 const {emitRefreshRooms, emitRefreshRoomPlayers, emitRejoinInit} = require("./utils/emitUtils");
 const {v4: uuidv4} = require('uuid');
 const {differenceBy} = require("lodash/array");
-const {shuffle} = require("lodash/collection");
 const {goToNextStage} = require("./utils/stageUtils");
 const {GameEngine} = require("./model/GameEngine");
 const express = require('express');
 const app = express();
 const path = require('path');
 const {emitRefreshStatus} = require("./utils/emitUtils");
-const {sample} = require("lodash/collection");
 const {EMIT_TYPE} = require("./config/emitConfig");
 const server = require('http').createServer(app);
 const io = require('socket.io')(server, {
@@ -21,7 +19,6 @@ const io = require('socket.io')(server, {
     },
 });
 const port = process.env.PORT || 3000;
-const {Player} = require('./model/Player.js')
 
 server.listen(port, () => {
     console.log('Server listening at port %d', port);
@@ -99,19 +96,9 @@ io.on('connection', (socket) => {
         // startEngine
         const gameEngine = new GameEngine(io);
         rooms[roomId].gameEngine = gameEngine;
-
         const roomPlayers = rooms[roomId].players
-        let locations = shuffle([0, 1, 2, 3, 4, 5, 6, 7].slice(0, roomPlayers.length));
 
-        roomPlayers.forEach((p, i) => {
-            const newPlayer = new Player({
-                playerName: p.playerName,
-                playerId: p.playerId,
-                location: locations[i],
-            });
-            gameEngine.gameStatus.players[newPlayer.playerId] = newPlayer;
-        })
-
+        gameEngine.setPlayers(roomPlayers)
         gameEngine.startEngine(roomId);
         emitRefreshRooms(io, rooms);
     });

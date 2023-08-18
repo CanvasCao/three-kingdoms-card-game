@@ -12,9 +12,6 @@ class Player {
         this.location = player.location;
         this.playerName = player.playerName;
 
-        // TODO
-        this.canSelectHeroIds = ["WEI002", "SHU006", "WU006", "SHU003"]
-
         // cards
         this.cards = [];
 

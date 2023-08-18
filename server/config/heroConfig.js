@@ -57,6 +57,7 @@ const extractEnglishLetters = (inputString) => {
 
 const getHeroConfig = (heroId) => {
     return {
+        heroId,
         ...HERO_STATIC_CONFIG[heroId],
         ...HERO_SKILL_PROPS_CONFIG[heroId],
         kingdom: extractEnglishLetters(heroId) || "QUN",

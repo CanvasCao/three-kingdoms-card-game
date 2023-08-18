@@ -6,6 +6,8 @@ const heroSelectBoardBoardHandler = {
         const heroConfig = getHeroConfig(heroId)
         gameStatus.players[playerId].heroId = heroId;
         gameStatus.players[playerId].setPlayerConfig(heroConfig)
+
+        delete  gameStatus.players[playerId].canSelectHeros
     }
 }
 

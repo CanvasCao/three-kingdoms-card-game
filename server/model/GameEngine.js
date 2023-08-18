@@ -1,9 +1,11 @@
 const strikeEvent = require("../event/strikeEvent");
+const sampleSize = require("lodash/sampleSize");
+const {Player} = require("./Player");
+const {getHeroConfig} = require("../config/heroConfig");
 const {everyoneGetInitialCards} = require("../utils/cardUtils");
 const {setGameStatusStage} = require("../utils/stageUtils");
 const {heroSelectBoardBoardHandler} = require("../handler/heroSelectBoardHandler");
 const {RESPONSE_TYPE_CONFIG} = require("../config/responseTypeConfig");
-const {EQUIPMENT_CARDS_CONFIG} = require("../config/cardConfig");
 const {getResponseType} = require("../utils/responseUtils");
 const {trySettleNextScroll} = require("../utils/afterActionAndResponseUtils");
 const {tryFindNextSkillResponse} = require("../utils/afterActionAndResponseUtils");
@@ -35,6 +37,7 @@ const {responseCardHandler} = require("../handler/responseHandler");
 const {throwHandler} = require("../handler/throwHandler");
 const {cardBoardHandler} = require("../handler/cardBoardHandler");
 const {wuguBoardHandler} = require("../handler/wuguBoardHandler");
+const {shuffle} = require("lodash/collection");
 
 class GameEngine {
     constructor(io) {
@@ -74,9 +77,27 @@ class GameEngine {
         }
     }
 
+    setPlayers(roomPlayers) {
+        let locations = shuffle([0, 1, 2, 3, 4, 5, 6, 7].slice(0, roomPlayers.length));
+
+        roomPlayers.forEach((p, i) => {
+            const newPlayer = new Player({
+                playerName: p.playerName,
+                playerId: p.playerId,
+                location: locations[i],
+            });
+
+            // 选将
+            const allSelectHeroIds = ["WEI002", "SHU006", "WU006", "SHU003"];
+            const canSelectHeroIds = sampleSize(allSelectHeroIds, 2);
+            newPlayer.canSelectHeros = canSelectHeroIds.map(heroId => getHeroConfig(heroId))
+
+            this.gameStatus.players[newPlayer.playerId] = newPlayer;
+        })
+    }
+
     startEngine(roomId) {
         this.gameStatus.roomId = roomId;
-        // 选将
         emitInit(this.gameStatus);
     }
 
