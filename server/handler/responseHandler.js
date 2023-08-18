@@ -56,27 +56,28 @@ const responseCardHandler = {
         throwCards(gameStatus, response.cards);
 
         const onGoingResponseCardEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.RESPONSE_CARD_EVENTS);
-        const onGoingUseStrikeEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS);
 
         if (response.chooseToResponse) {
             onGoingResponseCardEvent.responseStatus = true // 雷击
 
             if (ALL_SHA_CARD_KEYS.includes(cardResponse.actionCardKey)) {
+                const onGoingUseStrikeEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS);
                 onGoingUseStrikeEvent.dodgeStatus = true; // 【贯石斧】、【青龙偃月刀】 猛进
             } else if (cardResponse.actionCardKey == CARD_CONFIG.JUE_DOU.key) { // 决斗出杀之后 需要互换目标
                 generateResponseCardEventThenSetNextResponseCardEventSkill(gameStatus, {
                     originId: cardResponse.targetId,
                     targetId: cardResponse.originId,
-                    actionCardKey: cardResponse.actionCardKey,
+                    actionCards: cardResponse.actionCards,
+                    actionActualCard: cardResponse.actionActualCard,
                     responseCardKeys: ALL_SHA_CARD_KEYS,
                     useOrPlay: USE_OR_PLAY_CONFIG.PLAY
                 })
             }
         } else {
             generateDamageEventThenSetNextDamageEventSkill(gameStatus, {
-                damageCards: onGoingUseStrikeEvent?.cards||[],
-                damageActualCard: onGoingUseStrikeEvent.actualCard, // 渠道
-                damageAttribute: onGoingUseStrikeEvent?.actualCard?.attribute,// 属性
+                damageCards: cardResponse.actionCards,
+                damageActualCard: cardResponse.actionActualCard, // 渠道
+                damageAttribute: cardResponse.actionActualCard?.attribute,// 属性
                 originId: cardResponse.targetId,// 来源
                 targetId: cardResponse.originId
             })

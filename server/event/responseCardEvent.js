@@ -14,7 +14,8 @@ const generateResponseCardEventThenSetNextResponseCardEventSkill = (gameStatus, 
     originId,
     targetId,
     cardNumber = 1,
-    actionCardKey,
+    actionCards,
+    actionActualCard,
     responseCardKeys,
     useOrPlay,
 }) => {
@@ -23,7 +24,8 @@ const generateResponseCardEventThenSetNextResponseCardEventSkill = (gameStatus, 
             originId,
             targetId,
             cardNumber,
-            actionCardKey,
+            actionCards,
+            actionActualCard,
             responseCardKeys,
             useOrPlay,
             responseStatus: undefined,
@@ -40,14 +42,19 @@ const setNextResponseCardEventSkill = (gameStatus) => {
         return
     }
 
-    const {useOrPlay, actionCardKey, responseCardKeys, eventTimingsWithSkills, originId, targetId, cardNumber} = responseCardEvent
+    const {useOrPlay, actionCards, actionActualCard, responseCardKeys, eventTimingsWithSkills, originId, targetId, cardNumber} = responseCardEvent
 
     const timingIndex = 0;
     if (eventTimingsWithSkills.length == 0) {
         const eventTimingName = PLAY_EVENT_TIMINGS[timingIndex]
 
         // 这个阶段只判断八卦
-        const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, actionCardKey, originId, targetId})
+        const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {
+            eventTimingName,
+            actionCardKey: actionActualCard?.key,
+            originId,
+            targetId
+        })
         eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
 
         if (eventTimingSkills.length > 0) {
@@ -69,14 +76,15 @@ const setNextResponseCardEventSkill = (gameStatus) => {
                     originId,
                     targetId,
                     cardNumber,
-                    actionCardKey,
+                    actionCards,
+                    actionActualCard,
                     responseCardKeys,
                 }
                 return;
             } else if (responseCardEvent.responseStatus === true) {  // 使用以后 雷击
                 const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {
                     eventTimingName,
-                    actionCardKey,
+                    actionCardKey: actionActualCard?.key,
                     originId,
                     targetId
                 })

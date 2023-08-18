@@ -25,10 +25,10 @@ const generateUseStrikeEventsThenSetNextStrikeEventSkill = (gameStatus, {originI
 
     gameStatus.useStrikeEvents = targetPlayers.map((targetPlayer) => {
         return {
-            originId,
-            targetId: targetPlayer.playerId,
             cards,
             actualCard,
+            originId,
+            targetId: targetPlayer.playerId,
             cantShan: false,
             eventTimingsWithSkills: [],
             done: false
@@ -107,7 +107,8 @@ const setNextStrikeEventSkill = (gameStatus) => {
                     generateResponseCardEventThenSetNextResponseCardEventSkill(gameStatus, {
                         originId: useStrikeEvent.targetId,
                         targetId: useStrikeEvent.originId,
-                        actionCardKey,
+                        actionCards: useStrikeEvent.cards,
+                        actionActualCard: useStrikeEvent.actualCard,
                         responseCardKeys: [CARD_CONFIG.SHAN.key],
                         useOrPlay: USE_OR_PLAY_CONFIG.USE
                     })

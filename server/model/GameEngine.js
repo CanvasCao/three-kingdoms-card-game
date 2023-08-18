@@ -160,8 +160,8 @@ class GameEngine {
             throwCards(this.gameStatus, action.cards);
         }
 
-        trySettleNextScroll(this.gameStatus);
         tryFindNextSkillResponse(this.gameStatus);
+        trySettleNextScroll(this.gameStatus);
         emitRefreshStatus(this.gameStatus);
 
         emitNotifyPlayPublicCard(this.gameStatus, action);

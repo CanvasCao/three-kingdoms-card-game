@@ -79,10 +79,9 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
                 generateResponseCardEventThenSetNextResponseCardEventSkill(gameStatus, {
                     originId: curScrollResponse.originId,
                     targetId: curScrollResponse.targetId,
-                    actionCardKey: curScrollResponse.actualCard.key,
-                    responseCardKeys: curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.key ?
-                        [CARD_CONFIG.SHAN.key] :
-                        ALL_SHA_CARD_KEYS,
+                    actionCards: curScrollResponse.cards,
+                    actionActualCard: curScrollResponse.actualCard,
+                    responseCardKeys: curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.key ? [CARD_CONFIG.SHAN.key] : ALL_SHA_CARD_KEYS,
                     useOrPlay: USE_OR_PLAY_CONFIG.PLAY
                 })
                 clearNextScrollResponse(gameStatus);
