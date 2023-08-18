@@ -48,7 +48,6 @@ const setNextStrikeEventSkill = (gameStatus) => {
     const {eventTimingsWithSkills, originId, targetId, actualCard} = useStrikeEvent;
     const originPlayer = gameStatus.players[originId];
     const targetPlayer = gameStatus.players[targetId];
-    const action = gameStatus.action;
     const actionCardKey = actualCard?.key;
 
     if (eventTimingsWithSkills.length == 0) {
@@ -87,7 +86,7 @@ const setNextStrikeEventSkill = (gameStatus) => {
         } else {
             const eventTimingName = USE_EVENT_TIMING.WHEN_SETTLEMENT_BEGINS // 【仁王盾】【藤甲①】
             // 杀会取消的情况 无QIN_GANG_JIAN&&黑杀&&仁王盾
-            if (getActualCardColor(action.actualCard) == CARD_COLOR.BLACK &&
+            if (getActualCardColor(actualCard) == CARD_COLOR.BLACK &&
                 targetPlayer.shieldCard?.key == EQUIPMENT_CARDS_CONFIG.REN_WANG_DUN.key &&
                 originPlayer.weaponCard?.key != EQUIPMENT_CARDS_CONFIG.QIN_GANG_JIAN.key) {
                 useStrikeEvent.done = true;

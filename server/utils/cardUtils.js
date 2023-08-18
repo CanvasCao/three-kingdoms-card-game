@@ -36,6 +36,10 @@ const everyoneGetInitialCards = (gameStatus) => {
 }
 
 const getActualCardColor = (actualCard) => {
+    if(!actualCard){
+        return CARD_COLOR.NO;
+    }
+
     let count = 0;
     const map = {
         [CARD_HUASE.HONGTAO]: 1,

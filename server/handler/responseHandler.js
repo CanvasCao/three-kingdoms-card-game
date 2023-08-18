@@ -51,18 +51,17 @@ const {ALL_EVENTS_KEY_CONFIG} = require("../config/eventConfig")
 const responseCardHandler = {
     setStatusByCardResponse: (gameStatus, response) => {
         const cardResponse = gameStatus.cardResponse;
-        const action = gameStatus.action;
         const responseOriginPlayer = gameStatus.players[cardResponse.originId];
-        const responseTargetPlayer = gameStatus.players[cardResponse.targetId];
         responseOriginPlayer.removeCards(response.cards);
         throwCards(gameStatus, response.cards);
 
         const onGoingResponseCardEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.RESPONSE_CARD_EVENTS);
+        const onGoingUseStrikeEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS);
+
         if (response.chooseToResponse) {
             onGoingResponseCardEvent.responseStatus = true // 雷击
 
             if (ALL_SHA_CARD_KEYS.includes(cardResponse.actionCardKey)) {
-                const onGoingUseStrikeEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS);
                 onGoingUseStrikeEvent.dodgeStatus = true; // 【贯石斧】、【青龙偃月刀】 猛进
             } else if (cardResponse.actionCardKey == CARD_CONFIG.JUE_DOU.key) { // 决斗出杀之后 需要互换目标
                 generateResponseCardEventThenSetNextResponseCardEventSkill(gameStatus, {
@@ -74,16 +73,17 @@ const responseCardHandler = {
                 })
             }
         } else {
-            if (ALL_SHA_CARD_KEYS.includes(cardResponse.actionCardKey)) {
-                delete gameStatus.useStrikeEvents;
-            }
             generateDamageEventThenSetNextDamageEventSkill(gameStatus, {
-                damageCards: action.cards,
-                damageActualCard: action.actualCard, // 渠道
-                damageAttribute: action.actualCard?.attribute,// 属性
+                damageCards: onGoingUseStrikeEvent?.cards||[],
+                damageActualCard: onGoingUseStrikeEvent.actualCard, // 渠道
+                damageAttribute: onGoingUseStrikeEvent?.actualCard?.attribute,// 属性
                 originId: cardResponse.targetId,// 来源
                 targetId: cardResponse.originId
             })
+
+            if (ALL_SHA_CARD_KEYS.includes(cardResponse.actionCardKey)) {
+                delete gameStatus.useStrikeEvents;
+            }
             delete gameStatus.responseCardEvents;// 吕布无双的情况下删除所有的responseCardEvents
         }
         clearCardResponse(gameStatus);
@@ -225,22 +225,6 @@ const responseCardHandler = {
 
         clearNextScrollResponse(gameStatus);
     },
-
-    // // 武器
-    // setStatusByQingLongYanYueDaoResponse: (gameStatus, response) => {
-    //     if (response.chooseToResponse) {
-    //         const action = gameStatus.action;
-    //         clearNextWeaponResponse(gameStatus);
-    //         gameStatus.cardResponse = {
-    //             originId: action.targetIds[0],
-    //             targetId: action.originId,
-    //             cardNumber: 1,
-    //         }
-    //     } else {
-    //         clearNextWeaponResponse(gameStatus);
-    //         clearCardResponse(gameStatus)
-    //     }
-    // }
 }
 
 exports.responseCardHandler = responseCardHandler;
