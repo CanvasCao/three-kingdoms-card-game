@@ -154,6 +154,15 @@ const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingNam
         [...ALL_SHA_CARD_KEYS].includes(actionCardKey)
     ) {
         // 寒冰箭
+        if (originPlayer.weaponCard &&
+            originPlayer.weaponCard.key === CARD_CONFIG.HAN_BIN_JIAN.key &&
+            (targetPlayer.hasAnyCards())
+        ) {
+            const skill = configTimingSkillToResponseSkill(
+                {key: EQUIPMENT_CARDS_CONFIG.HAN_BIN_JIAN.key},
+                originPlayer.playerId)
+            eventTimingSkills = eventTimingSkills.concat(skill)
+        }
 
         // 麒麟弓
         if (originPlayer.weaponCard &&

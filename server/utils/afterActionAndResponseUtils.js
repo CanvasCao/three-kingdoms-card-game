@@ -9,9 +9,9 @@ const {setNextPandingEventSkill} = require("../event/pandingEvent");
 const tryFindNextSkillResponse = (gameStatus) => {
     if (gameStatus.cardResponse ||
         gameStatus.skillResponse ||
-        gameStatus.taoResponses.length > 0 ||
-        gameStatus.cardBoardResponses.length > 0 ||
-        gameStatus.wuxieSimultaneousResponse.hasWuxiePlayerIds.length > 0
+        gameStatus.taoResponses?.length > 0 ||
+        gameStatus.cardBoardResponses?.length > 0 ||
+        gameStatus.wuxieSimultaneousResponse?.hasWuxiePlayerIds?.length > 0
         // gameStatus.scrollResponses.length > 0 || // 结算万箭齐发和南蛮入侵过程中 会放技能
     ) {
         return;

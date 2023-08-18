@@ -1,3 +1,4 @@
+const {cloneDeep} = require("lodash");
 const {EQUIPMENT_CARDS_CONFIG} = require("../../config/cardConfig");
 const {generateDamageEventThenSetNextDamageEventSkill} = require("../../event/damageEvent");
 const {findOnGoingEvent} = require("../../event/utils");
@@ -55,11 +56,10 @@ const handleQiLinGongResponse = (gameStatus, response) => {
             targetId: onGoingDamageEvent.targetId,
             cardBoardContentKey: EQUIPMENT_CARDS_CONFIG.QI_LIN_GONG.key
         }]
-    } else {
-        // 在CardBoard
-        // onGoingDamageEventSkill.done = true;
-        // 不能删除 gameStatus.skillResponse
+    }  else {
+        // onGoingDamageEventSkill.done = true; 在CardBoardHandler
     }
+    delete gameStatus.skillResponse;
 }
 
 const handleGuanShiFuResponse = (gameStatus, response) => {
@@ -120,7 +120,37 @@ const handleQingLongYanYueDaoResponse = (gameStatus, response) => {
     }
 }
 
+const handleHanBinJianResponse = (gameStatus, response) => {
+    const chooseToReleaseSkill = response.chooseToResponse;
+    const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
+    const onGoingDamageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
+
+    if (!chooseToReleaseSkill) {
+        onGoingDamageEventSkill.done = true;
+        return
+    }
+
+    if (onGoingDamageEventSkill.chooseToReleaseSkill === undefined) {
+        onGoingDamageEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
+
+        const cardBoardResponse = {
+            originId: onGoingDamageEvent.originId,
+            targetId: onGoingDamageEvent.targetId,
+            cardBoardContentKey: EQUIPMENT_CARDS_CONFIG.HAN_BIN_JIAN.key
+        }
+        gameStatus.cardBoardResponses = [
+            cloneDeep(cardBoardResponse), cloneDeep(cardBoardResponse)
+        ]
+
+        delete gameStatus.damageEvent;
+    }  else {
+        // onGoingDamageEventSkill.done = true; 在CardBoardHandler
+    }
+    delete gameStatus.skillResponse;
+}
+
 exports.handleCiXiongShuangGuJianResponse = handleCiXiongShuangGuJianResponse;
 exports.handleQiLinGongResponse = handleQiLinGongResponse;
 exports.handleGuanShiFuResponse = handleGuanShiFuResponse;
 exports.handleQingLongYanYueDaoResponse = handleQingLongYanYueDaoResponse;
+exports.handleHanBinJianResponse = handleHanBinJianResponse;

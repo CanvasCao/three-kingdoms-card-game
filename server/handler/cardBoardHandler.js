@@ -14,16 +14,19 @@ const cardBoardHandler = {
             gameStatus.players[originId].addCards(card);
         }
 
-        // 反馈 麒麟弓
-        if (gameStatus.skillResponse) {
-            const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
-            if (onGoingDamageEventSkill) {
-                onGoingDamageEventSkill.done = true;
-            }
-            clearSkillResponse(gameStatus);
+        // 反馈 麒麟弓 寒冰剑
+        const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
+        if (onGoingDamageEventSkill) {
+            onGoingDamageEventSkill.done = true;
         }
-        // 顺拆
+
         clearNextCardBoardResponse(gameStatus)
+        if (gameStatus.cardBoardResponses[0]) {
+            const targetPlayerId = gameStatus.cardBoardResponses[0].targetId
+            if (!gameStatus.players[targetPlayerId].hasAnyCards()) {
+                gameStatus.cardBoardResponses = [];
+            }
+        }
     }
 }
 

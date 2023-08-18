@@ -27,9 +27,9 @@ const handleWei002FanKuiResponse = (gameStatus, response) => {
             cardBoardContentKey: SKILL_CONFIG.WEI002_FAN_KUI.key
         }]
     } else {
-        // onGoingDamageEventSkill.done = true;
-        // 不能删除 gameStatus.skillResponse
+        // onGoingDamageEventSkill.done = true; 在CardBoardHandler
     }
+    delete gameStatus.skillResponse;
 }
 
 const handleWei002GuiCaiResponse = (gameStatus, response) => {
