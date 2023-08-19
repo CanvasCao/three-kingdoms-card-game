@@ -87,6 +87,7 @@ const ifAnyPlayerNeedToResponse = (gameStatus) => {
         gameStatus.skillResponse ||
         gameStatus.taoResponses.length > 0 ||
         gameStatus.scrollResponses.length > 0 ||
+        gameStatus.cardBoardResponses.length > 0 ||
         gameStatus.wuxieSimultaneousResponse.hasWuxiePlayerIds.length > 0
     ) {
         return true

@@ -89,7 +89,7 @@ class GameEngine {
 
             // 选将
             const allSelectHeroIds = ["WEI002", "SHU006", "WU006", "SHU003"];
-            const canSelectHeroIds = sampleSize(allSelectHeroIds, 2);
+            const canSelectHeroIds = [...sampleSize(allSelectHeroIds, 2), "WEI004"];
             newPlayer.canSelectHeros = canSelectHeroIds.map(heroId => getHeroConfig(heroId))
 
             this.gameStatus.players[newPlayer.playerId] = newPlayer;
