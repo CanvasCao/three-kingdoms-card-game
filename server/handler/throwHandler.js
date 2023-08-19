@@ -1,3 +1,4 @@
+const {GAME_STAGE_TIMING} = require("../config/eventConfig");
 const {getCurrentPlayer} = require("../utils/playerUtils");
 const {throwCards} = require("../utils/cardUtils")
 const throwHandler = {
@@ -5,6 +6,9 @@ const throwHandler = {
         const cards = data.cards;
         getCurrentPlayer(gameStatus).removeCards(cards);
         throwCards(gameStatus, cards);
+
+        const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_THROWING
+        gameStatus.gameStageEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills: []})
     }
 }
 

@@ -1,5 +1,5 @@
 const {EMIT_TYPE} = require("../config/emitConfig");
-const {GAME_STATUS} = require("../config/gameConfig");
+const {GAME_STATUS} = require("../config/gameAndStageConfig");
 const {CARD_LOCATION} = require("../config/cardConfig");
 const {ADD_TO_PUBLIC_CARD_TYPE} = require("../config/emitConfig");
 const {omit} = require("lodash")

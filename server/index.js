@@ -2,11 +2,11 @@
 const {emitRefreshRooms, emitRefreshRoomPlayers, emitRejoinInit} = require("./utils/emitUtils");
 const {v4: uuidv4} = require('uuid');
 const {differenceBy} = require("lodash/array");
-const {goToNextStage} = require("./utils/stageUtils");
 const {GameEngine} = require("./model/GameEngine");
 const express = require('express');
 const app = express();
 const path = require('path');
+const {goToNextStage} = require("./event/gameStageEvent");
 const {emitRefreshStatus} = require("./utils/emitUtils");
 const {EMIT_TYPE} = require("./config/emitConfig");
 const server = require('http').createServer(app);
@@ -103,11 +103,6 @@ io.on('connection', (socket) => {
         emitRefreshRooms(io, rooms);
     });
 
-    socket.on(EMIT_TYPE.GO_NEXT_STAGE, () => {
-        rooms?.[roomId]?.gameEngine && goToNextStage(rooms[roomId].gameEngine.gameStatus);
-        emitRefreshStatus(rooms[roomId].gameEngine.gameStatus);
-    });
-
     socket.on(EMIT_TYPE.ACTION, (action) => {
         rooms?.[roomId]?.gameEngine?.handleAction(action);
     });
@@ -128,7 +123,17 @@ io.on('connection', (socket) => {
         rooms?.[roomId]?.gameEngine?.handleHeroSelectBoardAction(data);
     });
 
+    socket.on(EMIT_TYPE.END_PLAY, () => {
+        rooms?.[roomId]?.gameEngine?.handleEndPlay();
+    });
+
     socket.on(EMIT_TYPE.THROW, (data) => {
         rooms?.[roomId]?.gameEngine?.handleThrowCards(data);
+    });
+
+    // debug
+    socket.on(EMIT_TYPE.GO_NEXT_STAGE, () => {
+        rooms?.[roomId]?.gameEngine && goToNextStage(rooms[roomId].gameEngine.gameStatus);
+        emitRefreshStatus(rooms[roomId].gameEngine.gameStatus);
     });
 });

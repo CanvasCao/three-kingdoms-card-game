@@ -6,26 +6,29 @@ const ADD_TO_PUBLIC_CARD_TYPE = {
 }
 
 const EMIT_TYPE = {
-    "REJOIN_ROOM": "rejoin_room",
-    "REFRESH_ROOMS": "refresh_rooms",
-    "JOIN_ROOM": "join_room",
-    "REFRESH_ROOM_PLAYERS": "refresh_room_players",
-    "DISCONNECT": "disconnect",
+    "REJOIN_ROOM": "REJOIN_ROOM",
+    "REFRESH_ROOMS": "REFRESH_ROOMS",
+    "JOIN_ROOM": "JOIN_ROOM",
+    "REFRESH_ROOM_PLAYERS": "REFRESH_ROOM_PLAYERS",
+    "DISCONNECT": "DISCONNECT",
 
-    "INIT": "init",
-    "GO_NEXT_STAGE": "go_next_stage",
-    "REFRESH_STATUS": "refresh_status",
+    "INIT": "INIT",
+    "REFRESH_STATUS": "REFRESH_STATUS",
 
-    "ACTION": "action",
-    "RESPONSE": "response",
-    "THROW": "throw",
-    "CARD_BOARD_ACTION": "card_board_action",
-    "WUGU_BOARD_ACTION": "wugu_board_action",
-    "HERO_SELECT_BOARD_ACTION": "hero_select_board_action",
+    "ACTION": "ACTION",
+    "RESPONSE": "RESPONSE",
+    "END_PLAY": "END_PLAY",
+    "THROW": "THROW",
+    "CARD_BOARD_ACTION": "CARD_BOARD_ACTION",
+    "WUGU_BOARD_ACTION": "WUGU_BOARD_ACTION",
+    "HERO_SELECT_BOARD_ACTION": "HERO_SELECT_BOARD_ACTION",
 
-    "NOTIFY_ADD_TO_PLAYER_CARD": "notify_add_to_player_card",
-    "NOTIFY_ADD_TO_PUBLIC_CARD": "notify_add_to_public_card",
-    "NOTIFY_ADD_LINES": "notify_add_lines"
+    "NOTIFY_ADD_TO_PLAYER_CARD": "NOTIFY_ADD_TO_PLAYER_CARD",
+    "NOTIFY_ADD_TO_PUBLIC_CARD": "NOTIFY_ADD_TO_PUBLIC_CARD",
+    "NOTIFY_ADD_LINES": "NOTIFY_ADD_LINES",
+
+    // DEBUG
+    "GO_NEXT_STAGE": "GO_NEXT_STAGE",
 }
 
 exports.ADD_TO_PUBLIC_CARD_TYPE = ADD_TO_PUBLIC_CARD_TYPE;

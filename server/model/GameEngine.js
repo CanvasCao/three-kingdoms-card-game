@@ -1,9 +1,11 @@
 const strikeEvent = require("../event/strikeEvent");
 const sampleSize = require("lodash/sampleSize");
+const {trySetNextGameStageEventSkill} = require("../event/gameStageEvent");
+const {generateGameStageEventThenSetNextGameStageEventSkill} = require("../event/gameStageEvent");
+const {endPlayHandler} = require("../handler/endPlayHandler");
 const {Player} = require("./Player");
 const {getHeroConfig} = require("../config/heroConfig");
 const {everyoneGetInitialCards} = require("../utils/cardUtils");
-const {setGameStatusStage} = require("../utils/stageUtils");
 const {heroSelectBoardBoardHandler} = require("../handler/heroSelectBoardHandler");
 const {RESPONSE_TYPE_CONFIG} = require("../config/responseTypeConfig");
 const {getResponseType} = require("../utils/responseUtils");
@@ -29,9 +31,6 @@ const {
 const {
     throwCards
 } = require("../utils/cardUtils");
-const {
-    tryGoToNextPlayOrResponseOrThrowTurn,
-} = require("../utils/stageUtils");
 const {actionHandler} = require("../handler/actionHandler");
 const {responseCardHandler} = require("../handler/responseHandler");
 const {throwHandler} = require("../handler/throwHandler");
@@ -207,7 +206,7 @@ class GameEngine {
         trySettleNextScroll(this.gameStatus)
 
         // 打无懈可击延迟锦囊生效后/闪电求桃之后 需要判断是不是从判定阶段到出牌阶段
-        tryGoToNextPlayOrResponseOrThrowTurn(this.gameStatus);
+        trySetNextGameStageEventSkill(this.gameStatus);
 
         emitRefreshStatus(this.gameStatus);
 
@@ -218,12 +217,18 @@ class GameEngine {
         );
     }
 
+    handleEndPlay() {
+        endPlayHandler.handleEndPlay(this.gameStatus)
+        trySetNextGameStageEventSkill(this.gameStatus);
+        emitRefreshStatus(this.gameStatus);
+    }
+
     handleThrowCards(data) {
         throwHandler.handleThrowCards(this.gameStatus, data)
         emitRefreshStatus(this.gameStatus);
         emitNotifyThrowPlayPublicCard(this.gameStatus, data);
 
-        tryGoToNextPlayOrResponseOrThrowTurn(this.gameStatus);
+        trySetNextGameStageEventSkill(this.gameStatus);
         emitRefreshStatus(this.gameStatus);
     }
 
@@ -237,10 +242,9 @@ class GameEngine {
         trySettleNextScroll(this.gameStatus)
 
         // 打无懈可击延迟锦囊生效后/闪电求桃之后 需要判断是不是从判定阶段到出牌阶段
-        tryGoToNextPlayOrResponseOrThrowTurn(this.gameStatus);
+        trySetNextGameStageEventSkill(this.gameStatus);
 
         emitRefreshStatus(this.gameStatus);
-
         emitNotifyCardBoardAction(this.gameStatus, data)
     }
 
@@ -258,11 +262,9 @@ class GameEngine {
         heroSelectBoardBoardHandler.handleHeroSelect(this.gameStatus, data)
 
         if (Object.values(this.gameStatus.players).every((p) => p.heroId)) {
-            setGameStatusStage(this.gameStatus)
             everyoneGetInitialCards(this.gameStatus)
+            generateGameStageEventThenSetNextGameStageEventSkill(this.gameStatus)
             emitRefreshStatus(this.gameStatus);
-
-            tryGoToNextPlayOrResponseOrThrowTurn(this.gameStatus)
         }
 
         setTimeout(() => {

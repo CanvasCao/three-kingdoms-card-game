@@ -66,12 +66,12 @@ const trySettleNextScroll = (gameStatus) => {
     ) {
         return;
     }
-    // 无懈可击失效以后 下一个人的锦囊需要继续求无懈可击
+    // 下一个人的锦囊需要继续求无懈可击
     if (gameStatus.scrollResponses.length > 0 && gameStatus.scrollResponses[0].isEffect === undefined) {
         const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
         if (hasWuxiePlayers.length > 0) {
             generateWuxieSimultaneousResponseByScroll(gameStatus)
-        } else { // 没人有无懈可击直接生效
+        } else {
             setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, gameStatus.scrollResponses[0].actualCard.key);
         }
     }

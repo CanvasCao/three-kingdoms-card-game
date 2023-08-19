@@ -52,6 +52,19 @@ const getResponseType = (gameStatus) => {
     }
 }
 
+const ifAnyPlayerNeedToResponse = (gameStatus) => {
+    if (gameStatus.cardResponse ||
+        gameStatus.skillResponse ||
+        gameStatus.taoResponses.length > 0 ||
+        gameStatus.scrollResponses.length > 0 ||
+        gameStatus.cardBoardResponses.length > 0 ||
+        gameStatus.wuxieSimultaneousResponse.hasWuxiePlayerIds.length > 0
+    ) {
+        return true
+    }
+    return false
+}
+
 exports.clearNextTaoResponse = clearNextTaoResponse;
 exports.clearNextCardBoardResponse = clearNextCardBoardResponse;
 exports.clearCardResponse = clearCardResponse;
@@ -59,4 +72,6 @@ exports.clearSkillResponse = clearSkillResponse;
 exports.clearNextScrollResponse = clearNextScrollResponse;
 exports.clearWuxieSimultaneousResponse = clearWuxieSimultaneousResponse;
 exports.clearAllResponses = clearAllResponses;
+
 exports.getResponseType = getResponseType;
+exports.ifAnyPlayerNeedToResponse = ifAnyPlayerNeedToResponse;

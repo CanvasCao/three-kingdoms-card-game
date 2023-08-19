@@ -1,0 +1,149 @@
+const {ifAnyPlayerNeedToResponse} = require("../utils/responseUtils");
+const {setCurrentLocationToNextLocation} = require("../utils/locationUtils");
+const {getCurrentPlayer} = require("../utils/playerUtils");
+const {resetPlayerStatusWhenNewTurnStart} = require("../utils/playerUtils");
+const {clearAllResponses} = require("../utils/responseUtils");
+const {STAGE_NAMES} = require("../config/gameAndStageConfig");
+const {isNil} = require("lodash/lang");
+const {executeNextOnePandingCard} = require("./pandingEvent");
+const {generateWuxieSimultaneousResponseByPandingCard} = require("../utils/wuxieUtils");
+const {getAllHasWuxiePlayers} = require("../utils/playerUtils");
+const {getNextNeedExecutePandingSign} = require("../utils/pandingUtils");
+const {GAME_STAGE_TIMING} = require("../config/eventConfig");
+const {findNextUnDoneSkillInLastEventTimingsWithSkills} = require("./utils");
+const {setEventSkillResponse} = require("./utils");
+const {findAllEventSkillsByTimingNameAndActionCard} = require("./utils");
+const {last} = require("lodash");
+
+// only debug
+const goToNextStage = (gameStatus) => {
+    // gameStatus.stageIndex++;
+    // if (gameStatus.stageIndex >= STAGE_NAMES.length) {
+    //     resetPlayerStatusWhenNewTurnStart(gameStatus)
+    // } else {
+    //     setGameStatusStage(gameStatus);
+    // }
+    //
+    // clearAllResponses(gameStatus)
+    // trySetNextGameStageEventSkill(gameStatus);
+}
+
+const generateGameStageEventThenSetNextGameStageEventSkill = (gameStatus) => {
+    gameStatus.stage = {playerId: getCurrentPlayer(gameStatus).playerId, stageIndex: 0}
+    gameStatus.gameStageEvent = {eventTimingsWithSkills: []}
+    trySetNextGameStageEventSkill(gameStatus);
+}
+
+const trySetNextGameStageEventSkill = (gameStatus) => {
+    if (ifAnyPlayerNeedToResponse(gameStatus)) {
+        return
+    }
+
+    const currentPlayer = getCurrentPlayer(gameStatus);
+    if (currentPlayer.isDead) { // 自己的回合死亡后 需要直接移动到下一个人（闪电 决斗）
+        handleGameStageEventEnd(gameStatus)
+    }
+
+    const gameStageEvent = gameStatus.gameStageEvent;
+    const eventTimingsWithSkills = gameStageEvent.eventTimingsWithSkills;
+    const originId = currentPlayer.playerId
+
+    if (eventTimingsWithSkills.length == 0) {
+        gameStatus.stage.stageIndex = 1
+
+        const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus)
+        if (!nextNeedPandingSign) { // 3 没有延时锦囊
+            const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_JUDGING
+            gameStageEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills: []})
+            trySetNextGameStageEventSkill(gameStatus);
+        } else if (isNil(nextNeedPandingSign.isEffect)) { // 1 有未生效的判定 需要无懈可击
+            const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
+            if (hasWuxiePlayers.length > 0) {
+                generateWuxieSimultaneousResponseByPandingCard(gameStatus)
+            } else { // 没有无懈可击 延时锦囊直接生效
+                nextNeedPandingSign.isEffect = true;
+                trySetNextGameStageEventSkill(gameStatus); // nextNeedPandingSign生效之后进入 判定执行
+            }
+        } else { // 2 延时锦囊生效或失效了 需要执行结算
+            executeNextOnePandingCard(gameStatus);
+            trySetNextGameStageEventSkill(gameStatus); // 如果还有别的判定牌会再一次回到这里
+        }
+    }
+
+    if (last(eventTimingsWithSkills).eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_IS_JUDGING) {
+        const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_WHEN_DRAW_START //【突袭】
+        const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, originId})
+        gameStageEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
+
+        if (eventTimingSkills.length > 0) {
+            setEventSkillResponse(gameStatus, eventTimingSkills[0])
+            return;
+        }
+    }
+
+    if (last(eventTimingsWithSkills).eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_WHEN_DRAW_START) {
+        console.log("eventTimingsWithSkills",eventTimingsWithSkills)
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)
+        if (unDoneSkill) {
+            setEventSkillResponse(gameStatus, unDoneSkill)
+            return;
+        } else {
+            gameStatus.stage.stageIndex = 2
+            const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING
+            gameStageEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills: []})
+            currentPlayer.drawCards(gameStatus)
+        }
+    }
+
+    if (last(eventTimingsWithSkills).eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING) {
+        gameStatus.stage.stageIndex = 3
+        if (currentPlayer.skipPlay) {
+            const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_PLAYING
+            gameStageEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills: []})
+        } else {
+            // 等待前端出牌结束时插入
+        }
+    }
+
+    if (last(eventTimingsWithSkills).eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_IS_PLAYING) {
+        const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_BETWEEN_PLAY_AND_THROW //【突袭】
+        const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, originId})
+        gameStageEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
+        if (eventTimingSkills.length > 0) {
+            setEventSkillResponse(gameStatus, eventTimingSkills[0])
+            return;
+        }
+    }
+
+    if (last(eventTimingsWithSkills).eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_BETWEEN_PLAY_AND_THROW) {
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)
+        if (unDoneSkill) {
+            setEventSkillResponse(gameStatus, unDoneSkill)
+            return;
+        } else {
+            gameStatus.stage.stageIndex = 4
+            if (!currentPlayer.needThrow()) {
+                const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_THROWING
+                gameStageEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills: []})
+            } else {
+                // 等待前端弃牌结束时插入
+            }
+        }
+    }
+
+    if (last(eventTimingsWithSkills).eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_IS_THROWING) {
+        handleGameStageEventEnd(gameStatus);
+    }
+}
+
+const handleGameStageEventEnd = (gameStatus) => {
+    getCurrentPlayer(gameStatus).resetWhenMyTurnEnds()
+    setCurrentLocationToNextLocation(gameStatus)
+    getCurrentPlayer(gameStatus).resetWhenMyTurnStarts();
+
+    generateGameStageEventThenSetNextGameStageEventSkill(gameStatus);
+}
+
+exports.goToNextStage = goToNextStage;
+exports.generateGameStageEventThenSetNextGameStageEventSkill = generateGameStageEventThenSetNextGameStageEventSkill;
+exports.trySetNextGameStageEventSkill = trySetNextGameStageEventSkill;

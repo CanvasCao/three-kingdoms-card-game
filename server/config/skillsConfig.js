@@ -1,6 +1,6 @@
+const {GAME_STAGE_TIMING} = require("./eventConfig");
 const {DAMAGE_EVENT_TIMING} = require("./eventConfig");
 const {PANDING_EVENT_TIMING} = require("./eventConfig");
-const {CARD_CONFIG} = require("./cardConfig");
 const {USE_EVENT_TIMING} = require("./eventConfig");
 
 const SKILL_CONFIG = {
@@ -49,6 +49,11 @@ const TIMING_SKILLS_CONFIG = {
         key: "WEI002_GUI_CAI",
         triggerTiming: PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT,
     },
+    WEI004_TU_XI: {
+        key: "WEI004_TU_XI",
+        triggerTiming: GAME_STAGE_TIMING.GAME_STAGE_WHEN_DRAW_START,
+    },
+
     SHU006_TIE_JI: {
         key: "SHU006_TIE_JI",
         triggerTiming: USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET,
