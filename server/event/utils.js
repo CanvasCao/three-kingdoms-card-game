@@ -68,7 +68,7 @@ const findNextUnDoneSkillInLastEventTimingsWithSkills = (gameStatus, eventTiming
 
 
 const findOnGoingEvent = (gameStatus, eventKey) => {
-    if ([ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS, ALL_EVENTS_KEY_CONFIG.RESPONSE_CARD_EVENTS].includes(eventKey)) {
+    if (eventKey.endsWith("s")) { // 复数结尾
         return gameStatus?.[eventKey]?.find((event) => !event.done)
     }
     return gameStatus?.[eventKey]

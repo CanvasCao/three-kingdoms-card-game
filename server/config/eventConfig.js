@@ -192,6 +192,8 @@ const ALL_EVENTS_KEY_CONFIG = {
     RESPONSE_CARD_EVENTS: "responseCardEvents",
     PANDING_EVENT: "pandingEvent",
     DAMAGE_EVENT: "damageEvent",
+
+    GAME_STAGE_EVENT: "gameStageEvent"
 }
 
 const USE_OR_PLAY_CONFIG = {

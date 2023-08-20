@@ -1,4 +1,5 @@
 const strikeEvent = require("../event/strikeEvent");
+const {handleWei004TuXiResponse} = require("./skills/WEI004");
 const {handleHanBinJianResponse} = require("./skills/weapon");
 const {handleQingLongYanYueDaoResponse} = require("./skills/weapon");
 const {handleGuanShiFuResponse} = require("./skills/weapon");
@@ -51,6 +52,7 @@ const {ALL_EVENTS_KEY_CONFIG} = require("../config/eventConfig")
 const responseCardHandler = {
     setStatusByCardResponse: (gameStatus, response) => {
         const cardResponse = gameStatus.cardResponse;
+        const actionCardKey = cardResponse.actionActualCard.key;
         const responseOriginPlayer = gameStatus.players[cardResponse.originId];
         responseOriginPlayer.removeCards(response.cards);
         throwCards(gameStatus, response.cards);
@@ -60,10 +62,10 @@ const responseCardHandler = {
         if (response.chooseToResponse) {
             onGoingResponseCardEvent.responseStatus = true // 雷击
 
-            if (ALL_SHA_CARD_KEYS.includes(cardResponse.actionCardKey)) {
+            if (ALL_SHA_CARD_KEYS.includes(actionCardKey)) {
                 const onGoingUseStrikeEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS);
                 onGoingUseStrikeEvent.dodgeStatus = true; // 【贯石斧】、【青龙偃月刀】 猛进
-            } else if (cardResponse.actionCardKey == CARD_CONFIG.JUE_DOU.key) { // 决斗出杀之后 需要互换目标
+            } else if (actionCardKey == CARD_CONFIG.JUE_DOU.key) { // 决斗出杀之后 需要互换目标
                 generateResponseCardEventThenSetNextResponseCardEventSkill(gameStatus, {
                     originId: cardResponse.targetId,
                     targetId: cardResponse.originId,
@@ -82,7 +84,7 @@ const responseCardHandler = {
                 targetId: cardResponse.originId
             })
 
-            if (ALL_SHA_CARD_KEYS.includes(cardResponse.actionCardKey)) {
+            if (ALL_SHA_CARD_KEYS.includes(actionCardKey)) {
                 delete gameStatus.useStrikeEvents;
             }
             delete gameStatus.responseCardEvents;// 吕布无双的情况下删除所有的responseCardEvents
@@ -104,6 +106,8 @@ const responseCardHandler = {
             handleWei002FanKuiResponse(gameStatus, response)
         } else if (skillNameKey == SKILL_CONFIG.WEI002_GUI_CAI.key) {
             handleWei002GuiCaiResponse(gameStatus, response)
+        } else if (skillNameKey == SKILL_CONFIG.WEI004_TU_XI.key) {
+            handleWei004TuXiResponse(gameStatus, response)
         } else if (skillNameKey == SKILL_CONFIG.WU006_LIU_LI.key) {
             handleWu006LiuLiResponse(gameStatus, response)
         } else if (skillNameKey == CARD_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key) {

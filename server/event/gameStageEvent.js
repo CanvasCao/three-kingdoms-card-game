@@ -82,7 +82,6 @@ const trySetNextGameStageEventSkill = (gameStatus) => {
     }
 
     if (last(eventTimingsWithSkills).eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_WHEN_DRAW_START) {
-        console.log("eventTimingsWithSkills",eventTimingsWithSkills)
         const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
@@ -91,7 +90,10 @@ const trySetNextGameStageEventSkill = (gameStatus) => {
             gameStatus.stage.stageIndex = 2
             const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING
             gameStageEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills: []})
-            currentPlayer.drawCards(gameStatus)
+
+            if (!currentPlayer[`skip${GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING}`]) { // 突袭
+                currentPlayer.drawCards(gameStatus)
+            }
         }
     }
 
