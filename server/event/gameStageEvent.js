@@ -1,10 +1,9 @@
+const {STAGE_NAME} = require("../config/gameAndStageConfig");
 const {GAME_STAGE_TIMINGS} = require("../config/eventConfig");
 const {ifAnyPlayerNeedToResponse} = require("../utils/responseUtils");
 const {setCurrentLocationToNextLocation} = require("../utils/locationUtils");
 const {getCurrentPlayer} = require("../utils/playerUtils");
-const {resetPlayerStatusWhenNewTurnStart} = require("../utils/playerUtils");
 const {clearAllResponses} = require("../utils/responseUtils");
-const {STAGE_NAMES} = require("../config/gameAndStageConfig");
 const {isNil} = require("lodash/lang");
 const {executeNextOnePandingCard} = require("./pandingEvent");
 const {generateWuxieSimultaneousResponseByPandingCard} = require("../utils/wuxieUtils");
@@ -101,7 +100,7 @@ const trySetNextGameStageEventSkill = (gameStatus) => {
             const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING
             eventTimingsWithSkills.push({eventTimingName, eventTimingSkills: []})
 
-            if (!currentPlayer[`skip${GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING}`]) { // 突袭
+            if (!currentPlayer.skipTimimg[GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING]) { // 突袭
                 currentPlayer.drawCards(gameStatus)
             }
         }
@@ -109,7 +108,7 @@ const trySetNextGameStageEventSkill = (gameStatus) => {
 
     if (last(eventTimingsWithSkills).eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING) {
         gameStatus.stage.stageIndex = 3
-        if (currentPlayer.skipPlay) {
+        if (currentPlayer.skipStage[STAGE_NAME.PLAY]) {
             const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_PLAYING
             eventTimingsWithSkills.push({eventTimingName, eventTimingSkills: []})
         } else {

@@ -27,8 +27,10 @@ class Player {
 
         // delay scroll tags
         this.judgedShandian = false;
-        this.skipDraw = false;
-        this.skipPlay = false;
+
+        // skip
+        this.skipTimimg = {}
+        this.skipStage = {};
 
         // played tags
         this.shaTimes = 0;
@@ -127,9 +129,11 @@ class Player {
     }
 
     resetWhenMyTurnEnds() {
-        this.skipDraw = false;
-        this.skipPlay = false;
         this.judgedShandian = false;
+
+        this.skipTimimg = {}
+        this.skipStage = {};
+
         this.shaTimes = 0;
 
         // 可能有判定过但是没有移走的闪电

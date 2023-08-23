@@ -16,7 +16,7 @@ const handleWei004TuXiResponse = (gameStatus, response) => {
 
     if (onGoingGameStageEventSkill.chooseToReleaseSkill === undefined) {
         onGoingGameStageEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
-        getCurrentPlayer(gameStatus)[`skip${GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING}`] = true;
+        getCurrentPlayer(gameStatus).skipTimimg[GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING] = true;
     } else {
         emitNotifyAddLines(gameStatus, {
             fromId: response.originId,

@@ -1,3 +1,4 @@
+const {STAGE_NAME} = require("../config/gameAndStageConfig");
 const {clearCardResponse} = require("../utils/responseUtils");
 const {ALL_EVENTS_KEY_CONFIG} = require("../config/eventConfig");
 const {findOnGoingEvent} = require("./utils");
@@ -107,7 +108,7 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
             currentPlayer.removePandingSign(nextNeedPandingSign);
             throwCards(gameStatus, pandingActualCard);
             if (pandingResultCard.huase !== CARD_HUASE.HONGTAO) {
-                currentPlayer.skipPlay = true;
+                currentPlayer.skipStage[STAGE_NAME.PLAY] = true;
             }
         } else {
             currentPlayer.judgedShandian = true;
