@@ -35,7 +35,7 @@ const generateWuxieSimultaneousResponseByPandingCard = (gameStatus) => {
         throw Error("没有人有无懈可击 不需要生成wuxieSimultaneousResponse")
     }
     gameStatus.wuxieSimultaneousResponse = {
-        hasWuxiePlayerIds: hasWuxiePlayers.map((u) => u.playerId),
+        hasWuxiePlayerIds: hasWuxiePlayers.map((player) => player.playerId),
         wuxieChain: [{
             cards: [nextPandingSign.card],
             actualCard: nextPandingSign.actualCard

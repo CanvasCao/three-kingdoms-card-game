@@ -43,7 +43,7 @@ const generateGameStageEventThenSetNextGameStageEventSkill = (gameStatus) => {
     trySetNextGameStageEventSkill(gameStatus);
 }
 
-const trySetNextGameStageEventSkill = (gameStatus) => {
+const trySetNextGameStageEventSkill = (gameStatus, from) => {
     if (ifAnyPlayerNeedToResponse(gameStatus)) {
         return
     }
@@ -62,20 +62,24 @@ const trySetNextGameStageEventSkill = (gameStatus) => {
 
         const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus)
         if (!nextNeedPandingSign) { // 3 没有延时锦囊
-            const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_JUDGING
-            eventTimingsWithSkills.push({eventTimingName, eventTimingSkills: []})
-            trySetNextGameStageEventSkill(gameStatus);
         } else if (isNil(nextNeedPandingSign.isEffect)) { // 1 有未生效的判定 需要无懈可击
             const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
             if (hasWuxiePlayers.length > 0) {
                 generateWuxieSimultaneousResponseByPandingCard(gameStatus)
+                return;
             } else { // 没有无懈可击 延时锦囊直接生效
                 nextNeedPandingSign.isEffect = true;
-                trySetNextGameStageEventSkill(gameStatus); // nextNeedPandingSign生效之后进入 判定执行
+                executeNextOnePandingCard(gameStatus);
             }
         } else { // 2 延时锦囊生效或失效了 需要执行结算
             executeNextOnePandingCard(gameStatus);
-            trySetNextGameStageEventSkill(gameStatus); // 如果还有别的判定牌会再一次回到这里
+        }
+
+        if (ifAnyPlayerNeedToResponse(gameStatus)) {
+            return
+        } else {
+            const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_JUDGING
+            eventTimingsWithSkills.push({eventTimingName, eventTimingSkills: []})
         }
     }
 
