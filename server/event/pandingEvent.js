@@ -2,25 +2,22 @@ const {STAGE_NAME} = require("../config/gameAndStageConfig");
 const {clearCardResponse} = require("../utils/responseUtils");
 const {ALL_EVENTS_KEY_CONFIG} = require("../config/eventConfig");
 const {findOnGoingEvent} = require("./utils");
-const {CARD_ATTRIBUTE} = require("../config/cardConfig");
 const {generateDamageEventThenSetNextDamageEventSkill} = require("./damageEvent");
 const {findNextUnDoneSkillInLastEventTimingsWithSkills} = require("./utils");
 const {PANDING_EVENT_TIMINGS} = require("../config/eventConfig");
-const {DELAY_SCROLL_CARDS_CONFIG} = require("../config/cardConfig");
 const {isNil} = require("lodash/lang");
-const {moveShandianToNextPlayer} = require("../utils/pandingUtils");
-const {CARD_HUASE} = require("../config/cardConfig");
+const {moveShandianToNextPlayer, getNextNeedExecutePandingSign} = require("../utils/pandingUtils");
 const {getCurrentPlayer} = require("../utils/playerUtils");
-const {getNextNeedExecutePandingSign} = require("../utils/pandingUtils");
-const {CARD_CONFIG} = require("../config/cardConfig");
+const {
+    CARD_CONFIG, CARD_COLOR,
+    DELAY_SCROLL_CARDS_CONFIG,
+    CARD_HUASE,
+    CARD_ATTRIBUTE
+} = require("../config/cardConfig");
 const {SKILL_CONFIG} = require("../config/skillsConfig");
-const {setEventSkillResponse} = require("./utils");
-const {CARD_COLOR} = require("../config/cardConfig");
-const {getActualCardColor} = require("../utils/cardUtils");
-const {emitNotifyPandingPlayPublicCard} = require("../utils/emitUtils");
-const {throwCards} = require("../utils/cardUtils");
-const {getCards} = require("../utils/cardUtils");
-const {findAllEventSkillsByTimingNameAndActionCard} = require("./utils");
+const {setEventSkillResponse, findAllEventSkillsByTimingNameAndActionCard} = require("./utils");
+const {emitNotifyPandingPlayPublicCard, emitRefreshStatus} = require("../utils/emitUtils");
+const {throwCards, getCards, getActualCardColor} = require("../utils/cardUtils");
 const {last} = require("lodash");
 
 const generatePandingEventThenSetNextPandingEventSkill = (gameStatus, {originId, pandingNameKey}) => {
@@ -32,7 +29,7 @@ const generatePandingEventThenSetNextPandingEventSkill = (gameStatus, {originId,
         pandingNameKey,
         pandingResultCard,
     }
-
+    emitRefreshStatus(gameStatus); //为了显示判定Board
     emitNotifyPandingPlayPublicCard(gameStatus, pandingResultCard, gameStatus.players[originId], pandingNameKey);
     setNextPandingEventSkill(gameStatus);
 }

@@ -2,7 +2,7 @@ const {SKILL_CONFIG} = require("../../config/skillsConfig");
 const {ALL_EVENTS_KEY_CONFIG} = require("../../config/eventConfig");
 const {findOnGoingEvent} = require("../../event/utils");
 const {findOnGoingEventSkill} = require("../../event/utils");
-const {emitNotifyAddLines} = require("../../utils/emitUtils");
+const {emitNotifyAddLines,emitRefreshStatus} = require("../../utils/emitUtils");
 const {throwCards} = require("../../utils/cardUtils");
 
 const handleWei002FanKuiResponse = (gameStatus, response) => {
@@ -55,6 +55,7 @@ const handleWei002GuiCaiResponse = (gameStatus, response) => {
         onGoingPandingEventSkill.releaseCards = response.cards
         onGoingPandingEventSkill.done = true;
         delete gameStatus.skillResponse
+        emitRefreshStatus(gameStatus); //为了显示判定Board
     }
 }
 
