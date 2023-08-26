@@ -35,6 +35,12 @@ const HERO_STATIC_CONFIG = {
         maxBlood: 4,
         gender: 1
     },
+
+    // SP
+    SP001: {
+        maxBlood: 3,
+        gender: 0
+    },
 }
 
 // 武将技能切换和失效的时候 删除
@@ -46,6 +52,9 @@ const HERO_SKILL_PROPS_CONFIG = {
         responseStrikeNumber: 2,
         responseDuelNumber: 2,
     },
+    SP001: {
+        canRebirth: true,
+    }
 }
 
 const HERO_SKILLS_CONFIG = {
@@ -56,6 +65,7 @@ const HERO_SKILLS_CONFIG = {
     SHU006: [SKILL_CONFIG.SHU006_MA_SHU, SKILL_CONFIG.SHU006_TIE_JI],
     WU006: [SKILL_CONFIG.WU006_GUO_SE, SKILL_CONFIG.WU006_LIU_LI],
     QUN002: [SKILL_CONFIG.QUN002_WU_SHUANG],
+    SP001: [SKILL_CONFIG.SP001_CHONG_SHENG],
 }
 
 const extractEnglishLetters = (inputString) => {
@@ -76,7 +86,7 @@ const getHeroConfig = (heroId) => {
         heroId,
         ...HERO_STATIC_CONFIG[heroId],
         ...HERO_SKILL_PROPS_CONFIG[heroId],
-        kingdom: extractEnglishLetters(heroId) || "QUN",
+        kingdom: extractEnglishLetters(heroId),
         skills: HERO_SKILLS_CONFIG[heroId] || [],
     }
 }

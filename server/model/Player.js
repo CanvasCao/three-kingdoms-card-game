@@ -1,6 +1,7 @@
+const {throwCards} = require("../utils/cardUtils");
+const {emitNotifyThrowPlayPublicCard} = require("../utils/emitUtils");
 const {emitNotifyDrawCards} = require("../utils/emitUtils");
 const {getCards} = require("../utils/cardUtils");
-const {EQUIPMENT_CARDS_CONFIG, EQUIPMENT_TYPE, CARD_HUASE} = require("../config/cardConfig");
 const {Card} = require("./Card");
 const {differenceBy} = require("lodash/array");
 const {v4: uuidv4} = require('uuid');
@@ -115,16 +116,6 @@ class Player {
         this.currentBlood = this.currentBlood + number;
     }
 
-    resetWhenDie() {
-        this.cards = [];
-        this.pandingSigns = [];
-        this.weaponCard = null;
-        this.shieldCard = null;
-        this.plusHorseCard = null;
-        this.minusHorseCard = null;
-        this.isTieSuo = false;
-    }
-
     resetWhenMyTurnStarts() {
     }
 
@@ -146,6 +137,28 @@ class Player {
     // 弃牌阶段
     needThrow() {
         return this.cards.length > this.currentBlood
+    }
+
+    resetHero(gameStatus) {
+        const needThrowCards = [
+            ...this.cards,
+            this.weaponCard,
+            this.shieldCard,
+            this.plusHorseCard,
+            this.minusHorseCard,
+            ...this.pandingSigns.map((sign) => sign.actualCard),
+        ].filter(x => !!x)
+
+        emitNotifyThrowPlayPublicCard(gameStatus, {cards: needThrowCards, playerId: this.playerId})
+        throwCards(gameStatus, needThrowCards);
+
+        this.cards = [];
+        this.pandingSigns = [];
+        this.weaponCard = null;
+        this.shieldCard = null;
+        this.plusHorseCard = null;
+        this.minusHorseCard = null;
+        this.isTieSuo = false;
     }
 }
 

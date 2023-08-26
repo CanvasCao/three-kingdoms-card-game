@@ -1,5 +1,3 @@
-const {throwCards} = require("../utils/cardUtils")
-
 const _clearDeadPlayerInAllResponse = (gameStatus, player) => {
     if (gameStatus.skillResponse?.playerId == player.playerId) {
         delete gameStatus.skillResponse
@@ -16,22 +14,16 @@ const _clearDeadPlayerInAllResponse = (gameStatus, player) => {
 }
 
 const setStatusWhenPlayerDie = (gameStatus, player) => {
-    player.isDead = true;
+    player.resetHero(gameStatus);
+    _clearDeadPlayerInAllResponse(gameStatus, player)
 
-    let needThrowCards = [
-        ...player.cards,
-        player.weaponCard,
-        player.shieldCard,
-        player.plusHorseCard,
-        player.minusHorseCard,
-        ...player.pandingSigns.map((sign) => sign.actualCard),
-    ];
-    needThrowCards = needThrowCards.filter(x => !!x)
-    throwCards(gameStatus, needThrowCards);
-
-    player.resetWhenDie();
-
-    _clearDeadPlayerInAllResponse(gameStatus,player)
+    if (player.canRebirth) {
+        player.drawCards(gameStatus, 3)
+        player.currentBlood = 3;
+        delete player.canRebirth;
+    } else {
+        player.isDead = true;
+    }
 }
 
 exports.setStatusWhenPlayerDie = setStatusWhenPlayerDie;

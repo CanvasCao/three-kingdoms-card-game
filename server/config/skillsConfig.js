@@ -36,8 +36,13 @@ const SKILL_CONFIG = {
     WU006_LIU_LI: {
         key: 'WU006_LIU_LI',
     },
+
     QUN002_WU_SHUANG:{
         key: 'QUN002_WU_SHUANG',
+    },
+
+    SP001_CHONG_SHENG:{
+        key: 'SP001_CHONG_SHENG',
     }
 }
 
