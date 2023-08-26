@@ -93,7 +93,10 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
     if (pandingEvent.pandingNameKey == SKILL_CONFIG.SHU006_TIE_JI.key) {
         const useStrikeEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS);
         if (getActualCardColor(pandingResultCard) == CARD_COLOR.RED) {
+            pandingEvent.takeEffect = true
             useStrikeEvent.cantShan = true;
+        } else {
+            pandingEvent.takeEffect = false
         }
     } else if (pandingEvent.pandingNameKey == CARD_CONFIG.LE_BU_SI_SHU.key ||
         pandingEvent.pandingNameKey == CARD_CONFIG.SHAN_DIAN.key) {
@@ -103,16 +106,17 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
 
         if (pandingEvent.pandingNameKey == CARD_CONFIG.LE_BU_SI_SHU.key) {
             currentPlayer.removePandingSign(nextNeedPandingSign);
-            throwCards(gameStatus, pandingActualCard);
             if (pandingResultCard.huase !== CARD_HUASE.HONGTAO) {
+                pandingEvent.takeEffect = true
                 currentPlayer.skipStage[STAGE_NAME.PLAY] = true;
+            } else {
+                pandingEvent.takeEffect = false
             }
         } else {
             currentPlayer.judgedShandian = true;
             if (pandingResultCard.huase == CARD_HUASE.HEITAO && pandingResultCard.number >= 2 && pandingResultCard.number <= 9) {
                 currentPlayer.removePandingSign(nextNeedPandingSign);
-                throwCards(gameStatus, pandingActualCard);
-
+                pandingEvent.takeEffect = true
                 generateDamageEventThenSetNextDamageEventSkill(gameStatus, {
                     damageCards: [pandingCard],
                     damageActualCard: pandingActualCard, // 渠道
@@ -122,11 +126,13 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
                     targetId: currentPlayer.playerId
                 })
             } else {
+                pandingEvent.takeEffect = false
                 moveShandianToNextPlayer(gameStatus, nextNeedPandingSign)
             }
         }
     } else if (pandingEvent.pandingNameKey === CARD_CONFIG.BA_GUA_ZHEN.key) {
         if (getActualCardColor(pandingResultCard) == CARD_COLOR.RED) {
+            pandingEvent.takeEffect = true
             const responseCardEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.RESPONSE_CARD_EVENTS);
             responseCardEvent.responseStatus = true; // 雷击
 
@@ -136,8 +142,12 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
             }
 
             clearCardResponse(gameStatus)
+        } else {
+            pandingEvent.takeEffect = false
         }
     }
+
+    emitRefreshStatus(gameStatus); //为了显示判定Board
 }
 
 const handlePandingEventEnd = (gameStatus) => {

@@ -132,8 +132,12 @@ const omitGSArray = [
     'initCards',
     'currentLocation',
     'stageIndex',
-    'io']
-process.env.NODE_ENV == 'production' && omitGSArray.push('throwedCards')
+    'io',
+]
+if (process.env.NODE_ENV == 'production') {
+    omitGSArray.push('throwedCards')
+    omitGSArray.push('gameStageEvent')
+}
 
 // 只能在GameEngine的handler之后调用
 const emitRefreshStatus = (gameStatus) => {
