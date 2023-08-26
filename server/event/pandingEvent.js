@@ -85,8 +85,7 @@ const setNextPandingEventSkill = (gameStatus) => {
 
 const setStatusBasedOnPandingResult = (gameStatus) => {
     const pandingEvent = gameStatus.pandingEvent;
-    // pandingEvent.done = true;
-
+    pandingEvent.takeEffect = false
     const pandingResultCard = pandingEvent.pandingResultCard;
     const currentPlayer = getCurrentPlayer(gameStatus);
 
@@ -95,8 +94,6 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
         if (getActualCardColor(pandingResultCard) == CARD_COLOR.RED) {
             pandingEvent.takeEffect = true
             useStrikeEvent.cantShan = true;
-        } else {
-            pandingEvent.takeEffect = false
         }
     } else if (pandingEvent.pandingNameKey == CARD_CONFIG.LE_BU_SI_SHU.key ||
         pandingEvent.pandingNameKey == CARD_CONFIG.SHAN_DIAN.key) {
@@ -109,8 +106,6 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
             if (pandingResultCard.huase !== CARD_HUASE.HONGTAO) {
                 pandingEvent.takeEffect = true
                 currentPlayer.skipStage[STAGE_NAME.PLAY] = true;
-            } else {
-                pandingEvent.takeEffect = false
             }
         } else {
             currentPlayer.judgedShandian = true;
@@ -126,7 +121,6 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
                     targetId: currentPlayer.playerId
                 })
             } else {
-                pandingEvent.takeEffect = false
                 moveShandianToNextPlayer(gameStatus, nextNeedPandingSign)
             }
         }
@@ -140,10 +134,7 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
             if (onGoingUseStrikeEvent) {
                 onGoingUseStrikeEvent.dodgeStatus = true; // 【贯石斧】、【青龙偃月刀】 猛进
             }
-
             clearCardResponse(gameStatus)
-        } else {
-            pandingEvent.takeEffect = false
         }
     }
 
