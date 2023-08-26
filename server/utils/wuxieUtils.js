@@ -1,6 +1,4 @@
-const {ALL_SHA_CARD_KEYS} = require("../config/cardConfig");
 const {USE_OR_PLAY_CONFIG} = require("../config/eventConfig");
-const {CARD_CONFIG} = require("../config/cardConfig");
 const {generateResponseCardEventThenSetNextResponseCardEventSkill} = require("../event/responseCardEvent");
 const {STAGE_NAMES, STAGE_NAME} = require("../config/gameAndStageConfig");
 const {getNextNeedExecutePandingSign} = require("./pandingUtils");
@@ -89,7 +87,6 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
                     targetId: curScrollResponse.targetId,
                     actionCards: curScrollResponse.cards,
                     actionActualCard: curScrollResponse.actualCard,
-                    responseCardKeys: curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.key ? [CARD_CONFIG.SHAN.key] : ALL_SHA_CARD_KEYS,
                     useOrPlay: USE_OR_PLAY_CONFIG.PLAY
                 })
                 clearNextScrollResponse(gameStatus);

@@ -1,4 +1,8 @@
+const {findAllUnDoneEvents} = require("./utils");
+const {USE_OR_PLAY_CONFIG} = require("../config/eventConfig");
 const {CARD_CONFIG} = require("../config/cardConfig");
+const {SCROLL_CARDS_CONFIG} = require("../config/cardConfig");
+const {ALL_SHA_CARD_KEYS} = require("../config/cardConfig");
 const {PLAY_EVENT_TIMINGS} = require("../config/eventConfig");
 const {findOnGoingEvent} = require("./utils");
 const {ALL_EVENTS_KEY_CONFIG} = require("../config/eventConfig");
@@ -13,21 +17,26 @@ const {last} = require("lodash");
 const generateResponseCardEventThenSetNextResponseCardEventSkill = (gameStatus, {
     originId,
     targetId,
-    cardNumber = 1,
     actionCards,
     actionActualCard,
-    responseCardKeys,
     useOrPlay,
 }) => {
-    gameStatus.responseCardEvents = new Array(cardNumber).fill().map(() => {
+    let times = 1;
+    targetPlayer = gameStatus.players[targetId] // ResponseCardEvent targetPlayer 就是伤害来源
+    if (ALL_SHA_CARD_KEYS.includes(actionActualCard.key)) {
+        times = targetPlayer.responseStrikeNumber || 1;
+    } else if (actionActualCard.key == SCROLL_CARDS_CONFIG.JUE_DOU.key) {
+        times = targetPlayer.responseDuelNumber || 1;
+    }
+
+    gameStatus.responseCardEvents = new Array(times).fill().map(() => {
         return {
             originId,
             targetId,
-            cardNumber,
             actionCards,
             actionActualCard,
-            responseCardKeys,
             useOrPlay,
+            cardNumber: times,
             responseStatus: undefined,
             eventTimingsWithSkills: [],
             done: false,
@@ -42,7 +51,11 @@ const setNextResponseCardEventSkill = (gameStatus) => {
         return
     }
 
-    const {useOrPlay, actionCards, actionActualCard, responseCardKeys, eventTimingsWithSkills, originId, targetId, cardNumber} = responseCardEvent
+    // 吕布 重置cardNumber在前端显示
+    const allUnDoneEvents = findAllUnDoneEvents(gameStatus, ALL_EVENTS_KEY_CONFIG.RESPONSE_CARD_EVENTS);
+    gameStatus.responseCardEvents.forEach((event) => event.cardNumber = allUnDoneEvents.length)
+
+    const {actionCards, actionActualCard, cardNumber, eventTimingsWithSkills, originId, targetId} = responseCardEvent
 
     const timingIndex = 0;
     if (eventTimingsWithSkills.length == 0) {
@@ -78,7 +91,6 @@ const setNextResponseCardEventSkill = (gameStatus) => {
                     cardNumber,
                     actionCards,
                     actionActualCard,
-                    responseCardKeys,
                 }
                 return;
             } else if (responseCardEvent.responseStatus === true) {  // 使用以后 雷击
@@ -120,7 +132,20 @@ const setStatusWhenResponseCardEventDone = (gameStatus) => {
 
 const handleResponseCardEventEnd = (gameStatus) => {
     if (gameStatus.responseCardEvents.every((e) => e.done)) {
+        const responseCardEvent = gameStatus.responseCardEvents[0]
+        const actionCardKey = responseCardEvent.actionActualCard.key
         delete gameStatus.responseCardEvents;
+
+        // 响应决斗 之后出牌 需要互换目标
+        if (actionCardKey == CARD_CONFIG.JUE_DOU.key) {
+            generateResponseCardEventThenSetNextResponseCardEventSkill(gameStatus, {
+                originId: responseCardEvent.targetId,
+                targetId: responseCardEvent.originId,
+                actionCards: responseCardEvent.actionCards,
+                actionActualCard: responseCardEvent.actionActualCard,
+                useOrPlay: USE_OR_PLAY_CONFIG.PLAY
+            })
+        }
     } else {
         setNextResponseCardEventSkill(gameStatus)
     }

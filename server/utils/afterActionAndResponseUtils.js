@@ -31,6 +31,8 @@ const tryFindNextSkillResponse = (gameStatus) => {
         }
     }
 
+    // responseCardEvents 比 useStrikeEvents 优先
+    // 青龙偃月刀 被吕布第一张闪 闪避后 会继续要求第二张闪
     if (gameStatus.responseCardEvents) {
         setNextResponseCardEventSkill(gameStatus)
         if (gameStatus.cardResponse || gameStatus.skillResponse) {

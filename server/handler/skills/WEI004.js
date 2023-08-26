@@ -16,14 +16,14 @@ const handleWei004TuXiResponse = (gameStatus, response) => {
 
     if (onGoingGameStageEventSkill.chooseToReleaseSkill === undefined) {
         onGoingGameStageEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
-        getCurrentPlayer(gameStatus).skipTimimg[GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING] = true;
     } else {
         emitNotifyAddLines(gameStatus, {
             fromId: response.originId,
             toIds: response.skillTargetIds
         });
 
-        onGoingGameStageEventSkill.releaseTargetIds = response.skillTargetIds
+        getCurrentPlayer(gameStatus).skipTimimg[GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING] = true;
+
         onGoingGameStageEventSkill.done = true;
 
         gameStatus.cardBoardResponses = response.skillTargetIds.map((targetId) => {

@@ -65,15 +65,6 @@ const responseCardHandler = {
             if (ALL_SHA_CARD_KEYS.includes(actionCardKey)) {
                 const onGoingUseStrikeEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS);
                 onGoingUseStrikeEvent.dodgeStatus = true; // 【贯石斧】、【青龙偃月刀】 猛进
-            } else if (actionCardKey == CARD_CONFIG.JUE_DOU.key) { // 决斗出杀之后 需要互换目标
-                generateResponseCardEventThenSetNextResponseCardEventSkill(gameStatus, {
-                    originId: cardResponse.targetId,
-                    targetId: cardResponse.originId,
-                    actionCards: cardResponse.actionCards,
-                    actionActualCard: cardResponse.actionActualCard,
-                    responseCardKeys: ALL_SHA_CARD_KEYS,
-                    useOrPlay: USE_OR_PLAY_CONFIG.PLAY
-                })
             }
         } else {
             generateDamageEventThenSetNextDamageEventSkill(gameStatus, {

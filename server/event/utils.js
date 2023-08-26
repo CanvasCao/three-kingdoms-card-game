@@ -66,6 +66,12 @@ const findNextUnDoneSkillInLastEventTimingsWithSkills = (gameStatus, eventTiming
     })
 }
 
+const findAllUnDoneEvents = (gameStatus, eventKey) => {
+    if (eventKey.endsWith("s")) { // 复数结尾
+        return gameStatus?.[eventKey]?.filter((event) => !event.done)
+    }
+    return gameStatus?.[eventKey]
+}
 
 const findOnGoingEvent = (gameStatus, eventKey) => {
     if (eventKey.endsWith("s")) { // 复数结尾
@@ -228,10 +234,12 @@ const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingNam
 }
 
 exports.configTimingSkillToResponseSkill = configTimingSkillToResponseSkill;
-exports.findAllEventSkillsByTimingNameAndActionCard = findAllEventSkillsByTimingNameAndActionCard;
+exports.setEventSkillResponse = setEventSkillResponse;
 
+exports.findNextUnDoneSkillInLastEventTimingsWithSkills = findNextUnDoneSkillInLastEventTimingsWithSkills;
+
+exports.findAllUnDoneEvents = findAllUnDoneEvents;
 exports.findOnGoingEvent = findOnGoingEvent;
 exports.findOnGoingEventSkill = findOnGoingEventSkill;
 
-exports.setEventSkillResponse = setEventSkillResponse;
-exports.findNextUnDoneSkillInLastEventTimingsWithSkills = findNextUnDoneSkillInLastEventTimingsWithSkills;
+exports.findAllEventSkillsByTimingNameAndActionCard = findAllEventSkillsByTimingNameAndActionCard;

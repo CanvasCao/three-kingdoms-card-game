@@ -1,6 +1,5 @@
 const {USE_EVENT_TIMING} = require("../config/eventConfig");
 const {USE_OR_PLAY_CONFIG} = require("../config/eventConfig");
-const {CARD_CONFIG} = require("../config/cardConfig");
 const {generateResponseCardEventThenSetNextResponseCardEventSkill} = require("./responseCardEvent");
 const {findOnGoingEvent} = require("./utils");
 const {ALL_EVENTS_KEY_CONFIG} = require("../config/eventConfig");
@@ -109,7 +108,6 @@ const setNextStrikeEventSkill = (gameStatus) => {
                         targetId: useStrikeEvent.originId,
                         actionCards: useStrikeEvent.cards,
                         actionActualCard: useStrikeEvent.actualCard,
-                        responseCardKeys: [CARD_CONFIG.SHAN.key],
                         useOrPlay: USE_OR_PLAY_CONFIG.USE
                     })
                 }

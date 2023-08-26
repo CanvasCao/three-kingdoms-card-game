@@ -36,6 +36,9 @@ const SKILL_CONFIG = {
     WU006_LIU_LI: {
         key: 'WU006_LIU_LI',
     },
+    QUN002_WU_SHUANG:{
+        key: 'QUN002_WU_SHUANG',
+    }
 }
 
 const TIMING_SKILLS_CONFIG = {
