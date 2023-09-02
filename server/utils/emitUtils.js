@@ -1,3 +1,4 @@
+const {teamMembers} = require("./roomUtils");
 const {EMIT_TYPE} = require("../config/emitConfig");
 const {GAME_STATUS} = require("../config/gameAndStageConfig");
 const {CARD_LOCATION} = require("../config/cardConfig");
@@ -167,7 +168,7 @@ const emitRefreshRooms = (io, rooms) => {
     for (var roomId in rooms) {
         emitRooms.push({
             roomId,
-            players: rooms[roomId].players,
+            roomPlayers: rooms[roomId].roomPlayers,
             status: rooms[roomId].gameEngine ? GAME_STATUS.PLAYING : GAME_STATUS.IDLE,
         })
     }
@@ -176,7 +177,12 @@ const emitRefreshRooms = (io, rooms) => {
 
 const emitRefreshRoomPlayers = (io, rooms, roomId) => {
     if (!rooms[roomId].gameEngine) {
-        io.to(roomId).emit(EMIT_TYPE.REFRESH_ROOM_PLAYERS, rooms[roomId].players);
+        const data = {
+            roomId,
+            roomPlayers: rooms[roomId].roomPlayers,
+            teamMembers: teamMembers,
+        }
+        io.to(roomId).emit(EMIT_TYPE.REFRESH_ROOM_PLAYERS, data);
     }
 }
 

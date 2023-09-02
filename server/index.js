@@ -6,6 +6,7 @@ const {GameEngine} = require("./model/GameEngine");
 const express = require('express');
 const app = express();
 const path = require('path');
+const {getNextEmptyTeamMemberSlot} = require("./utils/roomUtils");
 const {goToNextStage} = require("./event/gameStageEvent");
 const {emitRefreshStatus} = require("./utils/emitUtils");
 const {EMIT_TYPE} = require("./config/emitConfig");
@@ -31,13 +32,11 @@ app.use(express.static(path.join(__dirname, '../client')));
 const roomNumber = 3;
 const rooms = {};
 for (let i = 1; i <= roomNumber; i++) {
-    rooms[i] = {gameEngine: null, players: []}
+    rooms[i] = {gameEngine: null, roomPlayers: []}
 }
 
 io.on('connection', (socket) => {
-    let playerId;
-    let playerName;
-    let roomId;
+    let playerId, roomId;
 
     socket.on(EMIT_TYPE.REJOIN_ROOM, (data) => {
         const room = rooms[data.roomId]
@@ -47,9 +46,8 @@ io.on('connection', (socket) => {
         const player = room.gameEngine?.gameStatus?.players[data.playerId];
         if (player) {
             playerId = player.playerId
-            playerName = player.name
             roomId = data.roomId
-            rooms[roomId].players.push({playerId: player.playerId, playerName: player.name})
+            rooms[roomId].roomPlayers.push({playerId: player.playerId, playerName: player.name})
             socket.join(roomId);
             emitRejoinInit(room.gameEngine.gameStatus, socket)
         }
@@ -61,25 +59,50 @@ io.on('connection', (socket) => {
 
     socket.on(EMIT_TYPE.JOIN_ROOM, (data) => {
         playerId = data.playerId
-        playerName = data.playerName
+        const playerName = data.playerName
         roomId = data.roomId
-        if (playerId && playerName && roomId && rooms[roomId] && (rooms[roomId].gameEngine == null)) {
-            if (rooms[roomId].players.length >= 8) {
-                return
-            }
 
-            rooms[roomId].players.push({playerId, playerName})
-            socket.join(roomId);
-            emitRefreshRooms(io, rooms)
-            emitRefreshRoomPlayers(io, rooms, roomId)
+        if (!playerId || !playerName || !roomId) {
+            return;
         }
+        if (!rooms[roomId]) {
+            return;
+        }
+        if (rooms[roomId].gameEngine) {
+            return;
+        }
+        if (rooms[roomId].roomPlayers.length >= 8) {
+            return
+        }
+
+        const roomPlayers = rooms[roomId].roomPlayers
+        const teamMember = getNextEmptyTeamMemberSlot(roomPlayers);
+        roomPlayers.push({playerId, playerName, teamMember})
+        socket.join(roomId);
+        emitRefreshRooms(io, rooms)
+        emitRefreshRoomPlayers(io, rooms, roomId)
+    })
+
+    socket.on(EMIT_TYPE.SWITCH_TEAM_MEMBER, (data) => {
+        playerId = data.playerId
+        roomId = data.roomId
+        const teamMember = data.teamMember;
+
+        const room = rooms[data.roomId]
+        if (!room || room.gameEngine) {
+            return
+        }
+
+        const roomPlayer = room.roomPlayers.find((player) => player.playerId == playerId);
+        roomPlayer.teamMember = teamMember;
+        emitRefreshRoomPlayers(io, rooms, roomId)
     })
 
     socket.on(EMIT_TYPE.DISCONNECT, () => {
         if (playerId && roomId) {
-            rooms[roomId].players = differenceBy(rooms[roomId].players, [{playerId}], 'playerId');
+            rooms[roomId].roomPlayers = differenceBy(rooms[roomId].roomPlayers, [{playerId}], 'playerId');
             socket.leave(roomId);
-            if (rooms[roomId].players.length <= 0) {
+            if (rooms[roomId].roomPlayers.length <= 0) {
                 if (process.env.NODE_ENV == 'production') {
                     rooms[roomId].gameEngine = null
                 }
@@ -93,10 +116,9 @@ io.on('connection', (socket) => {
         if (!playerId || !roomId) {
             return
         }
-        // startEngine
         const gameEngine = new GameEngine(io);
         rooms[roomId].gameEngine = gameEngine;
-        const roomPlayers = rooms[roomId].players
+        const roomPlayers = rooms[roomId].roomPlayers
 
         gameEngine.setPlayers(roomPlayers)
         gameEngine.startEngine(roomId);
