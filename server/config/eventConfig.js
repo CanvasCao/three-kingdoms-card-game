@@ -134,13 +134,13 @@ const GAME_STAGE_TIMING = {
     // 判定
     "GAME_STAGE_IS_JUDGING": "GAME_STAGE_IS_JUDGING",
 
-    // 【裸衣】
+    //
     "GAME_STAGE_BETWEEN_JUDGE_AND_DRAW": "GAME_STAGE_BETWEEN_JUDGE_AND_DRAW",
 
     // 【突袭】【英姿】
     "GAME_STAGE_WHEN_DRAW_START": "GAME_STAGE_WHEN_DRAW_START",
 
-    // 摸牌
+    // 摸牌 【裸衣】
     "GAME_STAGE_IS_DRAWING": "GAME_STAGE_IS_DRAWING",
 
     // 【巧变】【放权】

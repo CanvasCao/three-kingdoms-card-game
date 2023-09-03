@@ -19,6 +19,9 @@ const SKILL_CONFIG = {
     WEI004_TU_XI: {
         key: 'WEI004_TU_XI',
     },
+    WEI005_LUO_YI: {
+        key: 'WEI005_LUO_YI',
+    },
 
     SHU003_PAO_XIAO: {
         key: 'SHU003_PAO_XIAO',
@@ -37,11 +40,11 @@ const SKILL_CONFIG = {
         key: 'WU006_LIU_LI',
     },
 
-    QUN002_WU_SHUANG:{
+    QUN002_WU_SHUANG: {
         key: 'QUN002_WU_SHUANG',
     },
 
-    SP001_CHONG_SHENG:{
+    SP001_CHONG_SHENG: {
         key: 'SP001_CHONG_SHENG',
     }
 }
@@ -60,6 +63,10 @@ const TIMING_SKILLS_CONFIG = {
     WEI004_TU_XI: {
         key: "WEI004_TU_XI",
         triggerTiming: GAME_STAGE_TIMING.GAME_STAGE_WHEN_DRAW_START,
+    },
+    WEI005_LUO_YI: {
+        key: "WEI005_LUO_YI",
+        triggerTiming: GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING,
     },
 
     SHU006_TIE_JI: {

@@ -69,8 +69,11 @@ const setNextDamageEventSkill = (gameStatus) => {
             if (eventTimingSkills.length > 0) {
                 setEventSkillResponse(gameStatus, eventTimingSkills[0])
                 return;
-            } else { // WHEN_TAKE_DAMAGE结束 扣减体力
-                targetPlayer.reduceBlood(damageEvent.damageNumber)
+            } else {
+                // WHEN_TAKE_DAMAGE结束 扣减体力
+                const extraDamageNumber = originPlayer ? (originPlayer.extraDamageMap[damageActualCard.key] || 0) : 0
+                const damageNumber = damageEvent.damageNumber + extraDamageNumber
+                targetPlayer.reduceBlood(damageNumber)
                 // 求桃
                 generateQiuTaoResponses(gameStatus, targetPlayer)
             }

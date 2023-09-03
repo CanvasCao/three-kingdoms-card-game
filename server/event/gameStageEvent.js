@@ -102,21 +102,36 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
         } else {
             gameStatus.stage.stageIndex = 2
             const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING
-            eventTimingsWithSkills.push({eventTimingName, eventTimingSkills: []})
 
-            if (!currentPlayer.skipTimimg[GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING]) { // 突袭
-                currentPlayer.drawCards(gameStatus)
+            if (currentPlayer.skipTimimg[GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING]) { // 因为突袭skipTimimg
+                eventTimingsWithSkills.push({eventTimingName, eventTimingSkills: []})
+            } else {
+                const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, originId})
+                eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
+
+                if (eventTimingSkills.length > 0) {
+                    setEventSkillResponse(gameStatus, eventTimingSkills[0])
+                    return;
+                } else {
+                    currentPlayer.drawCards(gameStatus)
+                }
             }
         }
     }
 
     if (last(eventTimingsWithSkills)?.eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING) {
-        gameStatus.stage.stageIndex = 3
-        if (currentPlayer.skipStage[STAGE_NAME.PLAY]) {
-            const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_PLAYING
-            eventTimingsWithSkills.push({eventTimingName, eventTimingSkills: []})
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)
+        if (unDoneSkill) {
+            setEventSkillResponse(gameStatus, unDoneSkill)
+            return;
         } else {
-            // 等待前端出牌结束时插入
+            gameStatus.stage.stageIndex = 3
+            if (currentPlayer.skipStage[STAGE_NAME.PLAY]) {
+                const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_PLAYING
+                eventTimingsWithSkills.push({eventTimingName, eventTimingSkills: []})
+            } else {
+                // 等待前端出牌结束时插入
+            }
         }
     }
 

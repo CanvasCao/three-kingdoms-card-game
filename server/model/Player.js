@@ -34,6 +34,8 @@ class Player {
         this.skipTimimg = {}
         this.skipStage = {};
 
+        this.extraDamageMap = {};
+
         // played tags
         this.shaTimes = 0;
 
@@ -133,6 +135,8 @@ class Player {
             sign.isEffect = undefined;
             return sign
         })
+
+        this.extraDamageMap = {};
     }
 
     // 弃牌阶段

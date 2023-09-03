@@ -228,6 +228,12 @@ const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingNam
                 .map((skill) => configTimingSkillToResponseSkill(skill, originPlayerId))
             eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
             break;
+        case GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING:
+            eventSkillsForPlayer = originPlayer.skills.map((skill) => TIMING_SKILLS_CONFIG[skill.key])
+                .filter((skill) => skill && skill.triggerTiming == eventTimingName)
+                .map((skill) => configTimingSkillToResponseSkill(skill, originPlayerId))
+            eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
+            break;
     }
 
     return eventTimingSkills;
