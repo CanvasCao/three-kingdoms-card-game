@@ -12,6 +12,7 @@ class Player {
         this.playerId = player.playerId;
         this.location = player.location;
         this.playerName = player.playerName;
+        this.teamMember = player.teamMember;
 
         // cards
         this.cards = [];

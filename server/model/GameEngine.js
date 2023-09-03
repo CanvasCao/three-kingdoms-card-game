@@ -1,5 +1,6 @@
 const strikeEvent = require("../event/strikeEvent");
 const sampleSize = require("lodash/sampleSize");
+const {reorderRoomPlayers} = require("../utils/roomUtils");
 const {trySetNextGameStageEventSkill} = require("../event/gameStageEvent");
 const {generateGameStageEventThenSetNextGameStageEventSkill} = require("../event/gameStageEvent");
 const {endPlayHandler} = require("../handler/endPlayHandler");
@@ -77,18 +78,18 @@ class GameEngine {
     }
 
     setPlayers(roomPlayers) {
-        let locations = shuffle([0, 1, 2, 3, 4, 5, 6, 7].slice(0, roomPlayers.length));
-
-        roomPlayers.forEach((p, i) => {
+        const reordered = reorderRoomPlayers(roomPlayers);
+        reordered.forEach((roomPlayer, i) => {
             const newPlayer = new Player({
-                playerName: p.playerName,
-                playerId: p.playerId,
-                location: locations[i],
+                playerName: roomPlayer.playerName,
+                playerId: roomPlayer.playerId,
+                teamMember: roomPlayer.teamMember,
+                location: i,
             });
 
             // 选将
             const allSelectHeroIds = ["WEI002", "WEI004", "SHU006", "WU006", "SHU003", "QUN002"];
-            const canSelectHeroIds = [...sampleSize(allSelectHeroIds, 3), "SP001"];
+            const canSelectHeroIds = [...sampleSize(allSelectHeroIds, 3)]//, "SP001"];
             newPlayer.canSelectHeros = canSelectHeroIds.map(heroId => getHeroConfig(heroId))
 
             this.gameStatus.players[newPlayer.playerId] = newPlayer;

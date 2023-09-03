@@ -1,4 +1,23 @@
-const teamMembers = ['zhongchen-1', 'zhongchen-2', 'zhongchen-3', 'zhongchen-4', 'fanzei-1', 'fanzei-2', 'fanzei-3', 'fanzei-4'];
+const {shuffle} = require("lodash");
+const teamMembers = ['zhugong-1', 'zhugong-2', 'zhugong-3', 'zhugong-4', 'neijian-1', 'neijian-2', 'neijian-3', 'neijian-4'];
+
+const reorderRoomPlayers = (roomPlayers) => {
+    const zhugongMembers = shuffle(roomPlayers.filter(roomPlayer => roomPlayer.teamMember.startsWith('zhugong')));
+    const neijianMembers = shuffle(roomPlayers.filter(roomPlayer => roomPlayer.teamMember.startsWith('neijian')));
+
+    const result = [];
+    const maxLength = Math.max(zhugongMembers.length, neijianMembers.length);
+
+    for (let i = 0; i < maxLength; i++) {
+        if (i < zhugongMembers.length) {
+            result.push(zhugongMembers[i]);
+        }
+        if (i < neijianMembers.length) {
+            result.push(neijianMembers[i]);
+        }
+    }
+    return result;
+}
 
 const getNextEmptyTeamMemberSlot = (roomPlayers) => {
     for (let i = 0; i < teamMembers.length; i++) {
@@ -10,6 +29,6 @@ const getNextEmptyTeamMemberSlot = (roomPlayers) => {
 
 }
 
-
-exports.getNextEmptyTeamMemberSlot = getNextEmptyTeamMemberSlot;
 exports.teamMembers = teamMembers;
+exports.getNextEmptyTeamMemberSlot = getNextEmptyTeamMemberSlot;
+exports.reorderRoomPlayers = reorderRoomPlayers;
