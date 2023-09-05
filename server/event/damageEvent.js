@@ -37,13 +37,10 @@ const setNextDamageEventSkill = (gameStatus) => {
         return;
     }
 
-    const {originId, targetId, damageActualCard} = damageEvent;
+    const {originId, targetId, damageActualCard, eventTimingTracker} = damageEvent;
     const actionCardKey = damageActualCard?.key
-
     const originPlayer = gameStatus.players[originId]
     const targetPlayer = gameStatus.players[targetId]
-
-    const eventTimingTracker = damageEvent.eventTimingTracker;
 
     if (eventTimingTracker.length == 0) {
         const eventTimingName = DAMAGE_EVENT_TIMING.WHEN_CAUSE_DAMAGE // 【麒麟弓】、【寒冰剑】

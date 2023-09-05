@@ -195,12 +195,14 @@ const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingNam
             eventSkillsForPlayer = targetPlayer.skills.map((skill) => TIMING_SKILLS_CONFIG[skill.key])
                 .filter((skill) => skill && skill.triggerTiming == eventTimingName)
                 .filter((skill) => {
-                    // 如果技能需要来源
-                    return skill.needOrigin ? !!originId : true
+                    return skill.needOrigin ? !!originId : true // 如果技能需要来源
                 })
                 .filter((skill) => {
-                    // 如果需要技能来源有卡牌技能需要来源
-                    return skill.needOriginHasCards ? originPlayer.hasAnyCards() : true
+                    return skill.needOriginHasCards ? originPlayer.hasAnyCards() : true  // 如果需要技能来源有卡牌技能需要来源
+                })
+                .filter((skill) => {
+                    const onGoingDamageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
+                    return skill.needDamageCards ? !!onGoingDamageEvent.damageCards.length : true  // 如果伤害是由卡造成的
                 })
                 .map((skill) => configTimingSkillToResponseSkill(skill, targetPlayerId))
             eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
