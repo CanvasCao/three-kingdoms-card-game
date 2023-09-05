@@ -31,7 +31,12 @@ const goToNextStage = (gameStatus) => {
     } else {
         // 如果有没有处理的事件
         if (findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)) {
-            last(eventTimingsWithSkills).eventTimingSkills.forEach((skill) => skill.done = true)
+            last(eventTimingsWithSkills).eventTimingSkills.forEach((skill) => skill.done = true);
+
+            // 点击goToNextStage的时候 让XU_CHU摸牌
+            if (last(eventTimingsWithSkills).eventTimingName === GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING) {
+                getCurrentPlayer(gameStatus).drawCards(gameStatus)
+            }
         } else {
             const nextEventTimingName = GAME_STAGE_TIMINGS[index + 1]
             eventTimingsWithSkills.push({eventTimingName: nextEventTimingName, eventTimingSkills: []})
