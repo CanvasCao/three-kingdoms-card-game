@@ -1,5 +1,11 @@
-const CARD_LOCATION={
-    PAIDUI:"PAIDUI"
+const CARD_LOCATION = {
+    PAIDUI: "PAIDUI",
+    TABLE: "TABLE",
+
+    HAND: "HAND",
+    EQUIPMENT: "EQUIPMENT",
+    HORSE: "HORSE",
+    PANDING: "PANDING"
 }
 
 const CARD_HUASE = {

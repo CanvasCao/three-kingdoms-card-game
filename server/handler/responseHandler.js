@@ -1,4 +1,5 @@
 const strikeEvent = require("../event/strikeEvent");
+const {handleWei001JianXiongResponse} = require("./skills/WEI001");
 const {handleWei005LuoYiResponse} = require("./skills/WEI005");
 const {handleWei004TuXiResponse} = require("./skills/WEI004");
 const {handleHanBinJianResponse} = require("./skills/weapon");
@@ -92,6 +93,8 @@ const responseCardHandler = {
 
         if (skillNameKey == SKILL_CONFIG.SHU006_TIE_JI.key) {
             handleShu006TieJiResponse(gameStatus, response)
+        } else if (skillNameKey == SKILL_CONFIG.WEI001_JIAN_XIONG.key) {
+            handleWei001JianXiongResponse(gameStatus, response)
         } else if (skillNameKey == SKILL_CONFIG.WEI002_FAN_KUI.key) {
             handleWei002FanKuiResponse(gameStatus, response)
         } else if (skillNameKey == SKILL_CONFIG.WEI002_GUI_CAI.key) {

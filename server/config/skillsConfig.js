@@ -50,6 +50,10 @@ const SKILL_CONFIG = {
 }
 
 const TIMING_SKILLS_CONFIG = {
+    WEI001_JIAN_XIONG: {
+        key: "WEI001_JIAN_XIONG",
+        triggerTiming: DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE,
+    },
     WEI002_FAN_KUI: {
         key: "WEI002_FAN_KUI",
         triggerTiming: DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE,

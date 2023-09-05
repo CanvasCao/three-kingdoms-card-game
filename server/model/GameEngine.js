@@ -27,7 +27,7 @@ const {
     emitNotifyCardBoardAction,
     emitNotifyAddLines,
     emitNotifyThrowPlayPublicCard,
-    emitNotifyPickWuGuCard,
+    emitNotifyGetCardsFromTable,
 } = require("../utils/emitUtils");
 const {
     throwCards
@@ -89,7 +89,7 @@ class GameEngine {
 
             // 选将
             const allSelectHeroIds = ["WEI002", "WEI004", 'WEI005', "SHU003", "SHU006", "WU006", "QUN002"];
-            const canSelectHeroIds = [...sampleSize(allSelectHeroIds, 3)]//, "SP001"];
+            const canSelectHeroIds = [...sampleSize(allSelectHeroIds, 3), "WEI001",]//, "SP001"];
             newPlayer.canSelectHeros = canSelectHeroIds.map(heroId => getHeroConfig(heroId))
 
             this.gameStatus.players[newPlayer.playerId] = newPlayer;
@@ -256,7 +256,7 @@ class GameEngine {
         trySettleNextScroll(this.gameStatus)
         emitRefreshStatus(this.gameStatus);
 
-        emitNotifyPickWuGuCard(this.gameStatus, data);
+        emitNotifyGetCardsFromTable(this.gameStatus, {...data, cards: [data.card]});
     }
 
     handleHeroSelectBoardAction(data) {

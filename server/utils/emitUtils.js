@@ -1,3 +1,4 @@
+const {PLAYER_BOARD_ACTION} = require("../config/boardConfig");
 const {teamMembers} = require("./roomUtils");
 const {EMIT_TYPE} = require("../config/emitConfig");
 const {GAME_STATUS} = require("../config/gameAndStageConfig");
@@ -75,7 +76,7 @@ const emitNotifyCardBoardAction = (gameStatus, boardActionData) => {
     // }
     const io = gameStatus.io;
     const roomId = gameStatus.roomId;
-    if (boardActionData.type == "REMOVE") {
+    if (boardActionData.type == PLAYER_BOARD_ACTION.REMOVE) {
         io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PUBLIC_CARD, {
             cards: [boardActionData.card],
             fromId: boardActionData.targetId,
@@ -99,20 +100,20 @@ const emitNotifyJieDaoWeaponOwnerChange = (gameStatus, weaponCard) => {
         cards: [weaponCard],
         fromId: action.targetIds[0],
         toId: action.originId,
-        cardAreaType: 'EQUIPMENT',
+        cardAreaType: CARD_LOCATION.EQUIPMENT,
     });
 }
 
-const emitNotifyPickWuGuCard = (gameStatus, data) => {
-// export type EmitWugufengdengData = {
-//         card: Card,
+// export type data = {
+//         cards: Card[],
 //         playerId: string,
 //     }
+const emitNotifyGetCardsFromTable = (gameStatus, data) => {
     const io = gameStatus.io;
     const roomId = gameStatus.roomId;
     io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PLAYER_CARD, {
-        cards: [data.card],
-        fromId: CARD_LOCATION.PAIDUI,
+        cards: data.cards,
+        fromId: CARD_LOCATION.TABLE,
         toId: data.playerId,
     });
 }
@@ -197,7 +198,7 @@ exports.emitNotifyCardBoardAction = emitNotifyCardBoardAction;
 // TO PLAYER
 exports.emitNotifyDrawCards = emitNotifyDrawCards;
 exports.emitNotifyJieDaoWeaponOwnerChange = emitNotifyJieDaoWeaponOwnerChange;
-exports.emitNotifyPickWuGuCard = emitNotifyPickWuGuCard;
+exports.emitNotifyGetCardsFromTable = emitNotifyGetCardsFromTable;
 
 // ADD LINES
 exports.emitNotifyAddLines = emitNotifyAddLines;
