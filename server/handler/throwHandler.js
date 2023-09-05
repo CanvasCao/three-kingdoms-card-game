@@ -8,7 +8,7 @@ const throwHandler = {
         throwCards(gameStatus, cards);
 
         const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_THROWING
-        gameStatus.gameStageEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills: []})
+        gameStatus.gameStageEvent.eventTimingTracker.push({eventTimingName, eventTimingSkills: []})
     }
 }
 

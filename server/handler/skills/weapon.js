@@ -114,7 +114,7 @@ const handleQingLongYanYueDaoResponse = (gameStatus, response) => {
 
         // onGoingUseStrikeEvent 阶段重置
         onGoingUseStrikeEvent.dodgeStatus = undefined;
-        onGoingUseStrikeEvent.eventTimingsWithSkills = [onGoingUseStrikeEvent.eventTimingsWithSkills[0]]; // 只保留第一个元素
+        onGoingUseStrikeEvent.eventTimingTracker = [onGoingUseStrikeEvent.eventTimingTracker[0]]; // 只保留第一个元素
         onGoingUseStrikeEvent.cards = response.cards;
         onGoingUseStrikeEvent.actualCard = response.actualCard;
     }

@@ -29,7 +29,7 @@ const generateUseStrikeEventsThenSetNextStrikeEventSkill = (gameStatus, {originI
             originId,
             targetId: targetPlayer.playerId,
             cantShan: false,
-            eventTimingsWithSkills: [],
+            eventTimingTracker: [],
             done: false
         }
     })
@@ -44,15 +44,15 @@ const setNextStrikeEventSkill = (gameStatus) => {
         return
     }
 
-    const {eventTimingsWithSkills, originId, targetId, actualCard} = useStrikeEvent;
+    const {eventTimingTracker, originId, targetId, actualCard} = useStrikeEvent;
     const originPlayer = gameStatus.players[originId];
     const targetPlayer = gameStatus.players[targetId];
     const actionCardKey = actualCard?.key;
 
-    if (eventTimingsWithSkills.length == 0) {
+    if (eventTimingTracker.length == 0) {
         const eventTimingName = USE_EVENT_TIMING.WHEN_BECOMING_TARGET // 【流离】
         const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, actionCardKey, originId, targetId})
-        eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
+        eventTimingTracker.push({eventTimingName, eventTimingSkills})
 
         if (eventTimingSkills.length > 0) {
             setEventSkillResponse(gameStatus, eventTimingSkills[0])
@@ -60,15 +60,15 @@ const setNextStrikeEventSkill = (gameStatus) => {
         }
     }
 
-    if (last(eventTimingsWithSkills).eventTimingName == USE_EVENT_TIMING.WHEN_BECOMING_TARGET) {
-        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)
+    if (last(eventTimingTracker).eventTimingName == USE_EVENT_TIMING.WHEN_BECOMING_TARGET) {
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingTracker)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
         } else {
             const eventTimingName = USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET // 【铁骑】【烈弓】【青釭剑】【雌雄双股剑】
             const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, actionCardKey, originId, targetId})
-            eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
+            eventTimingTracker.push({eventTimingName, eventTimingSkills})
 
             if (eventTimingSkills.length > 0) {
                 setEventSkillResponse(gameStatus, eventTimingSkills[0])
@@ -77,8 +77,8 @@ const setNextStrikeEventSkill = (gameStatus) => {
         }
     }
 
-    if (last(eventTimingsWithSkills).eventTimingName == USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET) {
-        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)
+    if (last(eventTimingTracker).eventTimingName == USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET) {
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingTracker)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
@@ -102,7 +102,7 @@ const setNextStrikeEventSkill = (gameStatus) => {
                     })
                     handleUseStrikeEventEnd(gameStatus);
                 } else {
-                    eventTimingsWithSkills.push({eventTimingName, eventTimingSkills: []})
+                    eventTimingTracker.push({eventTimingName, eventTimingSkills: []})
                     generateResponseCardEventThenSetNextResponseCardEventSkill(gameStatus, {
                         originId: useStrikeEvent.targetId,
                         targetId: useStrikeEvent.originId,
@@ -115,7 +115,7 @@ const setNextStrikeEventSkill = (gameStatus) => {
         }
     }
 
-    if (last(eventTimingsWithSkills).eventTimingName == USE_EVENT_TIMING.WHEN_SETTLEMENT_BEGINS) {
+    if (last(eventTimingTracker).eventTimingName == USE_EVENT_TIMING.WHEN_SETTLEMENT_BEGINS) {
         if (useStrikeEvent.dodgeStatus === undefined) { // 没有决定是否响应 等待前端响应
             return;
         } else if (useStrikeEvent.dodgeStatus === true) {  // 使用以后 【贯石斧】
@@ -126,7 +126,7 @@ const setNextStrikeEventSkill = (gameStatus) => {
                 originId,
                 targetId
             })
-            eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
+            eventTimingTracker.push({eventTimingName, eventTimingSkills})
 
             if (eventTimingSkills.length > 0) {
                 setEventSkillResponse(gameStatus, eventTimingSkills[0])
@@ -138,8 +138,8 @@ const setNextStrikeEventSkill = (gameStatus) => {
         }
     }
 
-    if (last(eventTimingsWithSkills).eventTimingName == USE_EVENT_TIMING.BEFORE_TAKE_EFFECT) {
-        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)
+    if (last(eventTimingTracker).eventTimingName == USE_EVENT_TIMING.BEFORE_TAKE_EFFECT) {
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingTracker)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;

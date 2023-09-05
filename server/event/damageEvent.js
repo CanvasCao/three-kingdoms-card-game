@@ -24,7 +24,7 @@ const generateDamageEventThenSetNextDamageEventSkill = (gameStatus, {
         targetId,// 受到伤害的角色
         damageNumber,// 伤害值
         // isTieSuo, // 是否为连环伤害
-        eventTimingsWithSkills: [],
+        eventTimingTracker: [],
         done: false,
     }
 
@@ -43,12 +43,12 @@ const setNextDamageEventSkill = (gameStatus) => {
     const originPlayer = gameStatus.players[originId]
     const targetPlayer = gameStatus.players[targetId]
 
-    const eventTimingsWithSkills = damageEvent.eventTimingsWithSkills;
+    const eventTimingTracker = damageEvent.eventTimingTracker;
 
-    if (eventTimingsWithSkills.length == 0) {
+    if (eventTimingTracker.length == 0) {
         const eventTimingName = DAMAGE_EVENT_TIMING.WHEN_CAUSE_DAMAGE // 【麒麟弓】、【寒冰剑】
         const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, actionCardKey, originId, targetId})
-        damageEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
+        damageEvent.eventTimingTracker.push({eventTimingName, eventTimingSkills})
 
         if (eventTimingSkills.length > 0) {
             setEventSkillResponse(gameStatus, eventTimingSkills[0])
@@ -56,15 +56,15 @@ const setNextDamageEventSkill = (gameStatus) => {
         }
     }
 
-    if (last(eventTimingsWithSkills).eventTimingName == DAMAGE_EVENT_TIMING.WHEN_CAUSE_DAMAGE) {
-        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)
+    if (last(eventTimingTracker).eventTimingName == DAMAGE_EVENT_TIMING.WHEN_CAUSE_DAMAGE) {
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingTracker)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
         } else {
             const eventTimingName = DAMAGE_EVENT_TIMING.WHEN_TAKE_DAMAGE //【天香】
             const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, targetId})
-            damageEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
+            damageEvent.eventTimingTracker.push({eventTimingName, eventTimingSkills})
 
             if (eventTimingSkills.length > 0) {
                 setEventSkillResponse(gameStatus, eventTimingSkills[0])
@@ -80,15 +80,15 @@ const setNextDamageEventSkill = (gameStatus) => {
         }
     }
 
-    if (last(eventTimingsWithSkills).eventTimingName == DAMAGE_EVENT_TIMING.WHEN_TAKE_DAMAGE) {
-        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)
+    if (last(eventTimingTracker).eventTimingName == DAMAGE_EVENT_TIMING.WHEN_TAKE_DAMAGE) {
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingTracker)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
         } else {
             const eventTimingName = DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE // 【奸雄】、【反馈】、【刚烈】、【遗计】
             const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, targetId, originId})
-            damageEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
+            damageEvent.eventTimingTracker.push({eventTimingName, eventTimingSkills})
 
             if (eventTimingSkills.length > 0) {
                 setEventSkillResponse(gameStatus, eventTimingSkills[0])
@@ -97,8 +97,8 @@ const setNextDamageEventSkill = (gameStatus) => {
         }
     }
 
-    if (last(eventTimingsWithSkills).eventTimingName == DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE) {
-        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)
+    if (last(eventTimingTracker).eventTimingName == DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE) {
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingTracker)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;

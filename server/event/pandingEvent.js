@@ -24,7 +24,7 @@ const generatePandingEventThenSetNextPandingEventSkill = (gameStatus, {originId,
     const pandingResultCard = getCards(gameStatus, 1)
     gameStatus.pandingEvent = {
         originId,
-        eventTimingsWithSkills: [],
+        eventTimingTracker: [],
         done: false,
         pandingNameKey,
         pandingResultCard,
@@ -40,13 +40,13 @@ const setNextPandingEventSkill = (gameStatus) => {
         return;
     }
 
-    const {originId, eventTimingsWithSkills} = pandingEvent;
+    const {originId, eventTimingTracker} = pandingEvent;
 
     let timingIndex = 0;
-    if (eventTimingsWithSkills.length == 0) {
+    if (eventTimingTracker.length == 0) {
         const eventTimingName = PANDING_EVENT_TIMINGS[timingIndex] // BEFORE_PANDING_TAKE_EFFECT
         const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, originId})
-        pandingEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
+        pandingEvent.eventTimingTracker.push({eventTimingName, eventTimingSkills})
 
         if (eventTimingSkills.length > 0) {
             setEventSkillResponse(gameStatus, eventTimingSkills[0])
@@ -54,15 +54,15 @@ const setNextPandingEventSkill = (gameStatus) => {
         }
     }
 
-    if (last(eventTimingsWithSkills).eventTimingName == PANDING_EVENT_TIMINGS[timingIndex]) {
-        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)
+    if (last(eventTimingTracker).eventTimingName == PANDING_EVENT_TIMINGS[timingIndex]) {
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingTracker)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
         } else {
             const eventTimingName = PANDING_EVENT_TIMINGS[timingIndex + 1] // AFTER_PANDING_TAKE_EFFECT
             const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, originId})
-            pandingEvent.eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
+            pandingEvent.eventTimingTracker.push({eventTimingName, eventTimingSkills})
 
             if (eventTimingSkills.length > 0) {
                 setEventSkillResponse(gameStatus, eventTimingSkills[0])
@@ -71,8 +71,8 @@ const setNextPandingEventSkill = (gameStatus) => {
         }
     }
 
-    if (last(eventTimingsWithSkills).eventTimingName == PANDING_EVENT_TIMINGS[timingIndex + 1]) {
-        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)
+    if (last(eventTimingTracker).eventTimingName == PANDING_EVENT_TIMINGS[timingIndex + 1]) {
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingTracker)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;

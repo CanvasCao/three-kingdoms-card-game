@@ -38,7 +38,7 @@ const generateResponseCardEventThenSetNextResponseCardEventSkill = (gameStatus, 
             useOrPlay,
             cardNumber: times,
             responseStatus: undefined,
-            eventTimingsWithSkills: [],
+            eventTimingTracker: [],
             done: false,
         }
     })
@@ -55,10 +55,10 @@ const setNextResponseCardEventSkill = (gameStatus) => {
     const allUnDoneEvents = findAllUnDoneEvents(gameStatus, ALL_EVENTS_KEY_CONFIG.RESPONSE_CARD_EVENTS);
     gameStatus.responseCardEvents.forEach((event) => event.cardNumber = allUnDoneEvents.length)
 
-    const {actionCards, actionActualCard, cardNumber, eventTimingsWithSkills, originId, targetId} = responseCardEvent
+    const {actionCards, actionActualCard, cardNumber, eventTimingTracker, originId, targetId} = responseCardEvent
 
     const timingIndex = 0;
-    if (eventTimingsWithSkills.length == 0) {
+    if (eventTimingTracker.length == 0) {
         const eventTimingName = PLAY_EVENT_TIMINGS[timingIndex]
 
         // 这个阶段只判断八卦
@@ -68,7 +68,7 @@ const setNextResponseCardEventSkill = (gameStatus) => {
             originId,
             targetId
         })
-        eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
+        eventTimingTracker.push({eventTimingName, eventTimingSkills})
 
         if (eventTimingSkills.length > 0) {
             setEventSkillResponse(gameStatus, eventTimingSkills[0])
@@ -76,8 +76,8 @@ const setNextResponseCardEventSkill = (gameStatus) => {
         }
     }
 
-    if (last(eventTimingsWithSkills).eventTimingName == PLAY_EVENT_TIMINGS[timingIndex]) {
-        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)
+    if (last(eventTimingTracker).eventTimingName == PLAY_EVENT_TIMINGS[timingIndex]) {
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingTracker)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
@@ -100,7 +100,7 @@ const setNextResponseCardEventSkill = (gameStatus) => {
                     originId,
                     targetId
                 })
-                eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
+                eventTimingTracker.push({eventTimingName, eventTimingSkills})
 
                 if (eventTimingSkills.length > 0) {
                     setEventSkillResponse(gameStatus, eventTimingSkills[0])
@@ -113,8 +113,8 @@ const setNextResponseCardEventSkill = (gameStatus) => {
         }
     }
 
-    if (last(eventTimingsWithSkills).eventTimingName == PLAY_EVENT_TIMINGS[timingIndex + 1]) {
-        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)
+    if (last(eventTimingTracker).eventTimingName == PLAY_EVENT_TIMINGS[timingIndex + 1]) {
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingTracker)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;

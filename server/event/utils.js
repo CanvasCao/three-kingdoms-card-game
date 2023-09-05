@@ -17,7 +17,7 @@ const {v4: uuidv4} = require('uuid');
 //         "originId": "a2511baa-80f8-4e6b-be63-317e902bfa9d",
 //         "targetId": "1ea2ff47-b3c1-4b26-aabc-539c754b8076",
 //         "cantShan": false,
-//         "eventTimingsWithSkills": [
+//         "eventTimingTracker": [
 //             {
 //                 "eventTimingName": "WHEN_BECOMING_TARGET",
 //                 "eventTimingSkills": [
@@ -56,8 +56,8 @@ const setEventSkillResponse = (gameStatus, skill) => {
 }
 
 // UnDoneSkill
-const findNextUnDoneSkillInLastEventTimingsWithSkills = (gameStatus, eventTimingsWithSkills) => {
-    const eventTimingSkills = last(eventTimingsWithSkills).eventTimingSkills
+const findNextUnDoneSkillInLastEventTimingsWithSkills = (gameStatus, eventTimingTracker) => {
+    const eventTimingSkills = last(eventTimingTracker).eventTimingSkills
 
     // 找到没有放而且释放角色还没有阵亡的技能
     return eventTimingSkills.find((eventTimingSkill) => {
@@ -82,7 +82,7 @@ const findOnGoingEvent = (gameStatus, eventKey) => {
 
 const findOnGoingEventSkill = (gameStatus, eventKey) => {
     const event = findOnGoingEvent(gameStatus, eventKey)
-    const eventTiming = event?.eventTimingsWithSkills
+    const eventTiming = event?.eventTimingTracker
         .find((et) => et.eventTimingSkills
             .some((s) => s.done === false))
 

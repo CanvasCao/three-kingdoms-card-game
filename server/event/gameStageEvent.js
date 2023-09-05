@@ -17,29 +17,29 @@ const {last} = require("lodash");
 
 // only debug
 const goToNextStage = (gameStatus) => {
-    const eventTimingsWithSkills = gameStatus.gameStageEvent.eventTimingsWithSkills;
-    const lastEventTimingName = last(eventTimingsWithSkills)?.eventTimingName;
+    const eventTimingTracker = gameStatus.gameStageEvent.eventTimingTracker;
+    const lastEventTimingName = last(eventTimingTracker)?.eventTimingName;
     const index = GAME_STAGE_TIMINGS.findIndex((t) => t == lastEventTimingName);
 
     clearAllResponses(gameStatus)
-    if (!eventTimingsWithSkills.length) {
+    if (!eventTimingTracker.length) {
         const nextEventTimingName = GAME_STAGE_TIMINGS[0]
-        eventTimingsWithSkills.push({eventTimingName: nextEventTimingName, eventTimingSkills: []})
+        eventTimingTracker.push({eventTimingName: nextEventTimingName, eventTimingSkills: []})
         trySetNextGameStageEventSkill(gameStatus);
     } else if (index == GAME_STAGE_TIMINGS.length - 1) {
         handleGameStageEventEnd(gameStatus)
     } else {
         // 如果有没有处理的事件
-        if (findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)) {
-            last(eventTimingsWithSkills).eventTimingSkills.forEach((skill) => skill.done = true);
+        if (findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingTracker)) {
+            last(eventTimingTracker).eventTimingSkills.forEach((skill) => skill.done = true);
 
             // 点击goToNextStage的时候 让XU_CHU摸牌
-            if (last(eventTimingsWithSkills).eventTimingName === GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING) {
+            if (last(eventTimingTracker).eventTimingName === GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING) {
                 getCurrentPlayer(gameStatus).drawCards(gameStatus)
             }
         } else {
             const nextEventTimingName = GAME_STAGE_TIMINGS[index + 1]
-            eventTimingsWithSkills.push({eventTimingName: nextEventTimingName, eventTimingSkills: []})
+            eventTimingTracker.push({eventTimingName: nextEventTimingName, eventTimingSkills: []})
         }
         trySetNextGameStageEventSkill(gameStatus);
     }
@@ -48,7 +48,7 @@ const goToNextStage = (gameStatus) => {
 
 const generateGameStageEventThenSetNextGameStageEventSkill = (gameStatus) => {
     gameStatus.stage = {playerId: getCurrentPlayer(gameStatus).playerId, stageIndex: 0}
-    gameStatus.gameStageEvent = {eventTimingsWithSkills: []}
+    gameStatus.gameStageEvent = {eventTimingTracker: []}
     trySetNextGameStageEventSkill(gameStatus);
 }
 
@@ -63,16 +63,16 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
     }
 
     const gameStageEvent = gameStatus.gameStageEvent;
-    const eventTimingsWithSkills = gameStageEvent.eventTimingsWithSkills;
+    const eventTimingTracker = gameStageEvent.eventTimingTracker;
     const originId = currentPlayer.playerId
 
-    if (eventTimingsWithSkills.length == 0) {
+    if (eventTimingTracker.length == 0) {
         gameStatus.stage.stageIndex = 1
 
         const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus)
         if (!nextNeedPandingSign) { // 3 没有延时锦囊
             const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_JUDGING
-            eventTimingsWithSkills.push({eventTimingName, eventTimingSkills: []})
+            eventTimingTracker.push({eventTimingName, eventTimingSkills: []})
             trySetNextGameStageEventSkill(gameStatus);
         } else if (isNil(nextNeedPandingSign.isEffect)) { // 1 有未生效的判定 需要无懈可击
             const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
@@ -88,10 +88,10 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
         }
     }
 
-    if (last(eventTimingsWithSkills)?.eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_IS_JUDGING) {
+    if (last(eventTimingTracker)?.eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_IS_JUDGING) {
         const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_WHEN_DRAW_START //【突袭】
         const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, originId})
-        eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
+        eventTimingTracker.push({eventTimingName, eventTimingSkills})
 
         if (eventTimingSkills.length > 0) {
             setEventSkillResponse(gameStatus, eventTimingSkills[0])
@@ -99,8 +99,8 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
         }
     }
 
-    if (last(eventTimingsWithSkills)?.eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_WHEN_DRAW_START) {
-        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)
+    if (last(eventTimingTracker)?.eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_WHEN_DRAW_START) {
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingTracker)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
@@ -109,10 +109,10 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
             const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING
 
             if (currentPlayer.skipTimimg[GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING]) { // 因为突袭skipTimimg
-                eventTimingsWithSkills.push({eventTimingName, eventTimingSkills: []})
+                eventTimingTracker.push({eventTimingName, eventTimingSkills: []})
             } else {
                 const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, originId})
-                eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
+                eventTimingTracker.push({eventTimingName, eventTimingSkills})
 
                 if (eventTimingSkills.length > 0) {
                     setEventSkillResponse(gameStatus, eventTimingSkills[0])
@@ -124,8 +124,8 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
         }
     }
 
-    if (last(eventTimingsWithSkills)?.eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING) {
-        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)
+    if (last(eventTimingTracker)?.eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING) {
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingTracker)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
@@ -133,25 +133,25 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
             gameStatus.stage.stageIndex = 3
             if (currentPlayer.skipStage[STAGE_NAME.PLAY]) {
                 const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_PLAYING
-                eventTimingsWithSkills.push({eventTimingName, eventTimingSkills: []})
+                eventTimingTracker.push({eventTimingName, eventTimingSkills: []})
             } else {
                 // 等待前端出牌结束时插入
             }
         }
     }
 
-    if (last(eventTimingsWithSkills)?.eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_IS_PLAYING) {
+    if (last(eventTimingTracker)?.eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_IS_PLAYING) {
         const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_BETWEEN_PLAY_AND_THROW //【克己】
         const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, originId})
-        eventTimingsWithSkills.push({eventTimingName, eventTimingSkills})
+        eventTimingTracker.push({eventTimingName, eventTimingSkills})
         if (eventTimingSkills.length > 0) {
             setEventSkillResponse(gameStatus, eventTimingSkills[0])
             return;
         }
     }
 
-    if (last(eventTimingsWithSkills)?.eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_BETWEEN_PLAY_AND_THROW) {
-        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingsWithSkills)
+    if (last(eventTimingTracker)?.eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_BETWEEN_PLAY_AND_THROW) {
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingTracker)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
@@ -159,14 +159,14 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
             gameStatus.stage.stageIndex = 4
             if (!currentPlayer.needThrow()) {
                 const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_THROWING
-                eventTimingsWithSkills.push({eventTimingName, eventTimingSkills: []})
+                eventTimingTracker.push({eventTimingName, eventTimingSkills: []})
             } else {
                 // 等待前端弃牌结束时插入
             }
         }
     }
 
-    if (last(eventTimingsWithSkills)?.eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_IS_THROWING) {
+    if (last(eventTimingTracker)?.eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_IS_THROWING) {
         handleGameStageEventEnd(gameStatus);
     }
 }
