@@ -1,3 +1,4 @@
+const {intersectionBy} = require("lodash/array");
 const {GAME_STAGE_TIMING} = require("../config/eventConfig");
 const {ALL_SHA_CARD_KEYS} = require("../config/cardConfig");
 const {PLAY_EVENT_TIMING} = require("../config/eventConfig");
@@ -201,8 +202,11 @@ const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingNam
                     return skill.needOriginHasCards ? originPlayer.hasAnyCards() : true  // 如果需要技能来源有卡牌技能需要来源
                 })
                 .filter((skill) => {
-                    const onGoingDamageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
-                    return skill.needDamageCards ? !!onGoingDamageEvent.damageCards.length : true  // 如果伤害是由卡造成的
+                    if (skill.needDamageCards) { // 如果伤害是由卡造成的
+                        const onGoingDamageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
+                        return !!intersectionBy(onGoingDamageEvent.damageCards, gameStatus.throwedCards, 'cardId').length
+                    }
+                    return true
                 })
                 .map((skill) => configTimingSkillToResponseSkill(skill, targetPlayerId))
             eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
