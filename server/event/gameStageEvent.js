@@ -58,7 +58,7 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
     }
 
     const currentPlayer = getCurrentPlayer(gameStatus);
-    if (currentPlayer.isDead) { // 自己的回合死亡后 需要直接移动到下一个人（闪电 决斗）
+    if (getCurrentPlayer(gameStatus).isDead) { // 自己的回合死亡后 需要直接移动到下一个人（闪电 决斗）
         handleGameStageEventEnd(gameStatus)
     }
 
@@ -68,23 +68,32 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
 
     if (eventTimingTracker.length == 0) {
         gameStatus.stage.stageIndex = 1
+        const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_JUDGING
 
-        const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus)
-        if (!nextNeedPandingSign) { // 3 没有延时锦囊
-            const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_JUDGING
-            eventTimingTracker.push({eventTimingName, eventTimingSkills: []})
-            trySetNextGameStageEventSkill(gameStatus);
-        } else if (isNil(nextNeedPandingSign.isEffect)) { // 1 有未生效的判定 需要无懈可击
-            const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
-            if (hasWuxiePlayers.length > 0) {
-                generateWuxieSimultaneousResponseByPandingCard(gameStatus)
-            } else { // 没有无懈可击 延时锦囊直接生效
-                nextNeedPandingSign.isEffect = true;
-                trySetNextGameStageEventSkill(gameStatus); // nextNeedPandingSign生效之后进入 判定执行
+        let nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus)
+        if (nextNeedPandingSign) {
+            while (nextNeedPandingSign) {
+                if (isNil(nextNeedPandingSign.isEffect)) {
+                    const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
+                    if (hasWuxiePlayers.length > 0) {
+                        generateWuxieSimultaneousResponseByPandingCard(gameStatus)
+                        break;
+                    } else { // 没有无懈可击 延时锦囊直接生效
+                        nextNeedPandingSign.isEffect = true;
+                    }
+                }
+
+                executeNextOnePandingCard(gameStatus);
+                if (ifAnyPlayerNeedToResponse(gameStatus)) {
+                    break;
+                }
+                nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus)
             }
-        } else { // 2 延时锦囊生效或失效了 需要执行结算
-            executeNextOnePandingCard(gameStatus);
-            trySetNextGameStageEventSkill(gameStatus); // 如果还有别的判定牌会再一次回到这里
+
+            // while 中间没有break 说明判定自动结束
+            eventTimingTracker.push({eventTimingName, eventTimingSkills: []})
+        } else {
+            eventTimingTracker.push({eventTimingName, eventTimingSkills: []})
         }
     }
 

@@ -47,6 +47,8 @@ class Player {
             this[key] = config[key]
         }
         this.currentBlood = process.env.NODE_ENV == 'production' ? config.maxBlood : 2;
+        // this.currentBlood = 8;
+        // this.maxBlood = 8;
     }
 
     // Card
