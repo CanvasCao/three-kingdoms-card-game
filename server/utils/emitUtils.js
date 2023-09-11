@@ -63,7 +63,7 @@ const emitNotifyDrawCards = (gameStatus, cards, player) => {
         cards,
         fromId: CARD_LOCATION.PAIDUI,
         toId: player.playerId,
-        isPublic: true
+        isPublic: false,
     });
 }
 
