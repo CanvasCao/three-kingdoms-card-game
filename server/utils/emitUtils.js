@@ -63,31 +63,34 @@ const emitNotifyDrawCards = (gameStatus, cards, player) => {
         cards,
         fromId: CARD_LOCATION.PAIDUI,
         toId: player.playerId,
+        isPublic: true
     });
 }
 
 const emitNotifyCardBoardAction = (gameStatus, boardActionData) => {
-    // type EmitCardBoardData = {
+    // export type EmitCardBoardData = {
     //     originId: string,
     //     targetId: string,
     //     card: Card,
-    //     cardAreaType: CardAreaType
-    //     type: "REMOVE" | "MOVE",
+    //     action: PlayerBoardAction,
     // }
     const io = gameStatus.io;
     const roomId = gameStatus.roomId;
-    if (boardActionData.type == PLAYER_BOARD_ACTION.REMOVE) {
+    const {originId, targetId, card, action} = boardActionData
+    if (action == PLAYER_BOARD_ACTION.REMOVE) {
         io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PUBLIC_CARD, {
             cards: [boardActionData.card],
             fromId: boardActionData.targetId,
             type: ADD_TO_PUBLIC_CARD_TYPE.CHAI
         });
     } else {
+        const isPublic = !gameStatus.players[targetId].cards.find((c) => c.cardId == card.cardId)
+
         io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PLAYER_CARD, {
-            cards: [boardActionData.card],
-            fromId: boardActionData.targetId,
-            toId: boardActionData.originId,
-            cardAreaType: boardActionData.cardAreaType,
+            cards: [card],
+            fromId: targetId,
+            toId: originId,
+            isPublic
         });
     }
 }
@@ -100,7 +103,7 @@ const emitNotifyJieDaoWeaponOwnerChange = (gameStatus, weaponCard) => {
         cards: [weaponCard],
         fromId: action.targetIds[0],
         toId: action.originId,
-        cardAreaType: CARD_LOCATION.EQUIPMENT,
+        isPublic: true,
     });
 }
 
@@ -115,6 +118,7 @@ const emitNotifyGetCardsFromTable = (gameStatus, data) => {
         cards: data.cards,
         fromId: CARD_LOCATION.TABLE,
         toId: data.playerId,
+        isPublic: true,
     });
 }
 

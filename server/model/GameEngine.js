@@ -1,5 +1,6 @@
 const strikeEvent = require("../event/strikeEvent");
 const sampleSize = require("lodash/sampleSize");
+const {ALL_SHA_CARD_KEYS} = require("../config/cardConfig");
 const {reorderRoomPlayers} = require("../utils/roomUtils");
 const {trySetNextGameStageEventSkill} = require("../event/gameStageEvent");
 const {generateGameStageEventThenSetNextGameStageEventSkill} = require("../event/gameStageEvent");
@@ -88,8 +89,8 @@ class GameEngine {
             });
 
             // 选将
-            const allSelectHeroIds = ["WEI002", "WEI004", 'WEI005', "SHU003", "SHU006", "WU006", "QUN002"];
-            const canSelectHeroIds = [...sampleSize(allSelectHeroIds, 3), "WEI001",]//, "SP001"];
+            const allSelectHeroIds = ["WEI001", "WEI002", "WEI004", 'WEI005', "SHU003", "SHU006", "WU006", "QUN002"];
+            const canSelectHeroIds = [...sampleSize(allSelectHeroIds, 3),]//, "SP001"];
             newPlayer.canSelectHeros = canSelectHeroIds.map(heroId => getHeroConfig(heroId))
 
             this.gameStatus.players[newPlayer.playerId] = newPlayer;
@@ -105,9 +106,15 @@ class GameEngine {
         this.gameStatus.action = action;
         this.gameStatus.players[action.originId].removeCards(action.cards);
 
+        emitNotifyPlayPublicCard(this.gameStatus, action);
+        emitNotifyAddLines(this.gameStatus, {
+            fromId: action.originId,
+            toIds: action.targetId ? [action.targetId] : action.targetIds,
+            actualCard: action.actualCard
+        });
+
         // BASIC
-        if ([BASIC_CARDS_CONFIG.SHA.key, BASIC_CARDS_CONFIG.LEI_SHA.key, BASIC_CARDS_CONFIG.HUO_SHA.key].includes(action.actualCard.key)
-        ) {
+        if (ALL_SHA_CARD_KEYS.includes(action.actualCard.key)) {
             strikeEvent.generateUseStrikeEventsThenSetNextStrikeEventSkill(this.gameStatus,
                 {
                     originId: action.originId,
@@ -163,22 +170,23 @@ class GameEngine {
         tryFindNextSkillResponse(this.gameStatus);
         trySettleNextScroll(this.gameStatus);
         emitRefreshStatus(this.gameStatus);
-
-        emitNotifyPlayPublicCard(this.gameStatus, action);
-        emitNotifyAddLines(this.gameStatus, {
-            fromId: action.originId,
-            toIds: action.targetId ? [action.targetId] : action.targetIds,
-            actualCard: action.actualCard
-        });
     }
 
     handleResponse(response) {
         if (this.gameStatus.taoResponses.length > 0 && response?.actualCard?.key == BASIC_CARDS_CONFIG.SHAN.key) {
-            throw new Error("求桃的时候不能出闪")
+            console.error("求桃的时候不能出闪")
         }
+
 
         const responseType = getResponseType(this.gameStatus);
         const skillNameKey = this.gameStatus?.skillResponse?.skillNameKey
+
+        emitNotifyPlayPublicCard(
+            this.gameStatus,
+            response,
+            responseType == RESPONSE_TYPE_CONFIG.SKILL ? skillNameKey : undefined
+        );
+
         switch (responseType) {
             case RESPONSE_TYPE_CONFIG.TAO:
                 responseCardHandler.setStatusByTaoResponse(this.gameStatus, response);
@@ -210,12 +218,6 @@ class GameEngine {
         trySetNextGameStageEventSkill(this.gameStatus);
 
         emitRefreshStatus(this.gameStatus);
-
-        emitNotifyPlayPublicCard(
-            this.gameStatus,
-            response,
-            responseType == RESPONSE_TYPE_CONFIG.SKILL ? skillNameKey : undefined
-        );
     }
 
     handleEndPlay() {
@@ -225,15 +227,18 @@ class GameEngine {
     }
 
     handleThrowCards(data) {
+        emitNotifyThrowPlayPublicCard(this.gameStatus, data);
+
         throwHandler.handleThrowCards(this.gameStatus, data)
         emitRefreshStatus(this.gameStatus);
-        emitNotifyThrowPlayPublicCard(this.gameStatus, data);
 
         trySetNextGameStageEventSkill(this.gameStatus);
         emitRefreshStatus(this.gameStatus);
     }
 
     handleCardBoardAction(data) {
+        emitNotifyCardBoardAction(this.gameStatus, data)
+
         cardBoardHandler.handleCardBoard(this.gameStatus, data)
 
         // 第一个目标求闪/桃之后 继续找马超下一个铁骑的技能
@@ -246,17 +251,16 @@ class GameEngine {
         trySetNextGameStageEventSkill(this.gameStatus);
 
         emitRefreshStatus(this.gameStatus);
-        emitNotifyCardBoardAction(this.gameStatus, data)
     }
 
     handleWuguBoardAction(data) {
+        emitNotifyGetCardsFromTable(this.gameStatus, {...data, cards: [data.card]});
+
         wuguBoardHandler.handleWuGuBoard(this.gameStatus, data)
 
         // 下一个五谷丰登
         trySettleNextScroll(this.gameStatus)
         emitRefreshStatus(this.gameStatus);
-
-        emitNotifyGetCardsFromTable(this.gameStatus, {...data, cards: [data.card]});
     }
 
     handleHeroSelectBoardAction(data) {

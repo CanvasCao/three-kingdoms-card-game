@@ -1,16 +1,21 @@
 const {clearNextCardBoardResponse} = require("../utils/responseUtils");
 const {ALL_EVENTS_KEY_CONFIG} = require("../config/eventConfig");
 const {findOnGoingEventSkill} = require("../event/utils");
-const {clearSkillResponse} = require("../utils/responseUtils");
 const {CARD_BOARD_ACTION_TYPE} = require("../config/cardBoardConfig");
 const {throwCards} = require("../utils/cardUtils")
 const cardBoardHandler = {
+    // export type EmitCardBoardData = {
+    //     originId: string,
+    //     targetId: string,
+    //     card: Card,
+    //     action: PlayerBoardAction,
+    // }
     handleCardBoard(gameStatus, data) {
-        const {card, originId, targetId, type} = data;
+        const {card, originId, targetId, action} = data;
         gameStatus.players[targetId].removeCards(card);
-        if (type == CARD_BOARD_ACTION_TYPE.REMOVE) {
+        if (action == CARD_BOARD_ACTION_TYPE.REMOVE) {
             throwCards(gameStatus, card);
-        } else if (type == CARD_BOARD_ACTION_TYPE.MOVE) {
+        } else if (action == CARD_BOARD_ACTION_TYPE.MOVE) {
             gameStatus.players[originId].addCards(card);
         }
 
