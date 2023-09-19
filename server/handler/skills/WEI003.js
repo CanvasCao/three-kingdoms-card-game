@@ -1,3 +1,4 @@
+const {generatePandingEventThenSetNextPandingEventSkill} = require("../../event/pandingEvent");
 const {SKILL_CONFIG} = require("../../config/skillsConfig");
 const {generateDamageEventThenSetNextDamageEventSkill} = require("../../event/damageEvent");
 const {findOnGoingEventSkill} = require("../../event/utils");
@@ -21,7 +22,7 @@ const handleWei003GangLieResponse = (gameStatus, response) => {
                 damageCards: [],
                 damageActualCard: null, // 渠道
                 damageSkill: SKILL_CONFIG.WEI003_GANG_LIE.key,
-                originId: onGoingDamageEvent.targetId,// 来源
+                originId: onGoingDamageEvent.targetId,
                 targetId: onGoingDamageEvent.originId,
             })
         }
@@ -31,7 +32,12 @@ const handleWei003GangLieResponse = (gameStatus, response) => {
 
     if (onGoingDamageEventSkill.chooseToReleaseSkill === undefined) {
         onGoingDamageEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
-        gameStatus.skillResponse.playerId = onGoingDamageEvent.originId;// 修改技能使用人的目标
+
+        // 这里会插入司马懿的鬼才 但是由于onGoingDamageEventSkill没有done 所以司马懿的鬼才执行结束依然会回到刚烈
+        generatePandingEventThenSetNextPandingEventSkill(gameStatus, {
+            originId: onGoingDamageEvent.targetId,
+            pandingNameKey: onGoingDamageEventSkill.skillNameKey
+        })
     } else {
         originPlayer.removeCards(response.cards);
         throwCards(gameStatus, response.cards);

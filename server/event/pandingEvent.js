@@ -1,7 +1,8 @@
+const {clearSkillResponse} = require("../utils/responseUtils");
 const {STAGE_NAME} = require("../config/gameAndStageConfig");
 const {clearCardResponse} = require("../utils/responseUtils");
 const {ALL_EVENTS_KEY_CONFIG} = require("../config/eventConfig");
-const {findOnGoingEvent} = require("./utils");
+const {findOnGoingEvent, findOnGoingEventSkill} = require("./utils");
 const {generateDamageEventThenSetNextDamageEventSkill} = require("./damageEvent");
 const {findNextUnDoneSkillInLastEventTimingsWithSkills} = require("./utils");
 const {PANDING_EVENT_TIMINGS} = require("../config/eventConfig");
@@ -135,6 +136,22 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
                 onGoingUseStrikeEvent.dodgeStatus = true; // 【贯石斧】、【青龙偃月刀】 猛进
             }
             clearCardResponse(gameStatus)
+        }
+    } else if (pandingEvent.pandingNameKey === SKILL_CONFIG.WEI003_GANG_LIE.key) {
+        const onGoingDamageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
+        const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
+
+        if (pandingResultCard.huase !== CARD_HUASE.HONGTAO) {
+            pandingEvent.takeEffect = true
+
+            // 可能会被鬼才打断 需要重新设置
+            const {eventTimingTracker} = gameStatus.damageEvent;
+            const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingTracker)
+            setEventSkillResponse(gameStatus, unDoneSkill)
+            gameStatus.skillResponse.playerId = onGoingDamageEvent.originId;// 修改技能使用人的目标
+        } else {
+            clearSkillResponse(gameStatus)
+            onGoingDamageEventSkill.done = true;
         }
     }
 
