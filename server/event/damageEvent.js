@@ -38,13 +38,13 @@ const setNextDamageEventSkill = (gameStatus) => {
     }
 
     const {originId, targetId, damageActualCard, eventTimingTracker} = damageEvent;
-    const actionCardKey = damageActualCard?.key
+    const damageActualCardKey = damageActualCard?.key
     const originPlayer = gameStatus.players[originId]
     const targetPlayer = gameStatus.players[targetId]
 
     if (eventTimingTracker.length == 0) {
         const eventTimingName = DAMAGE_EVENT_TIMING.WHEN_CAUSE_DAMAGE // 【麒麟弓】、【寒冰剑】
-        const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, actionCardKey, originId, targetId})
+        const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, actionCardKey:damageActualCardKey, originId, targetId})
         damageEvent.eventTimingTracker.push({eventTimingName, eventTimingSkills})
 
         if (eventTimingSkills.length > 0) {
@@ -68,7 +68,7 @@ const setNextDamageEventSkill = (gameStatus) => {
                 return;
             } else {
                 // WHEN_TAKE_DAMAGE结束 扣减体力
-                const extraDamageNumber = originPlayer ? (originPlayer.extraDamageMap[damageActualCard.key] || 0) : 0
+                const extraDamageNumber = originPlayer ? (originPlayer.extraDamageMap[damageActualCardKey] || 0) : 0
                 const damageNumber = damageEvent.damageNumber + extraDamageNumber
                 targetPlayer.reduceBlood(damageNumber)
                 // 求桃

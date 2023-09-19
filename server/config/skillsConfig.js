@@ -16,6 +16,9 @@ const SKILL_CONFIG = {
     WEI002_GUI_CAI: {
         key: 'WEI002_GUI_CAI',
     },
+    WEI003_GANG_LIE: {
+        key: 'WEI003_GANG_LIE',
+    },
     WEI004_TU_XI: {
         key: 'WEI004_TU_XI',
     },
@@ -64,6 +67,10 @@ const TIMING_SKILLS_CONFIG = {
     WEI002_GUI_CAI: {
         key: "WEI002_GUI_CAI",
         triggerTiming: PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT,
+    },
+    WEI003_GANG_LIE: {
+        key: "WEI003_GANG_LIE",
+        triggerTiming: DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE,
     },
     WEI004_TU_XI: {
         key: "WEI004_TU_XI",
