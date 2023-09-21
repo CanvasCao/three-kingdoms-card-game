@@ -205,6 +205,7 @@ const responseCardHandler = {
             const APlayer = gameStatus.players[curScrollResponse.originId]
             const BPlayer = gameStatus.players[curScrollResponse.targetId]
             gameStatus.players[APlayer.playerId].removeCards(response.cards);
+            throwCards(gameStatus, response.cards);
 
             strikeEvent.generateUseStrikeEventsThenSetNextStrikeEventSkill(gameStatus,
                 {
