@@ -77,7 +77,7 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
                     const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
                     if (hasWuxiePlayers.length > 0) {
                         generateWuxieSimultaneousResponseByPandingCard(gameStatus)
-                        break;
+                        return;
                     } else { // 没有无懈可击 延时锦囊直接生效
                         nextNeedPandingSign.isEffect = true;
                     }
@@ -85,7 +85,7 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
 
                 executeNextOnePandingCard(gameStatus);
                 if (ifAnyPlayerNeedToResponse(gameStatus)) {
-                    break;
+                    return;
                 }
                 nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus)
             }

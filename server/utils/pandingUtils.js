@@ -9,7 +9,7 @@ const getNextNeedExecutePandingSign = (gameStatus) => {
         currentPlayer.pandingSigns.filter((sign) => sign.actualCard.key !== DELAY_SCROLL_CARDS_CONFIG.SHAN_DIAN.key) :
         currentPlayer.pandingSigns;
 
-    return needPandingSigns[0];
+    return needPandingSigns?.[0];
 }
 
 const moveShandianToNextPlayer = (gameStatus, sign) => {
