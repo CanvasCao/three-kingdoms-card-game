@@ -1,9 +1,11 @@
+const {findOnGoingEvent} = require("./utils");
 const {DAMAGE_EVENT_TIMING} = require("../config/eventConfig");
 const {generateQiuTaoResponses} = require("../utils/taoUtils");
 const {findNextUnDoneSkillInLastEventTimingsWithSkills} = require("./utils");
 const {setEventSkillResponse} = require("./utils");
 const {findAllEventSkillsByTimingNameAndActionCard} = require("./utils");
 const {last} = require("lodash");
+const {ALL_EVENTS_KEY_CONFIG} = require("../config/eventConfig");
 
 const generateDamageEventThenSetNextDamageEventSkill = (gameStatus, {
     damageCards, // 渠道
@@ -15,7 +17,7 @@ const generateDamageEventThenSetNextDamageEventSkill = (gameStatus, {
     damageNumber = 1,// 伤害值
     // isTieSuo = false // 是否为连环伤害
 }) => {
-    gameStatus.damageEvent = {
+    const newDamageEvent = {
         damageCards, // 渠道
         damageActualCard, // 渠道
         damageSkill, // 渠道
@@ -27,12 +29,16 @@ const generateDamageEventThenSetNextDamageEventSkill = (gameStatus, {
         eventTimingTracker: [],
         done: false,
     }
-
+    if (gameStatus.damageEvents) {
+        gameStatus.damageEvents.push(newDamageEvent)
+    } else {
+        gameStatus.damageEvents = [newDamageEvent]
+    }
     setNextDamageEventSkill(gameStatus);
 }
 
 const setNextDamageEventSkill = (gameStatus) => {
-    const damageEvent = gameStatus.damageEvent;
+    const damageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENTS)
     if (!damageEvent) {
         return;
     }
@@ -44,7 +50,12 @@ const setNextDamageEventSkill = (gameStatus) => {
 
     if (eventTimingTracker.length == 0) {
         const eventTimingName = DAMAGE_EVENT_TIMING.WHEN_CAUSE_DAMAGE // 【麒麟弓】、【寒冰剑】
-        const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, actionCardKey:damageActualCardKey, originId, targetId})
+        const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {
+            eventTimingName,
+            actionCardKey: damageActualCardKey,
+            originId,
+            targetId
+        })
         damageEvent.eventTimingTracker.push({eventTimingName, eventTimingSkills})
 
         if (eventTimingSkills.length > 0) {
@@ -108,14 +119,18 @@ const setNextDamageEventSkill = (gameStatus) => {
 }
 
 const setStatusWhenDamageEventDone = (gameStatus) => {
-    const damageEvent = gameStatus.damageEvent;
-    // damageEvent.done = true;
+    const damageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENTS);
+    damageEvent.done = true;
     // generateTieSuoTempStorageByShaAction(gameStatus);
     // generateTieSuoTempStorageByShandian(gameStatus);
 }
 
 const handleDamageEventEnd = (gameStatus) => {
-    delete gameStatus.damageEvent;
+    if (gameStatus.damageEvents.every((e) => e.done)) {
+        delete gameStatus.damageEvents;
+    } else {
+        setNextDamageEventSkill(gameStatus)
+    }
 }
 
 

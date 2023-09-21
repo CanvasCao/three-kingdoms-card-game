@@ -40,8 +40,8 @@ const handleCiXiongShuangGuJianResponse = (gameStatus, response) => {
 
 const handleQiLinGongResponse = (gameStatus, response) => {
     const chooseToReleaseSkill = response.chooseToResponse;
-    const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
-    const onGoingDamageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
+    const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENTS);
+    const onGoingDamageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENTS);
 
     if (!chooseToReleaseSkill) {
         onGoingDamageEventSkill.done = true;
@@ -122,8 +122,8 @@ const handleQingLongYanYueDaoResponse = (gameStatus, response) => {
 
 const handleHanBinJianResponse = (gameStatus, response) => {
     const chooseToReleaseSkill = response.chooseToResponse;
-    const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
-    const onGoingDamageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
+    const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENTS);
+    const onGoingDamageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENTS);
 
     if (!chooseToReleaseSkill) {
         onGoingDamageEventSkill.done = true;
@@ -142,7 +142,8 @@ const handleHanBinJianResponse = (gameStatus, response) => {
             cloneDeep(cardBoardResponse), cloneDeep(cardBoardResponse)
         ]
 
-        delete gameStatus.damageEvent;
+        const damageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENTS);
+        damageEvent.done = true;
     }  else {
         // onGoingDamageEventSkill.done = true; 在CardBoardHandler
     }

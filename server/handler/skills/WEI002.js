@@ -7,8 +7,8 @@ const {throwCards} = require("../../utils/cardUtils");
 
 const handleWei002FanKuiResponse = (gameStatus, response) => {
     const chooseToReleaseSkill = response.chooseToResponse;
-    const onGoingDamageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
-    const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
+    const onGoingDamageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENTS);
+    const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENTS);
 
     if (!chooseToReleaseSkill) {
         onGoingDamageEventSkill.done = true;

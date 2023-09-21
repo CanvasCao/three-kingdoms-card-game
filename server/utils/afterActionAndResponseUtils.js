@@ -24,7 +24,7 @@ const tryFindNextSkillResponse = (gameStatus) => {
         }
     }
 
-    if (gameStatus.damageEvent) {
+    if (gameStatus.damageEvents) {
         setNextDamageEventSkill(gameStatus)
         if (gameStatus.skillResponse) {
             return;

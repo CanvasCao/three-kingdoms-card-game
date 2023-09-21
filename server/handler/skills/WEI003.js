@@ -10,14 +10,16 @@ const handleWei003GangLieResponse = (gameStatus, response) => {
     const chooseToReleaseSkill = response.chooseToResponse;
     const originPlayer = gameStatus.players[response.originId];
 
-    const onGoingDamageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
-    const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
+    const onGoingDamageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENTS);
+    const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENTS);
 
     if (!chooseToReleaseSkill) {
         if (onGoingDamageEventSkill.chooseToReleaseSkill === undefined) {
             // 放弃刚烈
+            onGoingDamageEventSkill.done = true;
         } else {
             // 不弃牌夏侯惇对来源造成一点伤害
+            onGoingDamageEventSkill.done = true; // 顺序一定要在generate之前
             generateDamageEventThenSetNextDamageEventSkill(gameStatus, {
                 damageCards: [],
                 damageActualCard: null, // 渠道
@@ -26,7 +28,6 @@ const handleWei003GangLieResponse = (gameStatus, response) => {
                 targetId: onGoingDamageEvent.originId,
             })
         }
-        onGoingDamageEventSkill.done = true;
         return
     }
 

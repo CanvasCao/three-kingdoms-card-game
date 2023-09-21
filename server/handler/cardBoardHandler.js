@@ -20,7 +20,7 @@ const cardBoardHandler = {
         }
 
         // 反馈 麒麟弓 寒冰剑
-        const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
+        const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENTS);
         if (onGoingDamageEventSkill) {
             onGoingDamageEventSkill.done = true;
         }

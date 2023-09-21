@@ -199,8 +199,9 @@ const GAME_STAGE_TIMINGS = [
 const ALL_EVENTS_KEY_CONFIG = {
     USE_STRIKE_EVENTS: "useStrikeEvents",
     RESPONSE_CARD_EVENTS: "responseCardEvents",
+    DAMAGE_EVENTS: "damageEvents",
+
     PANDING_EVENT: "pandingEvent",
-    DAMAGE_EVENT: "damageEvent",
 
     GAME_STAGE_EVENT: "gameStageEvent"
 }

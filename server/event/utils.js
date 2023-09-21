@@ -203,7 +203,7 @@ const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingNam
                 })
                 .filter((skill) => {
                     if (skill.needDamageCards) { // 如果伤害是由卡造成的
-                        const onGoingDamageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENT);
+                        const onGoingDamageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENTS);
                         return !!intersectionBy(onGoingDamageEvent.damageCards, gameStatus.throwedCards, 'cardId').length
                     }
                     return true
