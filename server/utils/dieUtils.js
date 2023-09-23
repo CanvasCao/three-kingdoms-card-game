@@ -23,7 +23,34 @@ const setStatusWhenPlayerDie = (gameStatus, player) => {
         delete player.canRebirth;
     } else {
         player.isDead = true;
+
+        const winnerTeamName = getIfGameEnd(gameStatus)
+        if (winnerTeamName) {
+            gameStatus.winner = {
+                winnerTeamName,
+            }
+        }
     }
+}
+
+const getIfGameEnd = (gameStatus) => {
+    const players = gameStatus.players;
+    let cache = {};
+
+    for (const playerId in players) {
+        const player = players[playerId];
+        if (!player.isDead) {
+            if (!cache[player.teamName]) {
+                cache[player.teamName] = true;
+            }
+        }
+    }
+
+    if (Object.keys(cache).length > 1) {
+        return false
+    }
+
+    return Object.keys(cache)[0];
 }
 
 exports.setStatusWhenPlayerDie = setStatusWhenPlayerDie;

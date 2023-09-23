@@ -13,6 +13,8 @@ class Player {
         this.location = player.location;
         this.playerName = player.playerName;
         this.teamMember = player.teamMember;
+        this.teamName = player.teamMember.split('-')[0];
+        this.memberIndex = player.teamMember.split('-')[1];
 
         // cards
         this.cards = [];

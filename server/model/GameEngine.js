@@ -79,8 +79,8 @@ class GameEngine {
     }
 
     setPlayers(roomPlayers) {
-        const reordered = reorderRoomPlayers(roomPlayers);
-        reordered.forEach((roomPlayer, i) => {
+        const reorderedRoomPlayers = reorderRoomPlayers(roomPlayers);
+        reorderedRoomPlayers.forEach((roomPlayer, i) => {
             const newPlayer = new Player({
                 playerName: roomPlayer.playerName,
                 playerId: roomPlayer.playerId,

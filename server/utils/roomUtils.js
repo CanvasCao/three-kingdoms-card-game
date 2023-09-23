@@ -5,18 +5,18 @@ const reorderRoomPlayers = (roomPlayers) => {
     const zhugongMembers = shuffle(roomPlayers.filter(roomPlayer => roomPlayer.teamMember.startsWith('zhugong')));
     const neijianMembers = shuffle(roomPlayers.filter(roomPlayer => roomPlayer.teamMember.startsWith('neijian')));
 
-    const result = [];
+    const reorderedRoomPlayers = [];
     const maxLength = Math.max(zhugongMembers.length, neijianMembers.length);
 
     for (let i = 0; i < maxLength; i++) {
         if (i < zhugongMembers.length) {
-            result.push(zhugongMembers[i]);
+            reorderedRoomPlayers.push(zhugongMembers[i]);
         }
         if (i < neijianMembers.length) {
-            result.push(neijianMembers[i]);
+            reorderedRoomPlayers.push(neijianMembers[i]);
         }
     }
-    return result;
+    return reorderedRoomPlayers;
 }
 
 const getNextEmptyTeamMemberSlot = (roomPlayers) => {
