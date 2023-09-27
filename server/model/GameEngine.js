@@ -1,5 +1,6 @@
 const strikeEvent = require("../event/strikeEvent");
 const sampleSize = require("lodash/sampleSize");
+const {STAGE_NAME} = require("../config/gameAndStageConfig");
 const {ALL_SHA_CARD_KEYS} = require("../config/cardConfig");
 const {reorderRoomPlayers} = require("../utils/roomUtils");
 const {trySetNextGameStageEventSkill} = require("../event/gameStageEvent");
@@ -45,7 +46,10 @@ class GameEngine {
         this.gameStatus = {
             roomId: '',
             players: {},
-            stage: {},
+            stage: {
+                stageName: STAGE_NAME.START,
+                currentLocation: 0,
+            },
             action: {},
 
             // 基础牌
@@ -69,12 +73,17 @@ class GameEngine {
             wugufengdengCards: [],
             tieSuoTempStorage: [],
 
+            // event
+            gameStageEvent: undefined,
+            useStrikeEvents: [],
+            responseCardEvents: [],
+            damageEvents: [],
+            pandingEvent: undefined,
+
             // 不需要传到前端
             io: io,
             throwedCards: [],
             initCards: getInitCards(),
-            currentLocation: 0,
-            stageIndex: 0,
         }
     }
 

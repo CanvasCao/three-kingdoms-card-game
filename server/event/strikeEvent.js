@@ -18,7 +18,7 @@ const generateUseStrikeEventsThenSetNextStrikeEventSkill = (gameStatus, {originI
         .filter(p => targetIds.includes(p.playerId))
     const originPlayer = gameStatus.players[originId];
 
-    if (gameStatus.stage.playerId == originPlayer.playerId) {
+    if (getCurrentPlayer(gameStatus).playerId == originPlayer.playerId) {
         originPlayer.shaTimes++;
     }
 

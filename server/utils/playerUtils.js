@@ -1,7 +1,7 @@
 const {DELAY_SCROLL_CARDS_CONFIG, SCROLL_CARDS_CONFIG} = require("../config/cardConfig")
 
 const getCurrentPlayer = (gameStatus) => {
-    return Object.values(gameStatus.players).find((u) => u.location == gameStatus.currentLocation)
+    return Object.values(gameStatus.players).find((u) => u.location == gameStatus.stage.currentLocation)
 }
 
 const getNextShandianPlayer = (gameStatus) => {
@@ -14,7 +14,7 @@ const getNextShandianPlayer = (gameStatus) => {
     }
 
     const sorted = filtered.sort((a, b) => a.location - b.location);
-    const nextPlayer = sorted.find((player) => player.location > gameStatus.currentLocation);
+    const nextPlayer = sorted.find((player) => player.location > gameStatus.stage.currentLocation);
     return nextPlayer ? nextPlayer : sorted[0]
 }
 

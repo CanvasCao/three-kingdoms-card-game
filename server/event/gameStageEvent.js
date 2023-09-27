@@ -43,11 +43,13 @@ const goToNextStage = (gameStatus) => {
         }
         trySetNextGameStageEventSkill(gameStatus);
     }
+}
 
+const setGameStageName = (gameStatus, name) => {
+    gameStatus.stage.stageName = name
 }
 
 const generateGameStageEventThenSetNextGameStageEventSkill = (gameStatus) => {
-    gameStatus.stage = {playerId: getCurrentPlayer(gameStatus).playerId, stageIndex: 0}
     gameStatus.gameStageEvent = {eventTimingTracker: []}
     trySetNextGameStageEventSkill(gameStatus);
 }
@@ -67,7 +69,7 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
     const originId = currentPlayer.playerId
 
     if (eventTimingTracker.length == 0) {
-        gameStatus.stage.stageIndex = 1
+        setGameStageName(gameStatus, STAGE_NAME.JUDGE);
         const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_JUDGING
 
         let nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus)
@@ -114,7 +116,7 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
         } else {
-            gameStatus.stage.stageIndex = 2
+            setGameStageName(gameStatus, STAGE_NAME.DRAW);
             const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING
 
             if (currentPlayer.skipTimimg[GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING]) { // 因为突袭skipTimimg
@@ -139,7 +141,7 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
         } else {
-            gameStatus.stage.stageIndex = 3
+            setGameStageName(gameStatus, STAGE_NAME.PLAY);
             if (currentPlayer.skipStage[STAGE_NAME.PLAY]) {
                 const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_PLAYING
                 eventTimingTracker.push({eventTimingName, eventTimingSkills: []})
@@ -165,7 +167,7 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
         } else {
-            gameStatus.stage.stageIndex = 4
+            setGameStageName(gameStatus, STAGE_NAME.THROW);
             if (!currentPlayer.needThrow()) {
                 const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_THROWING
                 eventTimingTracker.push({eventTimingName, eventTimingSkills: []})

@@ -136,8 +136,6 @@ const emitNotifyAddLines = (gameStatus, {fromId, toIds, actualCard}) => {
 const omitGSArray = [
     // 'throwedCards',
     'initCards',
-    'currentLocation',
-    'stageIndex',
     'io',
 ]
 if (process.env.NODE_ENV == 'production') {
