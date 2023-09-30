@@ -1,4 +1,5 @@
 const strikeEvent = require("../event/strikeEvent");
+const {handleDrawCardsNumberWhenPlayImmediateScroll} = require("./skills/common");
 const {handleWei003GangLieResponse} = require("./skills/WEI003");
 const {handleWei001JianXiongResponse} = require("./skills/WEI001");
 const {handleWei005LuoYiResponse} = require("./skills/WEI005");
@@ -179,6 +180,8 @@ const responseCardHandler = {
             const validatedChainResponse = lastWuxieChainItem.actualCard.cardId === response.wuxieTargetCardId;
 
             if (validatedChainResponse) {
+                handleDrawCardsNumberWhenPlayImmediateScroll(gameStatus, originPlayer)
+
                 originPlayer.removeCards(response.cards);
                 resetHasWuxiePlayerIdsAndPushChainAfterValidatedWuxie(gameStatus, response);
                 const newHasWuxiePlayers = getAllHasWuxiePlayers(gameStatus);

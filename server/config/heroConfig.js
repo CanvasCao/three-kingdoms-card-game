@@ -31,6 +31,10 @@ const HERO_STATIC_CONFIG = {
         maxBlood: 4,
         gender: 1
     },
+    SHU007: {
+        maxBlood: 3,
+        gender: 0
+    },
 
     // WU
     WU006: {
@@ -52,9 +56,14 @@ const HERO_STATIC_CONFIG = {
 }
 
 // 武将技能切换和失效的时候 删除
-const HERO_SKILL_PROPS_CONFIG = {
+const HERO_SKILL_DYNAMIC_CONFIG = {
     SHU003: {
         shaLimitTimes: 100,
+    },
+    SHU007: {
+        drawCardsNumberWhenPlayImmediateScroll: 1,
+        bingLiangRange: 100,
+        shunRange: 100,
     },
     QUN002: {
         responseStrikeNumber: 2,
@@ -73,6 +82,7 @@ const HERO_SKILLS_CONFIG = {
     WEI005: [SKILL_CONFIG.WEI005_LUO_YI],
     SHU003: [SKILL_CONFIG.SHU003_PAO_XIAO],
     SHU006: [SKILL_CONFIG.SHU006_MA_SHU, SKILL_CONFIG.SHU006_TIE_JI],
+    SHU007: [SKILL_CONFIG.SHU007_JI_ZHI, SKILL_CONFIG.SHU007_QI_CAI],
     WU006: [SKILL_CONFIG.WU006_GUO_SE, SKILL_CONFIG.WU006_LIU_LI],
     QUN002: [SKILL_CONFIG.QUN002_WU_SHUANG],
     SP001: [SKILL_CONFIG.SP001_CHONG_SHENG],
@@ -95,7 +105,7 @@ const getHeroConfig = (heroId) => {
     return {
         heroId,
         ...HERO_STATIC_CONFIG[heroId],
-        ...HERO_SKILL_PROPS_CONFIG[heroId],
+        ...HERO_SKILL_DYNAMIC_CONFIG[heroId],
         kingdom: extractEnglishLetters(heroId),
         skills: HERO_SKILLS_CONFIG[heroId] || [],
     }

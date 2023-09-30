@@ -1,3 +1,4 @@
+const {handleDrawCardsNumberWhenPlayImmediateScroll} = require("./skills/common");
 const {
     EQUIPMENT_TYPE,
     SCROLL_CARDS_CONFIG,
@@ -79,9 +80,13 @@ const actionHandler = {
     setStatusByWuGuFengDengAction(gameStatus) {
         actionHandler.setStatusByScrollAction(gameStatus);
     },
-    setStatusByScrollAction(gameStatus) {
-        const action = gameStatus.action;
 
+    setStatusByScrollAction(gameStatus) {
+        // 黄月英急智
+        const originPlayer = gameStatus.players[gameStatus.action.originId]
+        handleDrawCardsNumberWhenPlayImmediateScroll(gameStatus, originPlayer)
+
+        const action = gameStatus.action;
         // targetIds 只有顺和拆 桃园 originId targetIds的值和action一样
         if (action.targetIds) {
             if (action.actualCard.key == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.key ||
