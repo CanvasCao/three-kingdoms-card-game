@@ -1,5 +1,6 @@
 const strikeEvent = require("../event/strikeEvent");
 const sampleSize = require("lodash/sampleSize");
+const {GAME_STATUS} = require("../config/gameAndStageConfig");
 const {STAGE_NAME} = require("../config/gameAndStageConfig");
 const {ALL_SHA_CARD_KEYS} = require("../config/cardConfig");
 const {reorderRoomPlayers} = require("../utils/roomUtils");
@@ -44,7 +45,10 @@ const {shuffle} = require("lodash/collection");
 class GameEngine {
     constructor(io) {
         this.gameStatus = {
-            roomId: '',
+            room: {
+                roomId: '',
+                status: GAME_STATUS.IDLE,
+            },
             players: {},
             stage: {
                 stageName: STAGE_NAME.START,
@@ -80,6 +84,9 @@ class GameEngine {
             damageEvents: [],
             pandingEvent: undefined,
 
+            // gameEnd
+            gameEnd: undefined,
+
             // 不需要传到前端
             io: io,
             throwedCards: [],
@@ -107,7 +114,7 @@ class GameEngine {
     }
 
     startEngine(roomId) {
-        this.gameStatus.roomId = roomId;
+        this.gameStatus.room = {roomId, status: GAME_STATUS.PLAYING};
         emitInit(this.gameStatus);
     }
 

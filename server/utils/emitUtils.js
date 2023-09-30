@@ -1,3 +1,4 @@
+const {Rooms} = require("../model/Rooms");
 const {PLAYER_BOARD_ACTION} = require("../config/boardConfig");
 const {teamMembers} = require("./roomUtils");
 const {EMIT_TYPE} = require("../config/emitConfig");
@@ -14,7 +15,7 @@ const emitNotifyPlayPublicCard = (gameStatus, behaviour, skillNameKey) => {
     }
 
     const io = gameStatus.io;
-    const roomId = gameStatus.roomId;
+    const roomId = gameStatus.room.roomId;
 
     if (behaviour.cards?.length) {
         io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PUBLIC_CARD, {
@@ -30,7 +31,7 @@ const emitNotifyPlayPublicCard = (gameStatus, behaviour, skillNameKey) => {
 
 const emitNotifyPandingPlayPublicCard = (gameStatus, pandingResultCard, player, pandingNameKey) => {
     const io = gameStatus.io;
-    const roomId = gameStatus.roomId;
+    const roomId = gameStatus.room.roomId;
     io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PUBLIC_CARD, {
         cards: [pandingResultCard],
         fromId: CARD_LOCATION.PAIDUI,
@@ -46,7 +47,7 @@ const emitNotifyThrowPlayPublicCard = (gameStatus, data) => {
     //     playerId: string,
     // }
     const io = gameStatus.io;
-    const roomId = gameStatus.roomId;
+    const roomId = gameStatus.room.roomId;
     const {cards, playerId} = data
     io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PUBLIC_CARD, {
         cards,
@@ -58,7 +59,7 @@ const emitNotifyThrowPlayPublicCard = (gameStatus, data) => {
 // TO PLAYER EMIT
 const emitNotifyDrawCards = (gameStatus, cards, player) => {
     const io = gameStatus.io;
-    const roomId = gameStatus.roomId;
+    const roomId = gameStatus.room.roomId;
     io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PLAYER_CARD, {
         cards,
         fromId: CARD_LOCATION.PAIDUI,
@@ -75,7 +76,7 @@ const emitNotifyCardBoardAction = (gameStatus, boardActionData) => {
     //     action: PlayerBoardAction,
     // }
     const io = gameStatus.io;
-    const roomId = gameStatus.roomId;
+    const roomId = gameStatus.room.roomId;
     const {originId, targetId, card, action} = boardActionData
     if (action == PLAYER_BOARD_ACTION.REMOVE) {
         io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PUBLIC_CARD, {
@@ -98,7 +99,7 @@ const emitNotifyCardBoardAction = (gameStatus, boardActionData) => {
 const emitNotifyJieDaoWeaponOwnerChange = (gameStatus, weaponCard) => {
     const io = gameStatus.io;
     const action = gameStatus.action;
-    const roomId = gameStatus.roomId;
+    const roomId = gameStatus.room.roomId;
     io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PLAYER_CARD, {
         cards: [weaponCard],
         fromId: action.targetIds[0],
@@ -113,7 +114,7 @@ const emitNotifyJieDaoWeaponOwnerChange = (gameStatus, weaponCard) => {
 //     }
 const emitNotifyGetCardsFromTable = (gameStatus, data) => {
     const io = gameStatus.io;
-    const roomId = gameStatus.roomId;
+    const roomId = gameStatus.room.roomId;
     io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PLAYER_CARD, {
         cards: data.cards,
         fromId: CARD_LOCATION.TABLE,
@@ -125,7 +126,7 @@ const emitNotifyGetCardsFromTable = (gameStatus, data) => {
 // LINES
 const emitNotifyAddLines = (gameStatus, {fromId, toIds, actualCard}) => {
     const io = gameStatus.io;
-    const roomId = gameStatus.roomId;
+    const roomId = gameStatus.room.roomId;
     io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_LINES, {
         fromId,
         toIds,
@@ -146,21 +147,31 @@ if (process.env.NODE_ENV == 'production') {
 // 只能在GameEngine的handler之后调用
 const emitRefreshStatus = (gameStatus) => {
     const io = gameStatus.io;
-    const roomId = gameStatus.roomId;
+    const roomId = gameStatus.room.roomId;
     const omitGS = omit(gameStatus, omitGSArray)
     io.to(roomId).emit(EMIT_TYPE.REFRESH_STATUS, omitGS);
+
+
+    // 如果游戏结束 帮助所有player离开socket 再emitRefreshRooms
+    if (gameStatus.gameEnd) {
+        gameStatus.room.status = GAME_STATUS.IDLE;
+        const {rooms} = new Rooms()
+        rooms[roomId].roomPlayers = [];
+        io.socketsLeave(roomId);
+        emitRefreshRooms(io, rooms)
+    }
 }
 
 const emitInit = (gameStatus) => {
     const io = gameStatus.io;
-    const roomId = gameStatus.roomId;
+    const roomId = gameStatus.room.roomId;
     const omitGS = omit(gameStatus, omitGSArray)
     io.to(roomId).emit(EMIT_TYPE.INIT, omitGS);
 }
 
 const emitRejoinInit = (gameStatus) => {
     const io = gameStatus.io;
-    const roomId = gameStatus.roomId;
+    const roomId = gameStatus.room.roomId;
     const omitGS = omit(gameStatus, omitGSArray)
     io.to(roomId).emit(EMIT_TYPE.INIT, omitGS);
 }
@@ -168,25 +179,30 @@ const emitRejoinInit = (gameStatus) => {
 // room
 const emitRefreshRooms = (io, rooms) => {
     const emitRooms = []
-    for (var roomId in rooms) {
+    for (let roomId in rooms) {
+        const {roomPlayers, gameEngine} = rooms[roomId]
+        const roomStatus = gameEngine?.gameStatus?.room?.status
         emitRooms.push({
             roomId,
-            roomPlayers: rooms[roomId].roomPlayers,
-            status: rooms[roomId].gameEngine ? GAME_STATUS.PLAYING : GAME_STATUS.IDLE,
+            roomPlayers,
+            status: roomStatus || GAME_STATUS.IDLE,
         })
     }
     io.emit(EMIT_TYPE.REFRESH_ROOMS, emitRooms);
 }
 
 const emitRefreshRoomPlayers = (io, rooms, roomId) => {
-    if (!rooms[roomId].gameEngine) {
-        const data = {
-            roomId,
-            roomPlayers: rooms[roomId].roomPlayers,
-            teamMembers: teamMembers,
-        }
-        io.to(roomId).emit(EMIT_TYPE.REFRESH_ROOM_PLAYERS, data);
+    const roomStatus = rooms[roomId]?.gameEngine?.gameStatus?.room?.status
+    if ([GAME_STATUS.PLAYING].includes(roomStatus)) {
+        return
     }
+
+    const data = {
+        roomId,
+        roomPlayers: rooms[roomId].roomPlayers,
+        teamMembers: teamMembers,
+    }
+    io.to(roomId).emit(EMIT_TYPE.REFRESH_ROOM_PLAYERS, data);
 }
 
 // TO PUBLIC

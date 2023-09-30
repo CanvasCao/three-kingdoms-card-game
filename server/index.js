@@ -6,6 +6,8 @@ const {GameEngine} = require("./model/GameEngine");
 const express = require('express');
 const app = express();
 const path = require('path');
+const {Rooms} = require("./model/Rooms");
+const {GAME_STATUS} = require("./config/gameAndStageConfig");
 const {getNextEmptyTeamMemberSlot} = require("./utils/roomUtils");
 const {goToNextStage} = require("./event/gameStageEvent");
 const {emitRefreshStatus} = require("./utils/emitUtils");
@@ -28,28 +30,27 @@ server.listen(port, () => {
 // Routing
 app.use(express.static(path.join(__dirname, '../client')));
 
-
-const roomNumber = 3;
-const rooms = {};
-for (let i = 1; i <= roomNumber; i++) {
-    rooms[i] = {gameEngine: null, roomPlayers: []}
-}
+const {rooms} = new Rooms();
 
 io.on('connection', (socket) => {
     let playerId, roomId;
 
     socket.on(EMIT_TYPE.REJOIN_ROOM, (data) => {
         const room = rooms[data.roomId]
-        if (!room || !room.gameEngine || !room.gameEngine?.gameStatus?.players) {
+        if (!room) {
+            return;
+        }
+        const {gameEngine, roomPlayers} = room;
+        if (!gameEngine || gameEngine?.gameStatus?.room?.status !== GAME_STATUS.PLAYING) {
             return
         }
-        const player = room.gameEngine?.gameStatus?.players[data.playerId];
+        const player = gameEngine?.gameStatus?.players[data.playerId];
         if (player) {
             playerId = player.playerId
             roomId = data.roomId
-            rooms[roomId].roomPlayers.push({playerId: player.playerId, playerName: player.name})
+            roomPlayers.push({playerId: player.playerId, playerName: player.playerName})
             socket.join(roomId);
-            emitRejoinInit(room.gameEngine.gameStatus, socket)
+            emitRejoinInit(gameEngine.gameStatus)
         }
     })
 
@@ -68,14 +69,17 @@ io.on('connection', (socket) => {
         if (!rooms[roomId]) {
             return;
         }
-        if (rooms[roomId].gameEngine) {
+
+        const room = rooms[roomId]
+        const {gameEngine, roomPlayers} = room
+        const roomStatus = gameEngine?.gameStatus?.room?.status
+        if (roomStatus === GAME_STATUS.PLAYING) {
             return;
         }
-        if (rooms[roomId].roomPlayers.length >= 8) {
+        if (roomPlayers.length >= 8) {
             return
         }
 
-        const roomPlayers = rooms[roomId].roomPlayers
         const teamMember = getNextEmptyTeamMemberSlot(roomPlayers);
         roomPlayers.push({playerId, playerName, teamMember})
         socket.join(roomId);
@@ -89,7 +93,8 @@ io.on('connection', (socket) => {
         const teamMember = data.teamMember;
 
         const room = rooms[data.roomId]
-        if (!room || room.gameEngine) {
+        const roomStatus = room.gameEngine?.gameStatus?.room?.status
+        if (!room || roomStatus == GAME_STATUS.PLAYING) {
             return
         }
 

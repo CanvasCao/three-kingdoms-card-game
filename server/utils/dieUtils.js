@@ -24,16 +24,17 @@ const setStatusWhenPlayerDie = (gameStatus, player) => {
     } else {
         player.isDead = true;
 
-        const winnerTeamName = getIfGameEnd(gameStatus)
+        const winnerTeamName = getIfGameEndWinnerTeamName(gameStatus)
+        // 游戏结束
         if (winnerTeamName) {
-            gameStatus.winner = {
+            gameStatus.gameEnd = {
                 winnerTeamName,
             }
         }
     }
 }
 
-const getIfGameEnd = (gameStatus) => {
+const getIfGameEndWinnerTeamName = (gameStatus) => {
     const players = gameStatus.players;
     let cache = {};
 
