@@ -32,6 +32,9 @@ const SKILL_CONFIG = {
     SHU003_PAO_XIAO: {
         key: 'SHU003_PAO_XIAO',
     },
+    SHU005_LONG_DAN:{
+        key: 'SHU005_LONG_DAN',
+    },
     SHU006_MA_SHU: {
         key: 'SHU006_MA_SHU',
     },
