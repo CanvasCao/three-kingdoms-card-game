@@ -45,6 +45,9 @@ const SKILL_CONFIG = {
         key: 'SHU007_QI_CAI',
     },
 
+    WU002_QI_XI:{
+        key: 'WU002_QI_XI',
+    },
     WU006_GUO_SE: {
         key: 'WU006_GUO_SE',
     },
