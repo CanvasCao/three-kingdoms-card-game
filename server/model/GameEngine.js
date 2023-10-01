@@ -105,8 +105,12 @@ class GameEngine {
             });
 
             // 选将
-            const allSelectHeroIds = ["WEI001", "WEI002", "WEI003", "WEI004", 'WEI005', "SHU003", "SHU006", "WU006", "QUN002"];
-            const canSelectHeroIds = [...sampleSize(allSelectHeroIds, 3)]//, "SP001"];
+            const allSelectHeroIds = [
+                "WEI001", "WEI002", "WEI003", "WEI004", 'WEI005',
+                "SHU003", "SHU006", "SHU007",
+                "WU006",
+                "QUN002"];
+            const canSelectHeroIds = [...sampleSize(allSelectHeroIds, 7), "SHU002"]//, "SP001"];
             newPlayer.canSelectHeros = canSelectHeroIds.map(heroId => getHeroConfig(heroId))
 
             this.gameStatus.players[newPlayer.playerId] = newPlayer;
@@ -189,11 +193,6 @@ class GameEngine {
     }
 
     handleResponse(response) {
-        if (this.gameStatus.taoResponses.length > 0 && response?.actualCard?.key == BASIC_CARDS_CONFIG.SHAN.key) {
-            console.error("求桃的时候不能出闪")
-        }
-
-
         const responseType = getResponseType(this.gameStatus);
         const skillNameKey = this.gameStatus?.skillResponse?.skillNameKey
 

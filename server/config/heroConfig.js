@@ -61,19 +61,25 @@ const HERO_STATIC_CONFIG = {
 
 // 武将技能切换和失效的时候 删除
 const HERO_SKILL_DYNAMIC_CONFIG = {
-    SHU003: {
+    SHU003_PAO_XIAO: {
         shaLimitTimes: 100,
     },
-    SHU007: {
+    SHU006_MA_SHU: {
+        minusHorseDistance: -1,
+    },
+    SHU007_JI_ZHI: {
         drawCardsNumberWhenPlayImmediateScroll: 1,
+
+    },
+    SHU007_QI_CAI: {
         bingLiangRange: 100,
         shunRange: 100,
     },
-    QUN002: {
+    QUN002_WU_SHUANG: {
         responseStrikeNumber: 2,
         responseDuelNumber: 2,
     },
-    SP001: {
+    SP001_CHONG_SHENG: {
         canRebirth: true,
     }
 }
@@ -109,12 +115,22 @@ const extractEnglishLetters = (inputString) => {
 }
 
 const getHeroConfig = (heroId) => {
+    const skills = HERO_SKILLS_CONFIG[heroId] || []
+    let dynamicConfig = {};
+    skills.forEach(skill => {
+        const skillDynamicConfig = HERO_SKILL_DYNAMIC_CONFIG[skill.key]
+        dynamicConfig = {
+            ...dynamicConfig,
+            ...skillDynamicConfig,
+        }
+    })
+
     return {
         heroId,
         ...HERO_STATIC_CONFIG[heroId],
-        ...HERO_SKILL_DYNAMIC_CONFIG[heroId],
+        ...dynamicConfig,
         kingdom: extractEnglishLetters(heroId),
-        skills: HERO_SKILLS_CONFIG[heroId] || [],
+        skills,
     }
 }
 
