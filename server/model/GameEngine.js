@@ -142,8 +142,10 @@ class GameEngine {
             switch (skillKey) {
                 case SKILL_CONFIG.SHU001_REN_DE.key:
                     handleShu001RenDeAction(this.gameStatus);
+                    break;
                 case SKILL_CONFIG.WU004_KU_ROU.key:
                     handleWu004KuRouAction(this.gameStatus);
+                    break;
             }
         } else {
             const cardType = CARD_CONFIG[actualCard?.key].type;
