@@ -1,5 +1,6 @@
 const strikeEvent = require("../event/strikeEvent");
 const sampleSize = require("lodash/sampleSize");
+const {handleWu004KuRouAction} = require("../handler/skills/WU004");
 const {CARD_CONFIG} = require("../config/cardConfig");
 const {handleShu001RenDeAction} = require("../handler/skills/SHU001");
 const {SKILL_CONFIG} = require("../config/skillsConfig");
@@ -111,9 +112,9 @@ class GameEngine {
             const allSelectHeroIds = [
                 "WEI001", "WEI002", "WEI003", "WEI004", 'WEI005',
                 "SHU001", "SHU002", "SHU003", "SHU005", "SHU006", "SHU007",
-                "WU002", "WU006",
+                "WU002", "WU004", "WU006",
                 "QUN002"];
-            const canSelectHeroIds = [...sampleSize(allSelectHeroIds, 7),]//, "SP001"];
+            const canSelectHeroIds = [...sampleSize(allSelectHeroIds, 7)]//, "SP001"];
             newPlayer.canSelectHeros = canSelectHeroIds.map(heroId => getHeroConfig(heroId))
 
             this.gameStatus.players[newPlayer.playerId] = newPlayer;
@@ -141,6 +142,8 @@ class GameEngine {
             switch (skillKey) {
                 case SKILL_CONFIG.SHU001_REN_DE.key:
                     handleShu001RenDeAction(this.gameStatus);
+                case SKILL_CONFIG.WU004_KU_ROU.key:
+                    handleWu004KuRouAction(this.gameStatus);
             }
         } else {
             const cardType = CARD_CONFIG[actualCard?.key].type;

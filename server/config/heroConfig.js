@@ -53,6 +53,10 @@ const HERO_STATIC_CONFIG = {
         maxBlood: 4,
         gender: 1
     },
+    WU004:{
+        maxBlood: 4,
+        gender: 1
+    },
     WU006: {
         maxBlood: 3,
         gender: 0
@@ -111,6 +115,7 @@ const HERO_SKILLS_CONFIG = {
     SHU007: [SKILL_CONFIG.SHU007_JI_ZHI, SKILL_CONFIG.SHU007_QI_CAI],
 
     WU002: [SKILL_CONFIG.WU002_QI_XI],
+    WU004: [SKILL_CONFIG.WU004_KU_ROU],
     WU006: [SKILL_CONFIG.WU006_GUO_SE, SKILL_CONFIG.WU006_LIU_LI],
     QUN002: [SKILL_CONFIG.QUN002_WU_SHUANG],
     SP001: [SKILL_CONFIG.SP001_CHONG_SHENG],

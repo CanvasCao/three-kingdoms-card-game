@@ -1,3 +1,4 @@
+const {SKILL_CONFIG} = require("../config/skillsConfig");
 const {findOnGoingEvent} = require("./utils");
 const {DAMAGE_EVENT_TIMING} = require("../config/eventConfig");
 const {generateQiuTaoResponses} = require("../utils/taoUtils");
@@ -8,7 +9,7 @@ const {last} = require("lodash");
 const {ALL_EVENTS_KEY_CONFIG} = require("../config/eventConfig");
 
 const generateDamageEventThenSetNextDamageEventSkill = (gameStatus, {
-    damageCards, // 渠道
+    damageCards = [], // 渠道
     damageActualCard, // 渠道
     damageSkill, // 渠道
     damageAttribute = null,// 属性
@@ -43,7 +44,7 @@ const setNextDamageEventSkill = (gameStatus) => {
         return;
     }
 
-    const {originId, targetId, damageActualCard, eventTimingTracker} = damageEvent;
+    const {originId, targetId, damageActualCard, damageSkill, eventTimingTracker} = damageEvent;
     const damageActualCardKey = damageActualCard?.key
     const originPlayer = gameStatus.players[originId]
     const targetPlayer = gameStatus.players[targetId]
@@ -83,7 +84,10 @@ const setNextDamageEventSkill = (gameStatus) => {
                 const damageNumber = damageEvent.damageNumber + extraDamageNumber
                 targetPlayer.reduceBlood(damageNumber)
                 // 求桃
-                generateQiuTaoResponses(gameStatus, targetPlayer)
+                if (targetPlayer.currentBlood <= 0) {
+                    generateQiuTaoResponses(gameStatus, targetPlayer)
+                    return
+                }
             }
         }
     }
@@ -94,6 +98,11 @@ const setNextDamageEventSkill = (gameStatus) => {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
         } else {
+            // 苦肉摸牌
+            if (damageSkill == SKILL_CONFIG.WU004_KU_ROU.key) {
+                originPlayer.drawCards(gameStatus)
+            }
+
             const eventTimingName = DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE // 【奸雄】、【反馈】、【刚烈】、【遗计】
             const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, targetId, originId})
             damageEvent.eventTimingTracker.push({eventTimingName, eventTimingSkills})

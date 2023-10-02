@@ -35,7 +35,7 @@ const SKILL_CONFIG = {
     SHU003_PAO_XIAO: {
         key: 'SHU003_PAO_XIAO',
     },
-    SHU005_LONG_DAN:{
+    SHU005_LONG_DAN: {
         key: 'SHU005_LONG_DAN',
     },
     SHU006_MA_SHU: {
@@ -51,8 +51,11 @@ const SKILL_CONFIG = {
         key: 'SHU007_QI_CAI',
     },
 
-    WU002_QI_XI:{
+    WU002_QI_XI: {
         key: 'WU002_QI_XI',
+    },
+    WU004_KU_ROU: {
+        key: 'WU004_KU_ROU',
     },
     WU006_GUO_SE: {
         key: 'WU006_GUO_SE',
