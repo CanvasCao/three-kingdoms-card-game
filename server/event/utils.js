@@ -29,7 +29,7 @@ const {v4: uuidv4} = require('uuid');
 //                 "eventTimingName": "AFTER_SPECIFYING_TARGET",
 //                 "eventTimingSkills": [
 //                     {
-//                         "skillNameKey": "铁骑",
+//                         "skillKey": "铁骑",
 //                         "playerId": "a2511baa-80f8-4e6b-be63-317e902bfa9d",
 //                         "chooseToReleaseSkill": false
 //                          releaseTargetIds: [],
@@ -45,7 +45,7 @@ const {v4: uuidv4} = require('uuid');
 
 const configTimingSkillToResponseSkill = (configSkill, playerId) => {
     return {
-        skillNameKey: configSkill.key,
+        skillKey: configSkill.key,
         playerId,
         chooseToReleaseSkill: undefined,
         done: false,

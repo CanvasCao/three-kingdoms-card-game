@@ -26,6 +26,9 @@ const SKILL_CONFIG = {
         key: 'WEI005_LUO_YI',
     },
 
+    SHU001_REN_DE: {
+        key: 'SHU001_REN_DE',
+    },
     SHU002_WU_SHENG: {
         key: 'SHU002_WU_SHENG',
     },

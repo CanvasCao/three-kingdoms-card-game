@@ -36,7 +36,9 @@ class Player {
         this.skipTimimg = {}
         this.skipStage = {};
 
+        // skill
         this.extraDamageMap = {};
+        this.givenCardNumber = 0;
 
         // played tags
         this.shaTimes = 0;
@@ -120,27 +122,29 @@ class Player {
     }
 
     addBlood(number = 1) {
-        this.currentBlood = this.currentBlood + number;
+        if (this.currentBlood < this.maxBlood) {
+            this.currentBlood = this.currentBlood + number;
+        }
     }
 
     resetWhenMyTurnStarts() {
     }
 
     resetWhenMyTurnEnds() {
-        this.judgedShandian = false;
-
         this.skipTimimg = {}
         this.skipStage = {};
 
         this.shaTimes = 0;
 
         // 可能有判定过但是没有移走的闪电
+        this.judgedShandian = false;
         this.pandingSigns = this.pandingSigns.map((sign) => {
             sign.isEffect = undefined;
             return sign
         })
 
-        this.extraDamageMap = {};
+        this.extraDamageMap = {}; // 许褚
+        this.givenCardNumber = 0; // 刘备
     }
 
     // 弃牌阶段

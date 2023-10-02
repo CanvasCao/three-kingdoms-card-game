@@ -1,5 +1,8 @@
 const strikeEvent = require("../event/strikeEvent");
 const sampleSize = require("lodash/sampleSize");
+const {CARD_CONFIG} = require("../config/cardConfig");
+const {handleShu001RenDeAction} = require("../handler/skills/SHU001");
+const {SKILL_CONFIG} = require("../config/skillsConfig");
 const {GAME_STATUS} = require("../config/gameAndStageConfig");
 const {STAGE_NAME} = require("../config/gameAndStageConfig");
 const {ALL_SHA_CARD_KEYS} = require("../config/cardConfig");
@@ -107,10 +110,10 @@ class GameEngine {
             // 选将
             const allSelectHeroIds = [
                 "WEI001", "WEI002", "WEI003", "WEI004", 'WEI005',
-                "SHU003", "SHU006", "SHU007",
-                "WU006",
+                "SHU001", "SHU002", "SHU003", "SHU005", "SHU006", "SHU007",
+                "WU002", "WU006",
                 "QUN002"];
-            const canSelectHeroIds = [...sampleSize(allSelectHeroIds, 7), "SHU002"]//, "SP001"];
+            const canSelectHeroIds = [...sampleSize(allSelectHeroIds, 7),]//, "SP001"];
             newPlayer.canSelectHeros = canSelectHeroIds.map(heroId => getHeroConfig(heroId))
 
             this.gameStatus.players[newPlayer.playerId] = newPlayer;
@@ -123,68 +126,46 @@ class GameEngine {
     }
 
     handleAction(action) {
+        const {originId, targetIds, actualCard, cards, skillKey} = action;
         this.gameStatus.action = action;
-        this.gameStatus.players[action.originId].removeCards(action.cards);
+        this.gameStatus.players[originId].removeCards(cards);
 
         emitNotifyPlayPublicCard(this.gameStatus, action);
         emitNotifyAddLines(this.gameStatus, {
-            fromId: action.originId,
-            toIds: action.targetId ? [action.targetId] : action.targetIds,
-            actualCard: action.actualCard
+            fromId: originId,
+            toIds: targetIds,
+            actualCard
         });
 
-        // BASIC
-        if (ALL_SHA_CARD_KEYS.includes(action.actualCard.key)) {
-            strikeEvent.generateUseStrikeEventsThenSetNextStrikeEventSkill(this.gameStatus,
-                {
-                    originId: action.originId,
-                    targetIds: action.targetIds,
-                    cards: action.cards,
-                    actualCard: action.actualCard
-                });
-            throwCards(this.gameStatus, action.cards);
-        } else if (action.actualCard.key == BASIC_CARDS_CONFIG.TAO.key) {
-            actionHandler.setStatusByTaoAction(this.gameStatus);
-            throwCards(this.gameStatus, action.cards);
-        }
-        // Equipment
-        else if (CARD_TYPE.EQUIPMENT == action.actualCard.type) {
-            actionHandler.setStatusByEquipmentAction(this.gameStatus);
-        }
-        // DELAY SCROLL
-        else if (action.actualCard.key == SCROLL_CARDS_CONFIG.SHAN_DIAN.key) {
-            actionHandler.setStatusByShanDianAction(this.gameStatus, this.gameStatus);
-        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.LE_BU_SI_SHU.key) {
-            actionHandler.setStatusByLeBuSiShuAction(this.gameStatus, this.gameStatus);
-        }
-        // SCROLL
-        else if (action.actualCard.key == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.key) {
-            actionHandler.setStatusByWuZhongShengYouAction(this.gameStatus);
-            throwCards(this.gameStatus, action.cards);
-        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.GUO_HE_CHAI_QIAO.key) {
-            actionHandler.setStatusByGuoHeChaiQiaoAction(this.gameStatus);
-            throwCards(this.gameStatus, action.cards);
-        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.key) {
-            actionHandler.setStatusByShunShouQianYangAction(this.gameStatus);
-            throwCards(this.gameStatus, action.cards);
-        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.key) {
-            actionHandler.setStatusByTaoYuanJieYiAction(this.gameStatus);
-            throwCards(this.gameStatus, action.cards);
-        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.key) {
-            actionHandler.setStatusByNanManRuQinAction(this.gameStatus);
-            throwCards(this.gameStatus, action.cards);
-        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.key) {
-            actionHandler.setStatusByWanJianQiFaAction(this.gameStatus);
-            throwCards(this.gameStatus, action.cards);
-        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.JUE_DOU.key) {
-            actionHandler.setStatusByJueDouAction(this.gameStatus);
-            throwCards(this.gameStatus, action.cards);
-        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.key) {
-            actionHandler.setStatusByJieDaoShaRenAction(this.gameStatus);
-            throwCards(this.gameStatus, action.cards);
-        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.WU_GU_FENG_DENG.key) {
-            actionHandler.setStatusByWuGuFengDengAction(this.gameStatus);
-            throwCards(this.gameStatus, action.cards);
+        if (!actualCard?.key) {
+            switch (skillKey) {
+                case SKILL_CONFIG.SHU001_REN_DE.key:
+                    handleShu001RenDeAction(this.gameStatus);
+            }
+        } else {
+            const cardType = CARD_CONFIG[actualCard?.key].type;
+            // BASIC
+            if (ALL_SHA_CARD_KEYS.includes(actualCard?.key)) {
+                strikeEvent.generateUseStrikeEventsThenSetNextStrikeEventSkill(
+                    this.gameStatus, {originId, targetIds, cards, actualCard});
+                throwCards(this.gameStatus, cards);
+            } else if (actualCard?.key == BASIC_CARDS_CONFIG.TAO.key) {
+                actionHandler.setStatusByTaoAction(this.gameStatus);
+                throwCards(this.gameStatus, cards);
+            }
+            // Equipment
+            else if (CARD_TYPE.EQUIPMENT == cardType) {
+                actionHandler.setStatusByEquipmentAction(this.gameStatus);
+            }
+            // SCROLL
+            else if (CARD_TYPE.SCROLL == cardType) {
+                if (SCROLL_CARDS_CONFIG[actualCard?.key]?.isDelay) {
+                    actionHandler.setStatusByDelayScrollAction(this.gameStatus);
+                } else {
+                    actionHandler.setStatusByScrollAction(this.gameStatus);
+                    throwCards(this.gameStatus, cards);
+                }
+            }
         }
 
         tryFindNextSkillResponse(this.gameStatus);
@@ -194,13 +175,7 @@ class GameEngine {
 
     handleResponse(response) {
         const responseType = getResponseType(this.gameStatus);
-        const skillNameKey = this.gameStatus?.skillResponse?.skillNameKey
-
-        emitNotifyPlayPublicCard(
-            this.gameStatus,
-            response,
-            responseType == RESPONSE_TYPE_CONFIG.SKILL ? skillNameKey : undefined
-        );
+        emitNotifyPlayPublicCard(this.gameStatus, response);
 
         switch (responseType) {
             case RESPONSE_TYPE_CONFIG.TAO:
@@ -220,7 +195,7 @@ class GameEngine {
                 if (curScrollResponse.actualCard.key === SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.key) {
                     responseCardHandler.setStatusByJieDaoResponse(this.gameStatus, response);
                 }
-                break
+                break;
         }
 
         // 第一个目标求闪/桃之后 继续找马超下一个铁骑的技能

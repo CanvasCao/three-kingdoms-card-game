@@ -11,140 +11,107 @@ const {
     getCards,
     throwCards
 } = require("../utils/cardUtils");
-const {v4: uuidv4} = require('uuid');
 
 const actionHandler = {
     setStatusByTaoAction: (gameStatus) => {
         const action = gameStatus.action;
         const originPlayer = gameStatus.players[action.originId]
-        if (originPlayer.currentBlood < originPlayer.maxBlood) {
-            originPlayer.addBlood();
-        }
+        originPlayer.addBlood();
     },
 
     // SCROLL
-    setStatusByWuZhongShengYouAction(gameStatus) {
-        actionHandler.setStatusByScrollAction(gameStatus);
-    },
-    setStatusByGuoHeChaiQiaoAction(gameStatus) {
-        actionHandler.setStatusByScrollAction(gameStatus);
-    },
-    setStatusByShunShouQianYangAction(gameStatus) {
-        actionHandler.setStatusByScrollAction(gameStatus);
-    },
-    setStatusByTaoYuanJieYiAction(gameStatus) {
-        actionHandler.setStatusByScrollAction(gameStatus);
-    },
-    setStatusByNanManRuQinAction(gameStatus) {
-        actionHandler.setStatusByScrollAction(gameStatus);
-    },
-    setStatusByWanJianQiFaAction(gameStatus) {
-        actionHandler.setStatusByScrollAction(gameStatus);
-    },
-    setStatusByJueDouAction(gameStatus) {
-        actionHandler.setStatusByScrollAction(gameStatus);
-    },
-    setStatusByJieDaoShaRenAction(gameStatus) {
-        // action={
-        //     origin:C,
-        //     targetIds:[A,B],
-        //     isEffect:false,
-        // }
-        // scrollResponses=[{
-        //     originId: A,
-        //     targetId: B,
-        //     isEffect:false,
-        // }]
-
-        // 1.失效
-        // scrollResponses=[]
-        //
-        // 2.生效
-        // scrollResponses=[{
-        //     originId: A,
-        //     targetId: B,
-        //     isEffect:true,
-        // }]
-        //
-        // 2.1 出杀
-        // scrollResponses=[]
-        // generateUseStrikeEventsThenSetNextStrikeEventSkill
-        //
-        // 2.2 不出杀
-        // scrollResponses=[]
-        // A remove weapon
-        // CurrentPlayer add weapon
-
-        actionHandler.setStatusByScrollAction(gameStatus);
-    },
-    setStatusByWuGuFengDengAction(gameStatus) {
-        actionHandler.setStatusByScrollAction(gameStatus);
-    },
-
     setStatusByScrollAction(gameStatus) {
+        const {cards, actualCard, originId, skillKey, targetIds = []} = gameStatus.action;
+
         // 黄月英急智
-        const originPlayer = gameStatus.players[gameStatus.action.originId]
+        const originPlayer = gameStatus.players[originId]
         handleDrawCardsNumberWhenPlayImmediateScroll(gameStatus, originPlayer)
 
-        const action = gameStatus.action;
-        // targetIds 只有顺和拆 桃园 originId targetIds的值和action一样
-        if (action.targetIds) {
-            if (action.actualCard.key == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.key ||
-                action.actualCard.key == SCROLL_CARDS_CONFIG.GUO_HE_CHAI_QIAO.key) {
-                gameStatus.scrollResponses = action.targetIds.map((targetId) => {
-                    return {
-                        originId: action.originId,
-                        targetId: targetId,
-                        cardTakeEffectOnPlayerId: targetId,
-                        cards: action.cards,
-                        actualCard: action.actualCard,
-                        isEffect: undefined,
-                    }
-                })
-            } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.key) {
-                gameStatus.scrollResponses = [{
-                    originId: action.targetIds[0],
-                    targetId: action.targetIds[1],
-                    cardTakeEffectOnPlayerId: action.targetIds[0],
-                    cards: action.cards,
-                    actualCard: action.actualCard,
+        // targetIds 只有顺和拆 originId targetIds的值和action一样
+        if (actualCard.key == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.key ||
+            actualCard.key == SCROLL_CARDS_CONFIG.GUO_HE_CHAI_QIAO.key) {
+            gameStatus.scrollResponses = targetIds.map((targetId) => {
+                return {
+                    originId,
+                    targetId: targetId,
+                    cardTakeEffectOnPlayerId: targetId,
+                    cards,
+                    actualCard,
                     isEffect: undefined,
+                }
+            })
+        } else if (actualCard.key == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.key) {
+            /**
+             action={
+                    origin:C,
+                    targetIds:[A,B],
+                    isEffect:false,
+                }
+             scrollResponses=[{
+                    originId: A,
+                    targetId: B,
+                    isEffect:false,
                 }]
-            }
-        } else if (action.targetId) {
-            if (action.actualCard.key == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.key) {
-                gameStatus.scrollResponses = [{
-                    originId: action.originId,
-                    targetId: action.targetId,
-                    cardTakeEffectOnPlayerId: action.originId,
-                    cards: action.cards,
-                    actualCard: action.actualCard,
-                    isEffect: undefined,
+
+             1.失效
+             scrollResponses=[]
+
+             2.生效
+             scrollResponses=[{
+                    originId: A,
+                    targetId: B,
+                    isEffect:true,
                 }]
-            } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.JUE_DOU.key) {
-                // 决斗originId targetId的值相反
-                gameStatus.scrollResponses = [{
-                    originId: action.targetId,
-                    targetId: action.originId,
-                    cardTakeEffectOnPlayerId: action.targetId,
-                    cards: action.cards,
-                    actualCard: action.actualCard,
-                    isEffect: undefined,
-                }]
-            }
-        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.key) {
+
+             2.1 出杀
+             scrollResponses=[]
+             generateUseStrikeEventsThenSetNextStrikeEventSkill
+
+             2.2 不出杀
+             scrollResponses=[]
+             A remove weapon
+             CurrentPlayer add weapon
+             **/
+            gameStatus.scrollResponses = [{
+                originId: targetIds[0],
+                targetId: targetIds[1],
+                cardTakeEffectOnPlayerId: targetIds[0],
+                cards,
+                actualCard,
+                isEffect: undefined,
+            }]
+        } else if (actualCard.key == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.key) {
+            gameStatus.scrollResponses = [{
+                originId: originId,
+                targetId: targetIds[0],
+                cardTakeEffectOnPlayerId: originId,
+                cards,
+                actualCard,
+                isEffect: undefined,
+            }]
+        } else if (actualCard.key == SCROLL_CARDS_CONFIG.JUE_DOU.key) {
+            // 决斗originId targetId的值相反
+            gameStatus.scrollResponses = [{
+                originId: targetIds[0],
+                targetId: originId,
+                cardTakeEffectOnPlayerId: targetIds[0],
+                cards,
+                actualCard,
+                isEffect: undefined,
+            }]
+        } else if (actualCard.key == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.key) {
             const players = getAllAlivePlayersStartFromFirstLocation(gameStatus, getCurrentPlayer(gameStatus).location)
             gameStatus.scrollResponses = players.filter((p) => p.currentBlood < p.maxBlood).map((player) => {
                 return {
                     originId: player.playerId,
                     cardTakeEffectOnPlayerId: player.playerId,
-                    cards: action.cards,
-                    actualCard: action.actualCard,
+                    cards,
+                    actualCard,
                     isEffect: undefined,
                 }
             })
-        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.key ||
-            action.actualCard.key == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.key) {
+        } else if (actualCard.key == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.key ||
+            actualCard.key == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.key) {
             const currentPlayer = getCurrentPlayer(gameStatus);
             const firstLocation = currentPlayer.location;
             const players = getAllAlivePlayersStartFromFirstLocation(gameStatus, firstLocation)
@@ -152,15 +119,15 @@ const actionHandler = {
             const scrollResponses = players.filter(p => p.playerId !== currentPlayer.playerId).map((player) => {
                 return {
                     originId: player.playerId,
-                    targetId: action.originId,
+                    targetId: originId,
                     cardTakeEffectOnPlayerId: player.playerId,
-                    cards: action.cards,
-                    actualCard: action.actualCard,
+                    cards,
+                    actualCard,
                     isEffect: undefined,
                 }
             })
             gameStatus.scrollResponses = scrollResponses
-        } else if (action.actualCard.key == SCROLL_CARDS_CONFIG.WU_GU_FENG_DENG.key) {
+        } else if (actualCard.key == SCROLL_CARDS_CONFIG.WU_GU_FENG_DENG.key) {
             const currentPlayer = getCurrentPlayer(gameStatus);
             const firstLocation = currentPlayer.location;
             const players = getAllAlivePlayersStartFromFirstLocation(gameStatus, firstLocation)
@@ -168,9 +135,9 @@ const actionHandler = {
             const scrollResponses = players.map((player) => {
                 return {
                     originId: player.playerId,
-                    cards: action.cards,
+                    cards,
                     cardTakeEffectOnPlayerId: player.playerId,
-                    actualCard: action.actualCard,
+                    actualCard,
                     isEffect: undefined,
                 }
             })
@@ -187,28 +154,31 @@ const actionHandler = {
     },
 
     // DELAY
-    setStatusByLeBuSiShuAction: (gameStatus) => {
-        const action = gameStatus.action;
-        const targetPlayer = gameStatus.players[action.targetId]
-        targetPlayer.pandingSigns.push({
-            card: action.cards[0],
-            actualCard: action.actualCard,
-        });
-    },
-    setStatusByShanDianAction: (gameStatus) => {
-        const action = gameStatus.action;
-        const originPlayer = gameStatus.players[action.originId]
-        originPlayer.pandingSigns.push({
-            card: action.cards[0],
-            actualCard: action.actualCard,
-        });
+    setStatusByDelayScrollAction: (gameStatus) => {
+        const {cards, actualCard, originId, skillKey, targetIds = []} = gameStatus.action;
+
+        const targetPlayer = gameStatus.players[targetIds[0]]
+        const originPlayer = gameStatus.players[originId]
+        const actualCardKey = actualCard?.key
+        if (actualCardKey === SCROLL_CARDS_CONFIG.SHAN_DIAN.key) {
+            originPlayer.pandingSigns.push({
+                card: cards[0],
+                actualCard,
+            });
+        } else if (actualCardKey === SCROLL_CARDS_CONFIG.LE_BU_SI_SHU.key) {
+            targetPlayer.pandingSigns.push({
+                card: cards[0],
+                actualCard,
+            });
+        }
     },
 
     // Equipment
     setStatusByEquipmentAction: (gameStatus) => {
-        const action = gameStatus.action;
-        const originPlayer = gameStatus.players[action.originId]
-        const equipmentCard = action.cards[0]
+        const {cards, actualCard, originId, skillKey, targetIds = []} = gameStatus.action;
+
+        const originPlayer = gameStatus.players[originId]
+        const equipmentCard = cards[0]
         const equipmentType = equipmentCard.equipmentType;
         if (equipmentType == EQUIPMENT_TYPE.PLUS_HORSE) {
             if (originPlayer.plusHorseCard) {

@@ -86,40 +86,40 @@ const responseCardHandler = {
     },
 
     setStatusBySkillResponse: (gameStatus, response) => {
-        const skillNameKey = gameStatus.skillResponse.skillNameKey;
+        const skillKey = gameStatus.skillResponse.skillKey;
         const chooseToReleaseSkill = response.chooseToResponse;
         gameStatus.skillResponse.chooseToReleaseSkill = chooseToReleaseSkill;
         if (!chooseToReleaseSkill) {
             delete gameStatus.skillResponse
         }
 
-        if (skillNameKey == SKILL_CONFIG.SHU006_TIE_JI.key) {
+        if (skillKey == SKILL_CONFIG.SHU006_TIE_JI.key) {
             handleShu006TieJiResponse(gameStatus, response)
-        } else if (skillNameKey == SKILL_CONFIG.WEI001_JIAN_XIONG.key) {
+        } else if (skillKey == SKILL_CONFIG.WEI001_JIAN_XIONG.key) {
             handleWei001JianXiongResponse(gameStatus, response)
-        } else if (skillNameKey == SKILL_CONFIG.WEI002_FAN_KUI.key) {
+        } else if (skillKey == SKILL_CONFIG.WEI002_FAN_KUI.key) {
             handleWei002FanKuiResponse(gameStatus, response)
-        } else if (skillNameKey == SKILL_CONFIG.WEI002_GUI_CAI.key) {
+        } else if (skillKey == SKILL_CONFIG.WEI002_GUI_CAI.key) {
             handleWei002GuiCaiResponse(gameStatus, response)
-        } else if (skillNameKey == SKILL_CONFIG.WEI003_GANG_LIE.key) {
+        } else if (skillKey == SKILL_CONFIG.WEI003_GANG_LIE.key) {
             handleWei003GangLieResponse(gameStatus, response)
-        } else if (skillNameKey == SKILL_CONFIG.WEI004_TU_XI.key) {
+        } else if (skillKey == SKILL_CONFIG.WEI004_TU_XI.key) {
             handleWei004TuXiResponse(gameStatus, response)
-        } else if (skillNameKey == SKILL_CONFIG.WU006_LIU_LI.key) {
+        } else if (skillKey == SKILL_CONFIG.WU006_LIU_LI.key) {
             handleWu006LiuLiResponse(gameStatus, response)
-        } else if (skillNameKey == SKILL_CONFIG.WEI005_LUO_YI.key) {
+        } else if (skillKey == SKILL_CONFIG.WEI005_LUO_YI.key) {
             handleWei005LuoYiResponse(gameStatus, response)
-        } else if (skillNameKey == CARD_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key) {
+        } else if (skillKey == CARD_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key) {
             handleCiXiongShuangGuJianResponse(gameStatus, response)
-        } else if (skillNameKey == CARD_CONFIG.QI_LIN_GONG.key) {
+        } else if (skillKey == CARD_CONFIG.QI_LIN_GONG.key) {
             handleQiLinGongResponse(gameStatus, response)
-        } else if (skillNameKey == CARD_CONFIG.BA_GUA_ZHEN.key) {
+        } else if (skillKey == CARD_CONFIG.BA_GUA_ZHEN.key) {
             handleBaGuaZhenResponse(gameStatus, response)
-        } else if (skillNameKey == CARD_CONFIG.GUAN_SHI_FU.key) {
+        } else if (skillKey == CARD_CONFIG.GUAN_SHI_FU.key) {
             handleGuanShiFuResponse(gameStatus, response)
-        } else if (skillNameKey == CARD_CONFIG.QING_LONG_YAN_YUE_DAO.key) {
+        } else if (skillKey == CARD_CONFIG.QING_LONG_YAN_YUE_DAO.key) {
             handleQingLongYanYueDaoResponse(gameStatus, response)
-        } else if (skillNameKey == CARD_CONFIG.HAN_BIN_JIAN.key) {
+        } else if (skillKey == CARD_CONFIG.HAN_BIN_JIAN.key) {
             handleHanBinJianResponse(gameStatus, response)
         }
     },

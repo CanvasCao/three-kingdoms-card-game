@@ -37,7 +37,7 @@ const handleWei003GangLieResponse = (gameStatus, response) => {
         // 这里会插入司马懿的鬼才 但是由于onGoingDamageEventSkill没有done 所以司马懿的鬼才执行结束依然会回到刚烈
         generatePandingEventThenSetNextPandingEventSkill(gameStatus, {
             originId: onGoingDamageEvent.targetId,
-            pandingNameKey: onGoingDamageEventSkill.skillNameKey
+            pandingNameKey: onGoingDamageEventSkill.skillKey
         })
     } else {
         originPlayer.removeCards(response.cards);

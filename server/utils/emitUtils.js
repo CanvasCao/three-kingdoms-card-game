@@ -8,7 +8,7 @@ const {ADD_TO_PUBLIC_CARD_TYPE} = require("../config/emitConfig");
 const {omit} = require("lodash")
 
 // TO PUBLIC EMIT
-const emitNotifyPlayPublicCard = (gameStatus, behaviour, skillNameKey) => {
+const emitNotifyPlayPublicCard = (gameStatus, behaviour) => {
     // behaviour is action/response
     if (!behaviour) {
         throw new Error("need behaviour")
@@ -24,7 +24,7 @@ const emitNotifyPlayPublicCard = (gameStatus, behaviour, skillNameKey) => {
             targetId: behaviour.targetId,
             cards: behaviour.cards,
             type: ADD_TO_PUBLIC_CARD_TYPE.PLAY,
-            skillNameKey
+            skillKey: behaviour.skillKey,
         });
     }
 }
