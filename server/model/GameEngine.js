@@ -115,7 +115,8 @@ class GameEngine {
                 "SHU001", "SHU002", "SHU003", "SHU005", "SHU006", "SHU007",
                 "WU001", "WU002", "WU004", "WU006",
                 "QUN002"];
-            const canSelectHeroIds = [...sampleSize(allSelectHeroIds, 7)]//, "SP001"];
+            const canSelectHeroIds = [...sampleSize(allSelectHeroIds,
+                process.env.NODE_ENV == 'production' ? 3 : allSelectHeroIds.length)]//, "SP001"];
             newPlayer.canSelectHeros = canSelectHeroIds.map(heroId => getHeroConfig(heroId))
 
             this.gameStatus.players[newPlayer.playerId] = newPlayer;

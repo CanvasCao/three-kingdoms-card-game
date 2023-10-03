@@ -99,7 +99,7 @@ const setNextDamageEventSkill = (gameStatus) => {
             return;
         } else {
             // 苦肉摸牌
-            if (damageSkill == SKILL_CONFIG.WU004_KU_ROU.key) {
+            if (damageSkill == SKILL_CONFIG.WU004_KU_ROU.key && !originPlayer.isDead) {
                 originPlayer.drawCards(gameStatus)
             }
 
