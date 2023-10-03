@@ -39,6 +39,7 @@ class Player {
         // skill
         this.extraDamageMap = {};
         this.givenCardNumber = 0;
+        this.zhiHengTimes = 0;
 
         // played tags
         this.shaTimes = 0;
@@ -145,6 +146,7 @@ class Player {
 
         this.extraDamageMap = {}; // 许褚
         this.givenCardNumber = 0; // 刘备
+        this.zhiHengTimes = 0; // 孙权
     }
 
     // 弃牌阶段

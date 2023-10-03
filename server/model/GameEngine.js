@@ -1,5 +1,6 @@
 const strikeEvent = require("../event/strikeEvent");
 const sampleSize = require("lodash/sampleSize");
+const {handleWu001ZhiHengAction} = require("../handler/skills/WU001");
 const {handleWu004KuRouAction} = require("../handler/skills/WU004");
 const {CARD_CONFIG} = require("../config/cardConfig");
 const {handleShu001RenDeAction} = require("../handler/skills/SHU001");
@@ -112,7 +113,7 @@ class GameEngine {
             const allSelectHeroIds = [
                 "WEI001", "WEI002", "WEI003", "WEI004", 'WEI005',
                 "SHU001", "SHU002", "SHU003", "SHU005", "SHU006", "SHU007",
-                "WU002", "WU004", "WU006",
+                "WU001", "WU002", "WU004", "WU006",
                 "QUN002"];
             const canSelectHeroIds = [...sampleSize(allSelectHeroIds, 7)]//, "SP001"];
             newPlayer.canSelectHeros = canSelectHeroIds.map(heroId => getHeroConfig(heroId))
@@ -145,6 +146,10 @@ class GameEngine {
                     break;
                 case SKILL_CONFIG.WU004_KU_ROU.key:
                     handleWu004KuRouAction(this.gameStatus);
+                    break;
+                case SKILL_CONFIG.WU001_ZHI_HENG.key:
+                    handleWu001ZhiHengAction(this.gameStatus);
+                    throwCards(this.gameStatus, cards);
                     break;
             }
         } else {
