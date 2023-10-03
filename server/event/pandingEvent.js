@@ -172,7 +172,6 @@ const executeNextOnePandingCard = (gameStatus) => {
         throw new Error("判定未生效 不能开始判定")
     }
 
-    const pandingCard = nextNeedPandingSign.card;
     const pandingActualCard = nextNeedPandingSign.actualCard;
     const isPandingLebusishu = pandingActualCard.key == DELAY_SCROLL_CARDS_CONFIG.LE_BU_SI_SHU.key;
     const isPandingShandian = pandingActualCard.key == DELAY_SCROLL_CARDS_CONFIG.SHAN_DIAN.key;
@@ -190,7 +189,7 @@ const executeNextOnePandingCard = (gameStatus) => {
     else if (nextNeedPandingSign.isEffect === true) {
         generatePandingEventThenSetNextPandingEventSkill(gameStatus, {
             originId: currentPlayer.playerId,
-            pandingNameKey: pandingCard.key
+            pandingNameKey: pandingActualCard.key
         })
     }
 }
