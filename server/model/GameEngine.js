@@ -120,7 +120,9 @@ class GameEngine {
             const canSelectHeroNumber = process.env.NODE_ENV == 'production' ? 3 : allSelectHeroIds.length
             const canSelectHeroIds = [
                 ...sampleSize(allSelectHeroIds, canSelectHeroNumber),
-                "WU003"]//, "SP001"];
+                // "WU003"
+            ]
+            // "SP001"];
             newPlayer.canSelectHeros = canSelectHeroIds.map(heroId => getHeroConfig(heroId))
 
             this.gameStatus.players[newPlayer.playerId] = newPlayer;
