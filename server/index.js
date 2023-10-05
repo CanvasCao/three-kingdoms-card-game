@@ -169,12 +169,14 @@ io.on('connection', (socket) => {
     });
 
     socket.on(EMIT_TYPE.THROW, (data) => {
-        rooms?.[roomId]?.gameEngine?.handleThrowCards(data);
+        rooms.getRoomEngine(roomId)?.handleThrowCards(data);
     });
 
     // debug
     socket.on(EMIT_TYPE.GO_NEXT_STAGE, () => {
-        rooms?.[roomId]?.gameEngine && goToNextStage(rooms[roomId].gameEngine.gameStatus);
-        emitRefreshStatus(rooms[roomId].gameEngine.gameStatus);
+        if (rooms.getRoomEngine(roomId)) {
+            goToNextStage(rooms.getRoomEngine(roomId).gameStatus);
+            emitRefreshStatus(rooms.getRoomEngine(roomId).gameStatus);
+        }
     });
 });
