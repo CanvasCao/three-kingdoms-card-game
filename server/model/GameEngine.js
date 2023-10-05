@@ -1,4 +1,3 @@
-const strikeEvent = require("../event/strikeEvent");
 const sampleSize = require("lodash/sampleSize");
 const {handleWu001ZhiHengAction} = require("../handler/skills/WU001");
 const {handleWu004KuRouAction} = require("../handler/skills/WU004");
@@ -45,7 +44,6 @@ const {responseCardHandler} = require("../handler/responseHandler");
 const {throwHandler} = require("../handler/throwHandler");
 const {cardBoardHandler} = require("../handler/cardBoardHandler");
 const {wuguBoardHandler} = require("../handler/wuguBoardHandler");
-const {shuffle} = require("lodash/collection");
 
 class GameEngine {
     constructor(io) {
@@ -92,6 +90,9 @@ class GameEngine {
             // gameEnd
             gameEnd: undefined,
 
+            // log
+            actionsLog: {},
+
             // 不需要传到前端
             io: io,
             throwedCards: [],
@@ -115,8 +116,11 @@ class GameEngine {
                 "SHU001", "SHU002", "SHU003", "SHU005", "SHU006", "SHU007",
                 "WU001", "WU002", "WU004", "WU006",
                 "QUN002"];
-            const canSelectHeroIds = [...sampleSize(allSelectHeroIds,
-                process.env.NODE_ENV == 'production' ? 3 : allSelectHeroIds.length)]//, "SP001"];
+
+            const canSelectHeroNumber = process.env.NODE_ENV == 'production' ? 3 : allSelectHeroIds.length
+            const canSelectHeroIds = [
+                ...sampleSize(allSelectHeroIds, canSelectHeroNumber),
+                "WU003"]//, "SP001"];
             newPlayer.canSelectHeros = canSelectHeroIds.map(heroId => getHeroConfig(heroId))
 
             this.gameStatus.players[newPlayer.playerId] = newPlayer;
@@ -157,8 +161,7 @@ class GameEngine {
             const cardType = CARD_CONFIG[actualCard?.key].type;
             // BASIC
             if (ALL_SHA_CARD_KEYS.includes(actualCard?.key)) {
-                strikeEvent.generateUseStrikeEventsThenSetNextStrikeEventSkill(
-                    this.gameStatus, {originId, targetIds, cards, actualCard});
+                actionHandler.setStatusByShaAction(this.gameStatus);
                 throwCards(this.gameStatus, cards);
             } else if (actualCard?.key == BASIC_CARDS_CONFIG.TAO.key) {
                 actionHandler.setStatusByTaoAction(this.gameStatus);
@@ -271,11 +274,9 @@ class GameEngine {
             everyoneGetInitialCards(this.gameStatus)
             generateGameStageEventThenSetNextGameStageEventSkill(this.gameStatus)
             emitRefreshStatus(this.gameStatus);
-        }
-
-        setTimeout(() => {
+        } else {
             emitRefreshStatus(this.gameStatus);
-        }, 1000)
+        }
     }
 }
 

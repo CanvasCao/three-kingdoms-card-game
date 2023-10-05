@@ -143,7 +143,6 @@ const handleResponseCardEventEnd = (gameStatus) => {
                 targetId: responseCardEvent.originId,
                 actionCards: responseCardEvent.actionCards,
                 actionActualCard: responseCardEvent.actionActualCard,
-                useOrPlay: USE_OR_PLAY_CONFIG.PLAY
             })
         }
     } else {

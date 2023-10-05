@@ -152,13 +152,13 @@ const emitRefreshStatus = (gameStatus) => {
     io.to(roomId).emit(EMIT_TYPE.REFRESH_STATUS, omitGS);
 
 
-    // 如果游戏结束 帮助所有player离开socket 再emitRefreshRooms
+    // 如果游戏结束  帮助所有player离开socket 再emitRefreshRooms
     if (gameStatus.gameEnd) {
-        gameStatus.room.status = GAME_STATUS.IDLE;
-        const {rooms} = new Rooms()
-        rooms[roomId].roomPlayers = [];
-        io.socketsLeave(roomId);
-        emitRefreshRooms(io, rooms)
+        let rooms = new Rooms()
+        rooms.setRoomPlayers(roomId, [])
+        rooms.setRoomStatus(roomId, GAME_STATUS.IDLE)
+        io.socketsLeave(roomId); // 帮助所有player离开socket
+        emitRefreshRooms(io)
     }
 }
 
@@ -177,29 +177,31 @@ const emitRejoinInit = (gameStatus) => {
 }
 
 // room
-const emitRefreshRooms = (io, rooms) => {
+const emitRefreshRooms = (io) => {
     const emitRooms = []
+    let rooms = new Rooms()
     for (let roomId in rooms) {
-        const {roomPlayers, gameEngine} = rooms[roomId]
-        const roomStatus = gameEngine?.gameStatus?.room?.status
+        const roomPlayers = rooms.getRoomPlayers(roomId)
+        const roomStatus = rooms.getRoomStatus(roomId)
         emitRooms.push({
             roomId,
             roomPlayers,
-            status: roomStatus || GAME_STATUS.IDLE,
+            status: roomStatus,
         })
     }
     io.emit(EMIT_TYPE.REFRESH_ROOMS, emitRooms);
 }
 
-const emitRefreshRoomPlayers = (io, rooms, roomId) => {
-    const roomStatus = rooms[roomId]?.gameEngine?.gameStatus?.room?.status
+const emitRefreshRoomPlayers = (io, roomId) => {
+    let rooms = new Rooms()
+    const roomStatus = rooms.getRoomStatus(roomId)
     if ([GAME_STATUS.PLAYING].includes(roomStatus)) {
         return
     }
 
     const data = {
         roomId,
-        roomPlayers: rooms[roomId].roomPlayers,
+        roomPlayers: rooms.getRoomPlayers(roomId),
         teamMembers: teamMembers,
     }
     io.to(roomId).emit(EMIT_TYPE.REFRESH_ROOM_PLAYERS, data);

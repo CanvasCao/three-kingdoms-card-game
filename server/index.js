@@ -30,32 +30,42 @@ server.listen(port, () => {
 // Routing
 app.use(express.static(path.join(__dirname, '../client')));
 
-const {rooms} = new Rooms();
-
+const rooms = new Rooms();
 io.on('connection', (socket) => {
     let playerId, roomId;
 
     socket.on(EMIT_TYPE.REJOIN_ROOM, (data) => {
-        const room = rooms[data.roomId]
+        const room = rooms.getRoom(data.roomId)
         if (!room) {
             return;
         }
-        const {gameEngine, roomPlayers} = room;
-        if (!gameEngine || gameEngine?.gameStatus?.room?.status !== GAME_STATUS.PLAYING) {
+
+        const roomStatus = rooms.getRoomStatus(data.roomId)
+        if (roomStatus !== GAME_STATUS.PLAYING) {
             return
         }
-        const player = gameEngine?.gameStatus?.players[data.playerId];
-        if (player) {
-            playerId = player.playerId
+
+        const roomEngine = rooms.getRoomEngine(data.roomId)
+        const quitedPlayer = roomEngine?.players[data.playerId];
+        if (quitedPlayer) {
+            playerId = quitedPlayer.playerId
             roomId = data.roomId
-            roomPlayers.push({playerId: player.playerId, playerName: player.playerName})
+
+            rooms.setRoomPlayers(roomId,
+                [...rooms.getRoomPlayers(roomId),
+                    {
+                        playerId: quitedPlayer.playerId,
+                        playerName: quitedPlayer.playerName,
+                        teamMember: quitedPlayer.teamMember,
+                    }]
+            )
             socket.join(roomId);
-            emitRejoinInit(gameEngine.gameStatus)
+            emitRejoinInit(roomEngine.gameStatus)
         }
     })
 
     socket.on(EMIT_TYPE.REFRESH_ROOMS, () => {
-        emitRefreshRooms(io, rooms)
+        emitRefreshRooms(io)
     })
 
     socket.on(EMIT_TYPE.JOIN_ROOM, (data) => {
@@ -66,25 +76,26 @@ io.on('connection', (socket) => {
         if (!playerId || !playerName || !roomId) {
             return;
         }
-        if (!rooms[roomId]) {
-            return;
-        }
 
-        const room = rooms[roomId]
-        const {gameEngine, roomPlayers} = room
-        const roomStatus = gameEngine?.gameStatus?.room?.status
+        const roomStatus = rooms.getRoomStatus(data.roomId)
         if (roomStatus === GAME_STATUS.PLAYING) {
             return;
         }
+
+        const roomPlayers = rooms.getRoomPlayers(data.roomId)
         if (roomPlayers.length >= 8) {
-            return
+            return;
         }
 
         const teamMember = getNextEmptyTeamMemberSlot(roomPlayers);
-        roomPlayers.push({playerId, playerName, teamMember})
+        rooms.setRoomPlayers(roomId,
+            [...rooms.getRoomPlayers(roomId),
+                {playerId, playerName, teamMember}]
+        )
+
         socket.join(roomId);
-        emitRefreshRooms(io, rooms)
-        emitRefreshRoomPlayers(io, rooms, roomId)
+        emitRefreshRooms(io)
+        emitRefreshRoomPlayers(io, roomId)
     })
 
     socket.on(EMIT_TYPE.SWITCH_TEAM_MEMBER, (data) => {
@@ -92,29 +103,34 @@ io.on('connection', (socket) => {
         roomId = data.roomId
         const teamMember = data.teamMember;
 
-        const room = rooms[data.roomId]
-        const roomStatus = room.gameEngine?.gameStatus?.room?.status
-        if (!room || roomStatus == GAME_STATUS.PLAYING) {
+        const roomStatus = rooms.getRoomStatus(data.roomId)
+        if (roomStatus == GAME_STATUS.PLAYING) {
             return
         }
 
-        const roomPlayer = room.roomPlayers.find((player) => player.playerId == playerId);
+        const roomPlayer = rooms.getRoomPlayers(data.roomId).find((player) => player.playerId == playerId);
         roomPlayer.teamMember = teamMember;
-        emitRefreshRoomPlayers(io, rooms, roomId)
+        emitRefreshRoomPlayers(io, roomId)
     })
 
     socket.on(EMIT_TYPE.DISCONNECT, () => {
-        if (playerId && roomId) {
-            rooms[roomId].roomPlayers = differenceBy(rooms[roomId].roomPlayers, [{playerId}], 'playerId');
-            socket.leave(roomId);
-            if (rooms[roomId].roomPlayers.length <= 0) {
-                if (process.env.NODE_ENV == 'production') {
-                    rooms[roomId].gameEngine = null
-                }
-            }
-            emitRefreshRooms(io, rooms)
-            emitRefreshRoomPlayers(io, rooms, roomId)
+        if (!playerId || !roomId) {
+            return
         }
+
+        const roomPlayers = rooms.getRoomPlayers(roomId)
+        rooms.setRoomPlayers(roomId, differenceBy(roomPlayers, [{playerId}], 'playerId'))
+        socket.leave(roomId);
+
+        if (rooms.getRoomPlayers(roomId).length <= 0) {
+            if (process.env.NODE_ENV == 'production') {
+                rooms.setRoomEngine(roomId, null)
+            } else {
+                // keepalive for FE debug
+            }
+        }
+        emitRefreshRooms(io)
+        emitRefreshRoomPlayers(io, roomId)
     });
 
     socket.on(EMIT_TYPE.INIT, () => {
@@ -122,36 +138,34 @@ io.on('connection', (socket) => {
             return
         }
         const gameEngine = new GameEngine(io);
-        rooms[roomId].gameEngine = gameEngine;
-        const roomPlayers = rooms[roomId].roomPlayers
-
-        gameEngine.setPlayers(roomPlayers)
+        rooms.setRoomEngine(roomId, gameEngine)
+        gameEngine.setPlayers(rooms.getRoomPlayers(roomId))
         gameEngine.startEngine(roomId);
-        emitRefreshRooms(io, rooms);
+        emitRefreshRooms(io);
     });
 
     socket.on(EMIT_TYPE.ACTION, (action) => {
-        rooms?.[roomId]?.gameEngine?.handleAction(action);
+        rooms.getRoomEngine(roomId)?.handleAction(action);
     });
 
     socket.on(EMIT_TYPE.RESPONSE, (response) => {
-        rooms?.[roomId]?.gameEngine?.handleResponse(response);
+        rooms.getRoomEngine(roomId)?.handleResponse(response);
     });
 
     socket.on(EMIT_TYPE.CARD_BOARD_ACTION, (data) => {
-        rooms?.[roomId]?.gameEngine?.handleCardBoardAction(data);
+        rooms.getRoomEngine(roomId)?.handleCardBoardAction(data);
     });
 
     socket.on(EMIT_TYPE.WUGU_BOARD_ACTION, (data) => {
-        rooms?.[roomId]?.gameEngine?.handleWuguBoardAction(data);
+        rooms.getRoomEngine(roomId)?.handleWuguBoardAction(data);
     });
 
     socket.on(EMIT_TYPE.HERO_SELECT_BOARD_ACTION, (data) => {
-        rooms?.[roomId]?.gameEngine?.handleHeroSelectBoardAction(data);
+        rooms.getRoomEngine(roomId)?.handleHeroSelectBoardAction(data);
     });
 
     socket.on(EMIT_TYPE.END_PLAY, () => {
-        rooms?.[roomId]?.gameEngine?.handleEndPlay();
+        rooms.getRoomEngine(roomId)?.handleEndPlay();
     });
 
     socket.on(EMIT_TYPE.THROW, (data) => {

@@ -87,7 +87,6 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
                     targetId: curScrollResponse.targetId,
                     actionCards: curScrollResponse.cards,
                     actionActualCard: curScrollResponse.actualCard,
-                    useOrPlay: USE_OR_PLAY_CONFIG.PLAY
                 })
                 clearNextScrollResponse(gameStatus);
             } else if (curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.key ||

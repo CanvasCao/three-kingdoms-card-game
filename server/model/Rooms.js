@@ -1,15 +1,56 @@
+const {GAME_STATUS} = require('../config/gameAndStageConfig')
+
 class Rooms {
     constructor() {
         if (!Rooms.instance) {
             const roomNumber = 3;
-            this.rooms = {};
-            for (let i = 1; i <= roomNumber; i++) {
-                this.rooms[i] = {gameEngine: null, roomPlayers: []}
+
+            for (let roomId = 1; roomId <= roomNumber; roomId++) {
+                this[roomId] = {gameEngine: null, roomPlayers: []}
             }
             Rooms.instance = this;
         }
 
         return Rooms.instance;
+    }
+
+    getRoom(roomId) {
+        return this?.[roomId]
+    }
+
+    setRoomPlayers(roomId, val) {
+        if (!this?.[roomId]?.roomPlayers) {
+            return
+        }
+        this[roomId].roomPlayers = val
+    }
+
+
+    getRoomPlayers(roomId) {
+        return this?.[roomId]?.roomPlayers || []
+    }
+
+
+    setRoomStatus(roomId, val) {
+        if (!this?.[roomId]?.gameEngine?.room?.status) {
+            return
+        }
+        this[roomId].gameEngine.room.status = val
+    }
+
+    getRoomStatus(roomId) {
+        return this?.[roomId]?.gameEngine?.room?.status || GAME_STATUS.IDLE
+    }
+
+    setRoomEngine(roomId, val) {
+        if (!this?.[roomId]) {
+            return
+        }
+        this[roomId].gameEngine = val
+    }
+
+    getRoomEngine(roomId) {
+        return this?.[roomId]?.gameEngine
     }
 }
 

@@ -1,4 +1,5 @@
 const {handleDrawCardsNumberWhenPlayImmediateScroll} = require("./skills/common");
+const strikeEvent = require("../event/strikeEvent");
 const {
     EQUIPMENT_TYPE,
     SCROLL_CARDS_CONFIG,
@@ -13,9 +14,15 @@ const {
 } = require("../utils/cardUtils");
 
 const actionHandler = {
+    setStatusByShaAction: (gameStatus) => {
+        const {cards, actualCard, originId, skillKey, targetIds = []} = gameStatus.action;
+        strikeEvent.generateUseStrikeEventsThenSetNextStrikeEventSkill(
+            gameStatus, {originId, targetIds, cards, actualCard}
+        );
+    },
     setStatusByTaoAction: (gameStatus) => {
-        const action = gameStatus.action;
-        const originPlayer = gameStatus.players[action.originId]
+        const {cards, actualCard, originId, skillKey, targetIds = []} = gameStatus.action;
+        const originPlayer = gameStatus.players[originId]
         originPlayer.addBlood();
     },
 
