@@ -1,3 +1,4 @@
+const {shuffle} = require("lodash");
 const {CARD_COLOR, CARD_HUASE} = require("../config/cardConfig");
 const {Card} = require("../model/Card");
 const {getInitCards} = require("../initCards")
@@ -12,31 +13,35 @@ const throwCards = (gameStatus, cards) => {
 }
 
 const getCards = (gameStatus, number = 2) => {
-    // TODO hardcode 补牌
-    if (gameStatus.initCards.length < number) {
-        // console.log("补牌")
-        gameStatus.initCards = getInitCards()
+    if (gameStatus.deckCards.length < number) {
+        if (process.env.NODE_ENV == 'production') {
+            gameStatus.deckCards = shuffle([...gameStatus.throwedCards, ...gameStatus.deckCards])
+            gameStatus.throwedCards = [];
+        } else {
+            gameStatus.deckCards = getInitCards()
+            gameStatus.throwedCards = [];
+        }
     }
 
     if (number > 1) {
         let cards = [];
         for (let i = 1; i <= number; i++) {
-            cards.push(JSON.parse(JSON.stringify(gameStatus.initCards.shift())))
+            cards.push(JSON.parse(JSON.stringify(gameStatus.deckCards.shift())))
         }
         return cards;
     } else {
-        return JSON.parse(JSON.stringify(gameStatus.initCards.shift()))
+        return JSON.parse(JSON.stringify(gameStatus.deckCards.shift()))
     }
 }
 
 const everyoneGetInitialCards = (gameStatus) => {
     Object.keys(gameStatus.players).forEach((playerId) => {
-        gameStatus.players[playerId].cards = getCards(gameStatus,4);
+        gameStatus.players[playerId].cards = getCards(gameStatus, 4);
     })
 }
 
 const getActualCardColor = (actualCard) => {
-    if(!actualCard){
+    if (!actualCard) {
         return CARD_COLOR.NO;
     }
 

@@ -1,4 +1,3 @@
-const {USE_OR_PLAY_CONFIG} = require("../config/eventConfig");
 const {generateResponseCardEventThenSetNextResponseCardEventSkill} = require("../event/responseCardEvent");
 const {STAGE_NAME} = require("../config/gameAndStageConfig");
 const {getNextNeedExecutePandingSign} = require("./pandingUtils");
@@ -46,22 +45,24 @@ const generateWuxieSimultaneousResponseByPandingCard = (gameStatus) => {
 // 即时锦囊生效 set scrollResponses isEffect true 或 clear scrollResponses
 const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (gameStatus, from) => {
     // console.log("from", from)
-    if (gameStatus.wuxieSimultaneousResponse.hasWuxiePlayerIds.length != 0) {
+    const {stage, wuxieSimultaneousResponse, scrollResponses, players} = gameStatus
+
+    if (wuxieSimultaneousResponse.hasWuxiePlayerIds.length != 0) {
         throw new Error("还有人思考无懈可击 无法开始结算锦囊");
     }
 
-    const isScrollEffected = (gameStatus.wuxieSimultaneousResponse.wuxieChain.length % 2 == 1) || // wuxieChain长度为奇数个 锦囊生效
-        gameStatus.wuxieSimultaneousResponse.wuxieChain.length == 0 // 不求无懈直接生效
+    const isScrollEffected = (wuxieSimultaneousResponse.wuxieChain.length % 2 == 1) || // wuxieChain长度为奇数个 锦囊生效
+        wuxieSimultaneousResponse.wuxieChain.length == 0 // 不求无懈直接生效
 
     // 延时锦囊
-    if (gameStatus.stage.stageName == STAGE_NAME.JUDGE) {
+    if (stage.getStageName() == STAGE_NAME.JUDGE) {
         const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus);
         nextNeedPandingSign.isEffect = isScrollEffected; // 延时锦囊生效开始判定 未生效需要跳过判定
     }
 
     // 即时锦囊
-    else if (gameStatus.scrollResponses.length > 0) {
-        const curScrollResponse = gameStatus.scrollResponses[0]
+    else if (scrollResponses.length > 0) {
+        const curScrollResponse = scrollResponses[0]
         if (isScrollEffected) {// 生效
             if (curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.key) {
                 const player = getCurrentPlayer(gameStatus)
@@ -73,8 +74,8 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
 
                 // 不写递归的算法
                 if (getAllHasWuxiePlayers(gameStatus).length == 0) {
-                    gameStatus.scrollResponses.forEach(res => {
-                        gameStatus.players[res.originId].addBlood();
+                    scrollResponses.forEach(res => {
+                        players[res.originId].addBlood();
                     })
                     gameStatus.scrollResponses = [];
                 }

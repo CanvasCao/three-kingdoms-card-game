@@ -68,7 +68,7 @@ const emitNotifyDrawCards = (gameStatus, cards, player) => {
     });
 }
 
-const emitNotifyCardBoardAction = (gameStatus, boardActionData) => {
+ const emitNotifyCardBoardAction = (gameStatus, boardActionData) => {
     // export type EmitCardBoardData = {
     //     originId: string,
     //     targetId: string,
@@ -135,8 +135,7 @@ const emitNotifyAddLines = (gameStatus, {fromId, toIds, actualCard}) => {
 }
 
 const omitGSArray = [
-    // 'throwedCards',
-    'initCards',
+    'deckCards',
     'io',
 ]
 if (process.env.NODE_ENV == 'production') {

@@ -22,6 +22,7 @@ const goToNextStage = (gameStatus) => {
     const index = GAME_STAGE_TIMINGS.findIndex((t) => t == lastEventTimingName);
 
     clearAllResponses(gameStatus)
+
     if (!eventTimingTracker.length) {
         const nextEventTimingName = GAME_STAGE_TIMINGS[0]
         eventTimingTracker.push({eventTimingName: nextEventTimingName, eventTimingSkills: []})
@@ -45,10 +46,6 @@ const goToNextStage = (gameStatus) => {
     }
 }
 
-const setGameStageName = (gameStatus, name) => {
-    gameStatus.stage.stageName = name
-}
-
 const generateGameStageEventThenSetNextGameStageEventSkill = (gameStatus) => {
     gameStatus.gameStageEvent = {eventTimingTracker: []}
     trySetNextGameStageEventSkill(gameStatus);
@@ -64,12 +61,12 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
         handleGameStageEventEnd(gameStatus)
     }
 
-    const gameStageEvent = gameStatus.gameStageEvent;
+    const {gameStageEvent, stage} = gameStatus;
     const eventTimingTracker = gameStageEvent.eventTimingTracker;
     const originId = currentPlayer.playerId
 
     if (eventTimingTracker.length == 0) {
-        setGameStageName(gameStatus, STAGE_NAME.JUDGE);
+        stage.setStageName(STAGE_NAME.JUDGE);
         const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_JUDGING
 
         let nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus)
@@ -116,7 +113,7 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
         } else {
-            setGameStageName(gameStatus, STAGE_NAME.DRAW);
+            stage.setStageName(STAGE_NAME.DRAW);
             const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING
 
             if (currentPlayer.skipTimimg[GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING]) { // 因为突袭skipTimimg
@@ -141,7 +138,7 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
         } else {
-            setGameStageName(gameStatus, STAGE_NAME.PLAY);
+            stage.setStageName(STAGE_NAME.PLAY);
             if (currentPlayer.skipStage[STAGE_NAME.PLAY]) {
                 const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_PLAYING
                 eventTimingTracker.push({eventTimingName, eventTimingSkills: []})
@@ -167,7 +164,7 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
             setEventSkillResponse(gameStatus, unDoneSkill)
             return;
         } else {
-            setGameStageName(gameStatus, STAGE_NAME.THROW);
+            stage.setStageName(STAGE_NAME.THROW);
             if (!currentPlayer.needThrow()) {
                 const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_THROWING
                 eventTimingTracker.push({eventTimingName, eventTimingSkills: []})
@@ -183,8 +180,9 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
 }
 
 const handleGameStageEventEnd = (gameStatus) => {
+    const {stage} = gameStatus;
     getCurrentPlayer(gameStatus).resetWhenMyTurnEnds()
-    setCurrentLocationToNextLocation(gameStatus)
+    stage.setCurrentLocationToNextLocation(gameStatus.players);
     getCurrentPlayer(gameStatus).resetWhenMyTurnStarts();
 
     generateGameStageEventThenSetNextGameStageEventSkill(gameStatus);

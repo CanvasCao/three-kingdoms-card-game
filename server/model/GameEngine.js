@@ -1,11 +1,11 @@
 const sampleSize = require("lodash/sampleSize");
+const {Stage} = require("./Stage");
 const {handleWu001ZhiHengAction} = require("../handler/skills/WU001");
 const {handleWu004KuRouAction} = require("../handler/skills/WU004");
 const {CARD_CONFIG} = require("../config/cardConfig");
 const {handleShu001RenDeAction} = require("../handler/skills/SHU001");
 const {SKILL_CONFIG} = require("../config/skillsConfig");
 const {GAME_STATUS} = require("../config/gameAndStageConfig");
-const {STAGE_NAME} = require("../config/gameAndStageConfig");
 const {ALL_SHA_CARD_KEYS} = require("../config/cardConfig");
 const {reorderRoomPlayers} = require("../utils/roomUtils");
 const {trySetNextGameStageEventSkill} = require("../event/gameStageEvent");
@@ -53,10 +53,7 @@ class GameEngine {
                 status: GAME_STATUS.IDLE,
             },
             players: {},
-            stage: {
-                stageName: STAGE_NAME.START,
-                currentLocation: 0,
-            },
+            stage: new Stage(),
             action: {},
 
             // 基础牌
@@ -96,7 +93,7 @@ class GameEngine {
             // 不需要传到前端
             io: io,
             throwedCards: [],
-            initCards: getInitCards(),
+            deckCards: getInitCards(),
         }
     }
 
