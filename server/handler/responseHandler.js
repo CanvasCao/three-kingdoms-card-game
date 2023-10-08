@@ -1,4 +1,5 @@
 const strikeEvent = require("../event/strikeEvent");
+const {handleWu003KeJiResponse} = require("./skills/WU003");
 const {handleDrawCardsNumberWhenPlayImmediateScroll} = require("./skills/common");
 const {handleWei003GangLieResponse} = require("./skills/WEI003");
 const {handleWei001JianXiongResponse} = require("./skills/WEI001");
@@ -105,6 +106,8 @@ const responseCardHandler = {
             handleWei003GangLieResponse(gameStatus, response)
         } else if (skillKey == SKILL_CONFIG.WEI004_TU_XI.key) {
             handleWei004TuXiResponse(gameStatus, response)
+        } else if (skillKey == SKILL_CONFIG.WU003_KE_JI.key) {
+            handleWu003KeJiResponse(gameStatus, response)
         } else if (skillKey == SKILL_CONFIG.WU006_LIU_LI.key) {
             handleWu006LiuLiResponse(gameStatus, response)
         } else if (skillKey == SKILL_CONFIG.WEI005_LUO_YI.key) {
@@ -218,7 +221,6 @@ const responseCardHandler = {
                     actualCard: response.actualCard
                 });
         } else {
-            // TODO 如果没有杀 自动不出
             // 不出杀 A=>B A不出 A把刀给当前用户
             const curScrollResponse = gameStatus.scrollResponses[0];
             const APlayer = gameStatus.players[curScrollResponse.originId]

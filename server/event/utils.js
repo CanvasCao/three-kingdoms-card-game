@@ -221,20 +221,17 @@ const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingNam
 
         // game stage
         case GAME_STAGE_TIMING.GAME_STAGE_WHEN_DRAW_START:
-            eventSkillsForPlayer = originPlayer.skills.map((skill) => TIMING_SKILLS_CONFIG[skill.key])
-                .filter((skill) => skill && skill.triggerTiming == eventTimingName)
-                .map((skill) => configTimingSkillToResponseSkill(skill, originId))
-            eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
-            break;
         case GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING:
-            eventSkillsForPlayer = originPlayer.skills.map((skill) => TIMING_SKILLS_CONFIG[skill.key])
-                .filter((skill) => skill && skill.triggerTiming == eventTimingName)
-                .map((skill) => configTimingSkillToResponseSkill(skill, originId))
-            eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
-            break;
         case GAME_STAGE_TIMING.GAME_STAGE_BETWEEN_PLAY_AND_THROW:
             eventSkillsForPlayer = originPlayer.skills.map((skill) => TIMING_SKILLS_CONFIG[skill.key])
                 .filter((skill) => skill && skill.triggerTiming == eventTimingName)
+                .filter((skill) => {
+                    if (!skill.validate) {
+                        return true
+                    } else {
+                        return skill.validate(gameStatus, {originId})
+                    }
+                })
                 .map((skill) => configTimingSkillToResponseSkill(skill, originId))
             eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
             break;

@@ -1,5 +1,4 @@
 const {findAllUnDoneEvents} = require("./utils");
-const {USE_OR_PLAY_CONFIG} = require("../config/eventConfig");
 const {CARD_CONFIG} = require("../config/cardConfig");
 const {SCROLL_CARDS_CONFIG} = require("../config/cardConfig");
 const {ALL_SHA_CARD_KEYS} = require("../config/cardConfig");

@@ -1,4 +1,6 @@
 const sampleSize = require("lodash/sampleSize");
+const {USE_OR_PLAY_CONFIG} = require("./Log");
+const {Log} = require("./Log");
 const {Stage} = require("./Stage");
 const {handleWu001ZhiHengAction} = require("../handler/skills/WU001");
 const {handleWu004KuRouAction} = require("../handler/skills/WU004");
@@ -14,6 +16,7 @@ const {endPlayHandler} = require("../handler/endPlayHandler");
 const {Player} = require("./Player");
 const {getHeroConfig} = require("../config/heroConfig");
 const {everyoneGetInitialCards} = require("../utils/cardUtils");
+const {getCurrentPlayer} = require("../utils/playerUtils");
 const {heroSelectBoardBoardHandler} = require("../handler/heroSelectBoardHandler");
 const {RESPONSE_TYPE_CONFIG} = require("../config/responseTypeConfig");
 const {getResponseType} = require("../utils/responseUtils");
@@ -87,11 +90,9 @@ class GameEngine {
             // gameEnd
             gameEnd: undefined,
 
-            // log
-            actionsLog: {},
-
             // 不需要传到前端
             io: io,
+            log: new Log(),
             throwedCards: [],
             deckCards: getInitCards(),
         }
@@ -117,7 +118,7 @@ class GameEngine {
             const canSelectHeroNumber = process.env.NODE_ENV == 'production' ? 3 : allSelectHeroIds.length
             const canSelectHeroIds = [
                 ...sampleSize(allSelectHeroIds, canSelectHeroNumber),
-                // "WU003"
+                "WU003"
             ]
             // "SP001"];
             newPlayer.canSelectHeros = canSelectHeroIds.map(heroId => getHeroConfig(heroId))
@@ -134,6 +135,16 @@ class GameEngine {
     handleAction(action) {
         const {originId, targetIds, actualCard, cards, skillKey} = action;
         this.gameStatus.action = action;
+
+        // 日志
+        this.gameStatus.log.addLog({
+            roundNumber: this.gameStatus.stage.getRoundNumber(),
+            whoseRoundId: getCurrentPlayer(this.gameStatus).playerId,
+            playerId: originId, addType: USE_OR_PLAY_CONFIG.USE,
+            card: actualCard
+        })
+
+        // 从手牌移除
         this.gameStatus.players[originId].removeCards(cards);
 
         emitNotifyPlayPublicCard(this.gameStatus, action);
@@ -187,8 +198,18 @@ class GameEngine {
     }
 
     handleResponse(response) {
+        const {actualCard, originId} = response
         const responseType = getResponseType(this.gameStatus);
         emitNotifyPlayPublicCard(this.gameStatus, response);
+
+        // 日志
+        this.gameStatus.log.addLog({
+            roundNumber: this.gameStatus.stage.getRoundNumber(),
+            whoseRoundId: getCurrentPlayer(this.gameStatus).playerId,
+            playerId: originId,
+            addType: USE_OR_PLAY_CONFIG.PLAY,
+            card: actualCard
+        })
 
         switch (responseType) {
             case RESPONSE_TYPE_CONFIG.TAO:

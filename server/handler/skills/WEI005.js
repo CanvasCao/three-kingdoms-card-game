@@ -20,7 +20,6 @@ const handleWei005LuoYiResponse = (gameStatus, response) => {
     } else {
         currentPlayer.drawCards(gameStatus)
     }
-
 }
 
 

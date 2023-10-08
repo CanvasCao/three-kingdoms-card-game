@@ -139,6 +139,7 @@ const omitGSArray = [
     'io',
 ]
 if (process.env.NODE_ENV == 'production') {
+    omitGSArray.push('log')
     omitGSArray.push('throwedCards')
     omitGSArray.push('gameStageEvent')
 }

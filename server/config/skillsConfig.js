@@ -1,3 +1,4 @@
+const {BASIC_CARDS_CONFIG} = require("./cardConfig");
 const {intersectionBy} = require("lodash/array");
 const {GAME_STAGE_TIMING} = require("./eventConfig");
 const {DAMAGE_EVENT_TIMING} = require("./eventConfig");
@@ -57,6 +58,9 @@ const SKILL_CONFIG = {
     WU002_QI_XI: {
         key: 'WU002_QI_XI',
     },
+    WU003_KE_JI: {
+        key: 'WU003_KE_JI',
+    },
     WU004_KU_ROU: {
         key: 'WU004_KU_ROU',
     },
@@ -111,6 +115,23 @@ const TIMING_SKILLS_CONFIG = {
     SHU006_TIE_JI: {
         key: "SHU006_TIE_JI",
         triggerTiming: USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET,
+    },
+    WU003_KE_JI: {
+        key: "WU003_KE_JI",
+        triggerTiming: GAME_STAGE_TIMING.GAME_STAGE_BETWEEN_PLAY_AND_THROW,
+        validate: (gameStatus, {originId}) => {
+            const {log, stage, players} = gameStatus
+            if (players[originId].needThrow()) {
+                const hasUsedOrPlayedSha = log.hasUsedOrPlayed({
+                    roundNumber: stage.getRoundNumber(),
+                    whoseRoundId: originId,
+                    playerId: originId,
+                    cardKey: BASIC_CARDS_CONFIG.SHA.key,
+                })
+                return !hasUsedOrPlayedSha;
+            }
+            return false
+        }
     },
     WU006_LIU_LI: {
         key: "WU006_LIU_LI",

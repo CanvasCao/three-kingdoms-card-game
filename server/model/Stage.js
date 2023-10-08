@@ -4,7 +4,11 @@ class Stage {
     constructor() {
         this.stageName = STAGE_NAME.START
         this.currentLocation = 0
-        this.gameRound = 0
+        this.roundNumber = 0
+    }
+
+    getRoundNumber() {
+        return this.roundNumber;
     }
 
     getStageName() {
@@ -33,7 +37,7 @@ class Stage {
             this.currentLocation = nextPlayer.location
         } else {
             // 新的一轮
-            this.gameRound++
+            this.roundNumber++
             this.currentLocation = sorted[0].location
         }
     }

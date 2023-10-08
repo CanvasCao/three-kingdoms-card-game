@@ -164,11 +164,11 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
             return;
         } else {
             stage.setStageName(STAGE_NAME.THROW);
-            if (!currentPlayer.needThrow()) {
-                const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_THROWING
+            const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_THROWING
+            if (currentPlayer.skipStage[STAGE_NAME.THROW] || !currentPlayer.needThrow()) {
                 eventTimingTracker.push({eventTimingName, eventTimingSkills: []})
             } else {
-                // 等待前端弃牌结束时插入
+                // 等待前端弃牌
             }
         }
     }
