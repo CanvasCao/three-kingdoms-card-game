@@ -1,8 +1,8 @@
+const {intersectionBy} = require("lodash/array");
 const {GAME_STAGE_TIMING} = require("./eventConfig");
 const {DAMAGE_EVENT_TIMING} = require("./eventConfig");
 const {PANDING_EVENT_TIMING} = require("./eventConfig");
 const {USE_EVENT_TIMING} = require("./eventConfig");
-
 const SKILL_CONFIG = {
     WEI001_JIAN_XIONG: {
         key: 'WEI001_JIAN_XIONG',
@@ -80,13 +80,16 @@ const TIMING_SKILLS_CONFIG = {
     WEI001_JIAN_XIONG: {
         key: "WEI001_JIAN_XIONG",
         triggerTiming: DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE,
-        needDamageCards: true
+        validate: (gameStatus, {onGoingDamageEvent}) => {
+            return !!intersectionBy(onGoingDamageEvent?.damageCards, gameStatus.throwedCards, 'cardId').length
+        }
     },
     WEI002_FAN_KUI: {
         key: "WEI002_FAN_KUI",
         triggerTiming: DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE,
-        needOrigin: true,
-        needOriginHasCards: true,
+        validate: (gameStatus, {originPlayer}) => {
+            return originPlayer && originPlayer.hasAnyCards()
+        }
     },
     WEI002_GUI_CAI: {
         key: "WEI002_GUI_CAI",

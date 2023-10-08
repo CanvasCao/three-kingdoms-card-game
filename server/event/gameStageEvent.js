@@ -1,7 +1,6 @@
 const {STAGE_NAME} = require("../config/gameAndStageConfig");
 const {GAME_STAGE_TIMINGS} = require("../config/eventConfig");
 const {ifAnyPlayerNeedToResponse} = require("../utils/responseUtils");
-const {setCurrentLocationToNextLocation} = require("../utils/locationUtils");
 const {getCurrentPlayer} = require("../utils/playerUtils");
 const {clearAllResponses} = require("../utils/responseUtils");
 const {isNil} = require("lodash/lang");

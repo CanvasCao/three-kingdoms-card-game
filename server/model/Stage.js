@@ -7,12 +7,16 @@ class Stage {
         this.gameRound = 0
     }
 
-    getStageName(){
+    getStageName() {
         return this.stageName;
     }
 
     setStageName(stageName) {
         this.stageName = stageName;
+    }
+
+    getCurrentLocation() {
+        return this.currentLocation;
     }
 
     setCurrentLocationToNextLocation(players) {

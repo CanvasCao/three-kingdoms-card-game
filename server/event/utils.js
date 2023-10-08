@@ -1,4 +1,3 @@
-const {intersectionBy} = require("lodash/array");
 const {GAME_STAGE_TIMING} = require("../config/eventConfig");
 const {ALL_SHA_CARD_KEYS} = require("../config/cardConfig");
 const {PLAY_EVENT_TIMING} = require("../config/eventConfig");
@@ -93,9 +92,7 @@ const findOnGoingEventSkill = (gameStatus, eventKey) => {
 // AllEventSkills
 const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingName, actionCardKey, originId, targetId}) => {
     const originPlayer = gameStatus.players[originId];
-    const originPlayerId = originPlayer?.playerId;
     const targetPlayer = gameStatus.players?.[targetId];
-    const targetPlayerId = targetPlayer?.playerId;
 
     let eventTimingSkills = [];
     let eventSkillsForPlayer = [];
@@ -103,7 +100,7 @@ const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingNam
     switch (eventTimingName) {
         // 判定 相关技能
         case PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT:
-            const allPlayers = getAllAlivePlayersStartFromFirstLocation(gameStatus, gameStatus.players[originId].location)
+            const allPlayers = getAllAlivePlayersStartFromFirstLocation(gameStatus, originPlayer?.location)
             allPlayers.forEach((player) => {
                 const eventSkillsForPlayer = player.skills.map((skill) => TIMING_SKILLS_CONFIG[skill.key])
                     .filter((skill) => skill && skill.triggerTiming == eventTimingName)
@@ -123,7 +120,7 @@ const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingNam
             if (ALL_SHA_CARD_KEYS.includes(actionCardKey)) {
                 const eventSkillsForPlayer = targetPlayer.skills.map((skill) => TIMING_SKILLS_CONFIG[skill.key])
                     .filter((skill) => skill && skill.triggerTiming == eventTimingName)
-                    .map((skill) => configTimingSkillToResponseSkill(skill, targetPlayerId))
+                    .map((skill) => configTimingSkillToResponseSkill(skill, targetId))
                 eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
             }
             break;
@@ -131,7 +128,7 @@ const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingNam
             if (ALL_SHA_CARD_KEYS.includes(actionCardKey)) {
                 const eventSkillsForPlayer = originPlayer.skills.map((skill) => TIMING_SKILLS_CONFIG[skill.key])
                     .filter((skill) => skill && skill.triggerTiming == eventTimingName)
-                    .map((skill) => configTimingSkillToResponseSkill(skill, originPlayerId))
+                    .map((skill) => configTimingSkillToResponseSkill(skill, originId))
                 eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
 
                 // 雌雄双股剑
@@ -196,19 +193,14 @@ const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingNam
             eventSkillsForPlayer = targetPlayer.skills.map((skill) => TIMING_SKILLS_CONFIG[skill.key])
                 .filter((skill) => skill && skill.triggerTiming == eventTimingName)
                 .filter((skill) => {
-                    return skill.needOrigin ? !!originId : true // 如果技能需要来源
-                })
-                .filter((skill) => {
-                    return skill.needOriginHasCards ? originPlayer.hasAnyCards() : true  // 如果需要技能来源有卡牌技能需要来源
-                })
-                .filter((skill) => {
-                    if (skill.needDamageCards) { // 如果伤害是由卡造成的
+                    if (!skill.validate) {
+                        return true
+                    } else {
                         const onGoingDamageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENTS);
-                        return !!intersectionBy(onGoingDamageEvent.damageCards, gameStatus.throwedCards, 'cardId').length
+                        return skill.validate(gameStatus, {onGoingDamageEvent, originPlayer})
                     }
-                    return true
                 })
-                .map((skill) => configTimingSkillToResponseSkill(skill, targetPlayerId))
+                .map((skill) => configTimingSkillToResponseSkill(skill, targetId))
             eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
             break;
 
@@ -231,13 +223,19 @@ const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingNam
         case GAME_STAGE_TIMING.GAME_STAGE_WHEN_DRAW_START:
             eventSkillsForPlayer = originPlayer.skills.map((skill) => TIMING_SKILLS_CONFIG[skill.key])
                 .filter((skill) => skill && skill.triggerTiming == eventTimingName)
-                .map((skill) => configTimingSkillToResponseSkill(skill, originPlayerId))
+                .map((skill) => configTimingSkillToResponseSkill(skill, originId))
             eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
             break;
         case GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING:
             eventSkillsForPlayer = originPlayer.skills.map((skill) => TIMING_SKILLS_CONFIG[skill.key])
                 .filter((skill) => skill && skill.triggerTiming == eventTimingName)
-                .map((skill) => configTimingSkillToResponseSkill(skill, originPlayerId))
+                .map((skill) => configTimingSkillToResponseSkill(skill, originId))
+            eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
+            break;
+        case GAME_STAGE_TIMING.GAME_STAGE_BETWEEN_PLAY_AND_THROW:
+            eventSkillsForPlayer = originPlayer.skills.map((skill) => TIMING_SKILLS_CONFIG[skill.key])
+                .filter((skill) => skill && skill.triggerTiming == eventTimingName)
+                .map((skill) => configTimingSkillToResponseSkill(skill, originId))
             eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
             break;
     }
