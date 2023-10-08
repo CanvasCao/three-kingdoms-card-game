@@ -220,6 +220,7 @@ const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingNam
             break;
 
         // game stage
+        case GAME_STAGE_TIMING.GAME_STAGE_WHEN_PREPARE:
         case GAME_STAGE_TIMING.GAME_STAGE_WHEN_DRAW_START:
         case GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING:
         case GAME_STAGE_TIMING.GAME_STAGE_BETWEEN_PLAY_AND_THROW:

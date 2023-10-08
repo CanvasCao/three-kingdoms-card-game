@@ -29,6 +29,7 @@ const generatePandingEventThenSetNextPandingEventSkill = (gameStatus, {originId,
         done: false,
         pandingNameKey,
         pandingResultCard,
+        pandingResultCardNeedThrow: true,
     }
     emitRefreshStatus(gameStatus); //为了显示判定Board
     emitNotifyPandingPlayPublicCard(gameStatus, pandingResultCard, gameStatus.players[originId], pandingNameKey);
@@ -151,6 +152,16 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
             clearSkillResponse(gameStatus)
             onGoingDamageEventSkill.done = true;
         }
+    } else if (pandingEvent.pandingNameKey === SKILL_CONFIG.WEI007_LUO_SHEN.key) {
+        const onGoingGameStageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.GAME_STAGE_EVENT);
+        if ([CARD_HUASE.HEITAO, CARD_HUASE.CAOHUA].includes(pandingResultCard.huase)) {
+            pandingEvent.takeEffect = true;
+            pandingEvent.pandingResultCardNeedThrow = false;
+
+            onGoingGameStageEvent.eventTimingTracker.pop() // 删除最后一个元素
+            gameStatus.players[pandingEvent.originId].addCards(pandingEvent.pandingResultCard)
+        }
+        clearSkillResponse(gameStatus)
     }
 
     emitRefreshStatus(gameStatus); //为了显示判定Board
@@ -158,7 +169,9 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
 
 const handlePandingEventEnd = (gameStatus) => {
     const pandingEvent = gameStatus.pandingEvent;
-    throwCards(gameStatus, pandingEvent.pandingResultCard);
+    if (pandingEvent.pandingResultCardNeedThrow) {
+        throwCards(gameStatus, pandingEvent.pandingResultCard);
+    }
     delete gameStatus.pandingEvent;
 }
 

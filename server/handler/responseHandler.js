@@ -1,4 +1,5 @@
 const strikeEvent = require("../event/strikeEvent");
+const {handleWei007LuoShenResponse} = require("./skills/WEI007");
 const {handleWu003KeJiResponse} = require("./skills/WU003");
 const {handleDrawCardsNumberWhenPlayImmediateScroll} = require("./skills/common");
 const {handleWei003GangLieResponse} = require("./skills/WEI003");
@@ -106,12 +107,14 @@ const responseCardHandler = {
             handleWei003GangLieResponse(gameStatus, response)
         } else if (skillKey == SKILL_CONFIG.WEI004_TU_XI.key) {
             handleWei004TuXiResponse(gameStatus, response)
+        } else if (skillKey == SKILL_CONFIG.WEI005_LUO_YI.key) {
+            handleWei005LuoYiResponse(gameStatus, response)
+        } else if (skillKey == SKILL_CONFIG.WEI007_LUO_SHEN.key) {
+            handleWei007LuoShenResponse(gameStatus, response)
         } else if (skillKey == SKILL_CONFIG.WU003_KE_JI.key) {
             handleWu003KeJiResponse(gameStatus, response)
         } else if (skillKey == SKILL_CONFIG.WU006_LIU_LI.key) {
             handleWu006LiuLiResponse(gameStatus, response)
-        } else if (skillKey == SKILL_CONFIG.WEI005_LUO_YI.key) {
-            handleWei005LuoYiResponse(gameStatus, response)
         } else if (skillKey == CARD_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key) {
             handleCiXiongShuangGuJianResponse(gameStatus, response)
         } else if (skillKey == CARD_CONFIG.QI_LIN_GONG.key) {

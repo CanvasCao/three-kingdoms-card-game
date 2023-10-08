@@ -112,13 +112,13 @@ class GameEngine {
             const allSelectHeroIds = [
                 "WEI001", "WEI002", "WEI003", "WEI004", 'WEI005',
                 "SHU001", "SHU002", "SHU003", "SHU005", "SHU006", "SHU007",
-                "WU001", "WU002", "WU004", "WU006",
+                "WU001", "WU002", "WU003", "WU004", "WU006",
                 "QUN002"];
 
             const canSelectHeroNumber = process.env.NODE_ENV == 'production' ? 3 : allSelectHeroIds.length
             const canSelectHeroIds = [
                 ...sampleSize(allSelectHeroIds, canSelectHeroNumber),
-                "WU003"
+                "WEI007"
             ]
             // "SP001"];
             newPlayer.canSelectHeros = canSelectHeroIds.map(heroId => getHeroConfig(heroId))

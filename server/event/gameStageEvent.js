@@ -65,6 +65,17 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
     const originId = currentPlayer.playerId
 
     if (eventTimingTracker.length == 0) {
+        const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_WHEN_PREPARE
+        const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, originId})
+        eventTimingTracker.push({eventTimingName, eventTimingSkills})
+
+        if (eventTimingSkills.length > 0) {
+            setEventSkillResponse(gameStatus, eventTimingSkills[0])
+            return;
+        }
+    }
+
+    if (last(eventTimingTracker)?.eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_WHEN_PREPARE) {
         stage.setStageName(STAGE_NAME.JUDGE);
         const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_JUDGING
 

@@ -26,6 +26,12 @@ const SKILL_CONFIG = {
     WEI005_LUO_YI: {
         key: 'WEI005_LUO_YI',
     },
+    WEI007_QING_GUO: {
+        key: 'WEI007_QING_GUO',
+    },
+    WEI007_LUO_SHEN: {
+        key: 'WEI007_LUO_SHEN',
+    },
 
     SHU001_REN_DE: {
         key: 'SHU001_REN_DE',
@@ -111,6 +117,11 @@ const TIMING_SKILLS_CONFIG = {
         key: "WEI005_LUO_YI",
         triggerTiming: GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING,
     },
+    WEI007_LUO_SHEN: {
+        key: "WEI007_LUO_SHEN",
+        triggerTiming: GAME_STAGE_TIMING.GAME_STAGE_WHEN_PREPARE,
+    },
+
 
     SHU006_TIE_JI: {
         key: "SHU006_TIE_JI",
