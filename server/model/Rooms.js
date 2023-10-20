@@ -6,7 +6,7 @@ class Rooms {
             const roomNumber = 3;
 
             for (let roomId = 1; roomId <= roomNumber; roomId++) {
-                this[roomId] = {gameEngine: null, roomPlayers: []}
+                this[roomId] = {gameEngine: null, roomPlayers: [], status: GAME_STATUS.IDLE}
             }
             Rooms.instance = this;
         }
@@ -32,14 +32,14 @@ class Rooms {
 
 
     setRoomStatus(roomId, val) {
-        if (!this?.[roomId]?.gameEngine?.room?.status) {
+        if (!this?.[roomId]) {
             return
         }
-        this[roomId].gameEngine.room.status = val
+        this[roomId].status = val
     }
 
     getRoomStatus(roomId) {
-        return this?.[roomId]?.gameEngine?.room?.status || GAME_STATUS.IDLE
+        return this?.[roomId]?.status || GAME_STATUS.IDLE
     }
 
     setRoomEngine(roomId, val) {

@@ -47,14 +47,12 @@ const {responseCardHandler} = require("../handler/responseHandler");
 const {throwHandler} = require("../handler/throwHandler");
 const {cardBoardHandler} = require("../handler/cardBoardHandler");
 const {wuguBoardHandler} = require("../handler/wuguBoardHandler");
+const {Rooms} = require("../model/Rooms");
 
 class GameEngine {
     constructor(io) {
         this.gameStatus = {
-            room: {
-                roomId: '',
-                status: GAME_STATUS.IDLE,
-            },
+            roomId: '',
             players: {},
             stage: new Stage(),
             action: {},
@@ -128,7 +126,11 @@ class GameEngine {
     }
 
     startEngine(roomId) {
-        this.gameStatus.room = {roomId, status: GAME_STATUS.PLAYING};
+        this.gameStatus.roomId = roomId;
+
+        const rooms = new Rooms();
+        rooms.setRoomStatus(roomId, GAME_STATUS.PLAYING)
+
         emitInit(this.gameStatus);
     }
 

@@ -46,7 +46,7 @@ io.on('connection', (socket) => {
         }
 
         const roomEngine = rooms.getRoomEngine(data.roomId)
-        const quitedPlayer = roomEngine?.players[data.playerId];
+        const quitedPlayer = roomEngine?.gameStatus?.players?.[data.playerId];
         if (quitedPlayer) {
             playerId = quitedPlayer.playerId
             roomId = data.roomId
