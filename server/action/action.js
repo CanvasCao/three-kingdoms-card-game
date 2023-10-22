@@ -125,7 +125,7 @@ const ACTION = {
     _removeCard(gameStatus, player, cards) {
         player.removeCards(cards)
 
-        if(player.cardsRemoveHook){
+        if (player.cardsRemoveHook) {
             player.cardsRemoveHook(player, gameStatus) // 陆逊
         }
     }

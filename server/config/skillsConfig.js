@@ -70,6 +70,12 @@ const SKILL_CONFIG = {
     WU004_KU_ROU: {
         key: 'WU004_KU_ROU',
     },
+    WU005_YING_ZI: {
+        key: 'WU005_YING_ZI',
+    },
+    WU005_FAN_JIAN: {
+        key: 'WU005_FAN_JIAN',
+    },
     WU006_GUO_SE: {
         key: 'WU006_GUO_SE',
     },

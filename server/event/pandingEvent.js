@@ -38,7 +38,7 @@ const generatePandingEventThenSetNextPandingEventSkill = (gameStatus, {originId,
     emitNotifyPublicCards(gameStatus, {
         cards: [pandingResultCard],
         fromId: CARD_LOCATION.PAIDUI,
-        pandingPlayerId: gameStatus.players[originId],
+        pandingPlayerId: gameStatus.players[originId].playerId,
         pandingNameKey,
     })
     setNextPandingEventSkill(gameStatus);

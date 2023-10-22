@@ -71,6 +71,10 @@ const HERO_STATIC_CONFIG = {
         maxBlood: 4,
         gender: 1
     },
+    WU005: {
+        maxBlood: 3,
+        gender: 1
+    },
     WU006: {
         maxBlood: 3,
         gender: 0
@@ -108,6 +112,10 @@ const HERO_SKILL_DYNAMIC_CONFIG = {
         bingLiangRange: 100,
         shunRange: 100,
     },
+
+    WU005_YING_ZI: {
+        drawCardNumber: 3,
+    },
     WU007_QIAN_XUN: {
         cantBeTargetKeys: [SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.key, SCROLL_CARDS_CONFIG.LE_BU_SI_SHU.key]
     },
@@ -118,6 +126,7 @@ const HERO_SKILL_DYNAMIC_CONFIG = {
             }
         }
     },
+
     QUN002_WU_SHUANG: {
         responseStrikeNumber: 2,
         responseDuelNumber: 2,
@@ -146,6 +155,7 @@ const HERO_SKILLS_CONFIG = {
     WU002: [SKILL_CONFIG.WU002_QI_XI],
     WU003: [SKILL_CONFIG.WU003_KE_JI],
     WU004: [SKILL_CONFIG.WU004_KU_ROU],
+    WU005: [SKILL_CONFIG.WU005_YING_ZI, SKILL_CONFIG.WU005_FAN_JIAN],
     WU006: [SKILL_CONFIG.WU006_GUO_SE, SKILL_CONFIG.WU006_LIU_LI],
     WU007: [SKILL_CONFIG.WU007_QIAN_XUN, SKILL_CONFIG.WU007_LIAN_YING],
 

@@ -139,7 +139,7 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
                     setEventSkillResponse(gameStatus, eventTimingSkills[0])
                     return;
                 } else {
-                    ACTION.draw(gameStatus, currentPlayer)
+                    ACTION.draw(gameStatus, currentPlayer, currentPlayer.drawCardNumber)
                 }
             }
         }
