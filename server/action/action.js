@@ -12,7 +12,8 @@ const ACTION = {
     use(gameStatus, action) {
         const {originId, targetIds, actualCard, cards, skillKey} = action;
         const isDelayScroll = SCROLL_CARDS_CONFIG[actualCard?.key]?.isDelay
-        gameStatus.players[originId].removeCards(cards);
+        this._removeCard(gameStatus, gameStatus.players[originId], cards)
+
 
         if (!isDelayScroll) {
             moveCardsToDiscardPile(gameStatus, cards);
@@ -42,7 +43,7 @@ const ACTION = {
     },
     equip(gameStatus, player, card) {
         emitNotifyPlayPublicCards(gameStatus, gameStatus.action);
-        player.removeCards(card)
+        this._removeCard(gameStatus, player, card)
 
         const equipmentType = card.equipmentType;
         if (equipmentType == EQUIPMENT_TYPE.PLUS_HORSE) {
@@ -73,17 +74,18 @@ const ACTION = {
     },
     play(gameStatus, response) {
         const {cards, actualCard, originId, skillKey} = response
-        gameStatus.players[originId].removeCards(cards);
+        this._removeCard(gameStatus, gameStatus.players[originId], cards)
+
         moveCardsToDiscardPile(gameStatus, response.cards);
         emitNotifyPlayPublicCards(gameStatus, response);
     },
     remove(gameStatus, originPlayer, targetPlayer, card) {
-        targetPlayer.removeCards(card);
+        this._removeCard(gameStatus, targetPlayer, card)
         moveCardsToDiscardPile(gameStatus, card);
         emitNotifyPublicCards(gameStatus, {fromId: targetPlayer.playerId, cards: [card], type: ADD_TO_PUBLIC_CARD_TYPE.CHAI})
     },
     move(gameStatus, originPlayer, targetPlayer, card) {
-        targetPlayer.removeCards(card);
+        this._removeCard(gameStatus, targetPlayer, card)
         originPlayer.addCards(card);
 
         const isPublic = !targetPlayer.cards.find((c) => c.cardId == card.cardId)
@@ -91,7 +93,8 @@ const ACTION = {
     },
     give(gameStatus, originPlayer, targetPlayer, cards) {
         targetPlayer.addCards(cards);
-        originPlayer.removeCards(cards);
+        this._removeCard(gameStatus, originPlayer, cards)
+
         emitNotifyMoveCards(gameStatus, originPlayer.playerId, targetPlayer.playerId, cards, false)
         emitNotifyAddLines(gameStatus, {
             fromId: originPlayer.playerId,
@@ -104,21 +107,27 @@ const ACTION = {
         emitNotifyDrawCards(gameStatus, player, cards)
     },
     discard(gameStatus, player, cards, skillKey) {
-        player.removeCards(cards);
+        this._removeCard(gameStatus, player, cards)
         moveCardsToDiscardPile(gameStatus, cards);
         emitNotifyPublicCards(gameStatus, {fromId: player.playerId, cards, skillKey})
     },
-    get() {
-    },
     gaiPan(gameStatus, player, cards, pandingResultCard, skillKey) {
-        player.removeCards(cards);
+        this._removeCard(gameStatus, player, cards)
         moveCardsToDiscardPile(gameStatus, pandingResultCard);
         emitNotifyPublicCards(gameStatus, {fromId: player.playerId, cards, type: ADD_TO_PUBLIC_CARD_TYPE.THROW, skillKey})
     },
     throw(gameStatus, player, cards) {
-        player.removeCards(cards);
+        this._removeCard(gameStatus, player, cards)
         moveCardsToDiscardPile(gameStatus, cards);
         emitNotifyPublicCards(gameStatus, {fromId: player.playerId, cards, type: ADD_TO_PUBLIC_CARD_TYPE.THROW})
+    },
+
+    _removeCard(gameStatus, player, cards) {
+        player.removeCards(cards)
+
+        if(player.cardsRemoveHook){
+            player.cardsRemoveHook(player, gameStatus) // 陆逊
+        }
     }
 }
 

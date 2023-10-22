@@ -1,5 +1,6 @@
 const {SCROLL_CARDS_CONFIG} = require("./cardConfig");
 const {SKILL_CONFIG} = require("./skillsConfig");
+const {ACTION} = require("../action/action");
 
 const HERO_STATIC_CONFIG = {
     WEI001: {
@@ -109,6 +110,13 @@ const HERO_SKILL_DYNAMIC_CONFIG = {
     },
     WU007_QIAN_XUN: {
         cantBeTargetKeys: [SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.key, SCROLL_CARDS_CONFIG.LE_BU_SI_SHU.key]
+    },
+    WU007_LIAN_YING: {
+        cardsRemoveHook: (player, gameStatus) => {
+            if (player.cards.length == 0) {
+                ACTION.draw(gameStatus, player, 1)
+            }
+        }
     },
     QUN002_WU_SHUANG: {
         responseStrikeNumber: 2,
