@@ -1,10 +1,7 @@
-const {throwCards} = require("../utils/cardUtils");
+const {moveCardsToDiscardPile} = require("../utils/cardUtils");
 const {emitNotifyThrowPlayPublicCard} = require("../utils/emitUtils");
-const {emitNotifyDrawCards} = require("../utils/emitUtils");
-const {getCards} = require("../utils/cardUtils");
 const {Card} = require("./Card");
 const {differenceBy} = require("lodash/array");
-const {v4: uuidv4} = require('uuid');
 
 class Player {
     constructor(player) {
@@ -57,12 +54,6 @@ class Player {
     }
 
     // Card
-    drawCards(gameStatus, number = 2) {
-        const cards = getCards(gameStatus, number)
-        this.addCards(cards);
-        emitNotifyDrawCards(gameStatus, cards, this)
-    }
-
     addCards(cards) {
         if (!cards) {
             return
@@ -165,7 +156,7 @@ class Player {
         ].filter(x => !!x)
 
         emitNotifyThrowPlayPublicCard(gameStatus, {cards: needThrowCards, playerId: this.playerId})
-        throwCards(gameStatus, needThrowCards);
+        moveCardsToDiscardPile(gameStatus, needThrowCards);
 
         this.cards = [];
         this.pandingSigns = [];

@@ -1,3 +1,4 @@
+const {ACTION} = require("../action/action");
 const {STAGE_NAME} = require("../config/gameAndStageConfig");
 const {GAME_STAGE_TIMINGS} = require("../config/eventConfig");
 const {ifAnyPlayerNeedToResponse} = require("../utils/responseUtils");
@@ -35,7 +36,7 @@ const goToNextStage = (gameStatus) => {
 
             // 点击goToNextStage的时候 让XU_CHU摸牌
             if (last(eventTimingTracker).eventTimingName === GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING) {
-                getCurrentPlayer(gameStatus).drawCards(gameStatus)
+                ACTION.draw(gameStatus, getCurrentPlayer(gameStatus))
             }
         } else {
             const nextEventTimingName = GAME_STAGE_TIMINGS[index + 1]
@@ -138,7 +139,7 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
                     setEventSkillResponse(gameStatus, eventTimingSkills[0])
                     return;
                 } else {
-                    currentPlayer.drawCards(gameStatus)
+                    ACTION.draw(gameStatus, currentPlayer)
                 }
             }
         }

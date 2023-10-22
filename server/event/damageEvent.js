@@ -1,3 +1,4 @@
+const {ACTION} = require("../action/action");
 const {SKILL_CONFIG} = require("../config/skillsConfig");
 const {findOnGoingEvent} = require("./utils");
 const {DAMAGE_EVENT_TIMING} = require("../config/eventConfig");
@@ -100,7 +101,7 @@ const setNextDamageEventSkill = (gameStatus) => {
         } else {
             // 苦肉摸牌
             if (damageSkill == SKILL_CONFIG.WU004_KU_ROU.key && !originPlayer.isDead) {
-                originPlayer.drawCards(gameStatus)
+                ACTION.draw(gameStatus, originPlayer)
             }
 
             const eventTimingName = DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE // 【奸雄】、【反馈】、【刚烈】、【遗计】

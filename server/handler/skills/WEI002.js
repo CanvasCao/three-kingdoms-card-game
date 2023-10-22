@@ -2,8 +2,8 @@ const {SKILL_CONFIG} = require("../../config/skillsConfig");
 const {ALL_EVENTS_KEY_CONFIG} = require("../../config/eventConfig");
 const {findOnGoingEvent} = require("../../event/utils");
 const {findOnGoingEventSkill} = require("../../event/utils");
-const {emitNotifyAddLines,emitRefreshStatus} = require("../../utils/emitUtils");
-const {throwCards} = require("../../utils/cardUtils");
+const {emitNotifyAddLines, emitRefreshStatus} = require("../../utils/emitUtils");
+const {ACTION} = require("../../action/action")
 
 const handleWei002FanKuiResponse = (gameStatus, response) => {
     const chooseToReleaseSkill = response.chooseToResponse;
@@ -48,8 +48,7 @@ const handleWei002GuiCaiResponse = (gameStatus, response) => {
     if (onGoingPandingEventSkill.chooseToReleaseSkill === undefined) {
         onGoingPandingEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
     } else { // 发动+改判
-        originPlayer.removeCards(response.cards);
-        throwCards(gameStatus, onGoingPandingEvent.pandingResultCard);
+        ACTION.gaiPan(gameStatus, originPlayer, response.cards, onGoingPandingEvent.pandingResultCard)
 
         onGoingPandingEvent.pandingResultCard = response.cards[0]
         onGoingPandingEventSkill.releaseCards = response.cards

@@ -1,4 +1,5 @@
-const {emitNotifyGetCardsFromTable} = require("../../utils/emitUtils");
+const {CARD_LOCATION} = require("../../config/cardConfig");
+const {emitNotifyMoveCards} = require("../../utils/emitUtils");
 const {findOnGoingEvent} = require("../../event/utils");
 const {findOnGoingEventSkill} = require("../../event/utils");
 const {ALL_EVENTS_KEY_CONFIG} = require("../../config/eventConfig");
@@ -14,10 +15,12 @@ const handleWei001JianXiongResponse = (gameStatus, response) => {
         if (onGoingDamageEvent.damageCards) {
             gameStatus.throwedCards = differenceBy(gameStatus.throwedCards, onGoingDamageEvent.damageCards, 'cardId');
             gameStatus.players[onGoingDamageEvent.targetId].addCards(onGoingDamageEvent.damageCards);
-            emitNotifyGetCardsFromTable(gameStatus, {
-                cards: onGoingDamageEvent.damageCards,
-                playerId: onGoingDamageEvent.targetId
-            })
+
+            emitNotifyMoveCards(gameStatus,
+                CARD_LOCATION.TABLE,
+                gameStatus.players[onGoingDamageEvent.targetId].playerId,
+                onGoingDamageEvent.damageCards,
+                true)
         }
 
         delete gameStatus.skillResponse

@@ -1,4 +1,5 @@
 const strikeEvent = require("../event/strikeEvent");
+const {ACTION} = require("../action/action");
 const {handleWei007LuoShenResponse} = require("./skills/WEI007");
 const {handleWu003KeJiResponse} = require("./skills/WU003");
 const {handleDrawCardsNumberWhenPlayImmediateScroll} = require("./skills/common");
@@ -31,9 +32,7 @@ const {
     clearNextTaoResponse,
     clearNextScrollResponse,
 } = require("../utils/responseUtils");
-const {throwCards} = require("../utils/cardUtils")
 const {getAllHasWuxiePlayers, getCurrentPlayer} = require("../utils/playerUtils")
-const {emitNotifyJieDaoWeaponOwnerChange} = require("../utils/emitUtils")
 const {ALL_EVENTS_KEY_CONFIG} = require("../config/eventConfig")
 
 // export type EmitResponseData = {
@@ -57,9 +56,7 @@ const responseCardHandler = {
     setStatusByCardResponse: (gameStatus, response) => {
         const cardResponse = gameStatus.cardResponse;
         const actionCardKey = cardResponse.actionActualCard.key;
-        const responseOriginPlayer = gameStatus.players[cardResponse.originId];
-        responseOriginPlayer.removeCards(response.cards);
-        throwCards(gameStatus, response.cards);
+        ACTION.play(gameStatus, response)
 
         const onGoingResponseCardEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.RESPONSE_CARD_EVENTS);
 
@@ -134,8 +131,7 @@ const responseCardHandler = {
         const curTaoResponse = gameStatus.taoResponses[0];
         const originPlayer = gameStatus.players[curTaoResponse.originId];
         const targetPlayer = gameStatus.players[curTaoResponse.targetId];
-        originPlayer.removeCards(response.cards);
-        throwCards(gameStatus, response.cards);
+        ACTION.play(gameStatus, response)
 
         if (response.chooseToResponse) { // 出桃了
             targetPlayer.addBlood();
@@ -188,7 +184,8 @@ const responseCardHandler = {
             if (validatedChainResponse) {
                 handleDrawCardsNumberWhenPlayImmediateScroll(gameStatus, originPlayer)
 
-                originPlayer.removeCards(response.cards);
+                ACTION.play(gameStatus, response)
+
                 resetHasWuxiePlayerIdsAndPushChainAfterValidatedWuxie(gameStatus, response);
                 const newHasWuxiePlayers = getAllHasWuxiePlayers(gameStatus);
                 if (newHasWuxiePlayers.length == 0) {
@@ -213,8 +210,8 @@ const responseCardHandler = {
             const curScrollResponse = gameStatus.scrollResponses[0];
             const APlayer = gameStatus.players[curScrollResponse.originId]
             const BPlayer = gameStatus.players[curScrollResponse.targetId]
-            gameStatus.players[APlayer.playerId].removeCards(response.cards);
-            throwCards(gameStatus, response.cards);
+
+            ACTION.play(gameStatus, response)
 
             strikeEvent.generateUseStrikeEventsThenSetNextStrikeEventSkill(gameStatus,
                 {
@@ -230,9 +227,7 @@ const responseCardHandler = {
             const currentPlayer = getCurrentPlayer(gameStatus);
 
             const weaponCard = cloneDeep(APlayer.weaponCard);
-            APlayer.removeCards(weaponCard)
-            currentPlayer.addCards(weaponCard)
-            emitNotifyJieDaoWeaponOwnerChange(gameStatus, weaponCard);
+            ACTION.move(gameStatus, currentPlayer, APlayer, weaponCard)
         }
 
         clearNextScrollResponse(gameStatus);

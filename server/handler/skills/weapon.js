@@ -1,10 +1,10 @@
+const {ACTION} = require("../../action/action");
 const {cloneDeep} = require("lodash");
 const {EQUIPMENT_CARDS_CONFIG} = require("../../config/cardConfig");
 const {generateDamageEventThenSetNextDamageEventSkill} = require("../../event/damageEvent");
 const {findOnGoingEvent} = require("../../event/utils");
 const {findOnGoingEventSkill} = require("../../event/utils");
 const {ALL_EVENTS_KEY_CONFIG} = require("../../config/eventConfig");
-const {throwCards} = require("../../utils/cardUtils")
 
 const handleCiXiongShuangGuJianResponse = (gameStatus, response) => {
     const chooseToReleaseSkill = response.chooseToResponse;
@@ -18,7 +18,7 @@ const handleCiXiongShuangGuJianResponse = (gameStatus, response) => {
             // 放弃CiXiongShuangGuJian
         } else {
             // 不弃牌伤害来源摸一张
-            gameStatus.players[onGoingUseStrikeEvent.originId].drawCards(gameStatus, 1)
+            ACTION.draw(gameStatus, gameStatus.players[onGoingUseStrikeEvent.originId], 1)
         }
         onGoingUseStrikeEventSkill.done = true;
         return
@@ -28,8 +28,7 @@ const handleCiXiongShuangGuJianResponse = (gameStatus, response) => {
         onGoingUseStrikeEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
         gameStatus.skillResponse.playerId = onGoingUseStrikeEvent.targetId;// 修改技能使用人的目标
     } else {
-        originPlayer.removeCards(response.cards);
-        throwCards(gameStatus, response.cards);
+        ACTION.discard(gameStatus, originPlayer, response.cards)
 
         onGoingUseStrikeEventSkill.releaseCards = response.cards
         onGoingUseStrikeEventSkill.done = true;
@@ -56,7 +55,7 @@ const handleQiLinGongResponse = (gameStatus, response) => {
             targetId: onGoingDamageEvent.targetId,
             cardBoardContentKey: EQUIPMENT_CARDS_CONFIG.QI_LIN_GONG.key
         }]
-    }  else {
+    } else {
         // onGoingDamageEventSkill.done = true; 在CardBoardHandler
     }
     delete gameStatus.skillResponse;
@@ -76,8 +75,7 @@ const handleGuanShiFuResponse = (gameStatus, response) => {
     if (onGoingUseStrikeEventSkill.chooseToReleaseSkill === undefined) {
         onGoingUseStrikeEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
     } else {
-        originPlayer.removeCards(response.cards);
-        throwCards(gameStatus, response.cards);
+        ACTION.discard(gameStatus, originPlayer, response.cards)
 
         onGoingUseStrikeEventSkill.done = true;
         delete gameStatus.skillResponse;
@@ -94,7 +92,6 @@ const handleGuanShiFuResponse = (gameStatus, response) => {
 
 const handleQingLongYanYueDaoResponse = (gameStatus, response) => {
     const chooseToReleaseSkill = response.chooseToResponse;
-    const originPlayer = gameStatus.players[response.originId];
     const onGoingUseStrikeEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS);
     const onGoingUseStrikeEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS);
 
@@ -106,8 +103,7 @@ const handleQingLongYanYueDaoResponse = (gameStatus, response) => {
     if (onGoingUseStrikeEventSkill.chooseToReleaseSkill === undefined) {
         onGoingUseStrikeEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
     } else {
-        originPlayer.removeCards(response.cards);
-        throwCards(gameStatus, response.cards);
+        ACTION.play(gameStatus, response)
 
         onGoingUseStrikeEventSkill.done = true;
         delete gameStatus.skillResponse;
@@ -144,7 +140,7 @@ const handleHanBinJianResponse = (gameStatus, response) => {
 
         const damageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENTS);
         damageEvent.done = true;
-    }  else {
+    } else {
         // onGoingDamageEventSkill.done = true; 在CardBoardHandler
     }
     delete gameStatus.skillResponse;

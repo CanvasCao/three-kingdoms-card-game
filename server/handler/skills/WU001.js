@@ -1,9 +1,11 @@
+const {ACTION} = require("../../action/action");
 const handleWu001ZhiHengAction = (gameStatus) => {
     const {cards, actualCard, originId, skillKey, targetIds = []} = gameStatus.action;
+    const player = gameStatus.players[originId]
 
-    gameStatus.players[originId].drawCards(gameStatus, cards.length);
-
-    gameStatus.players[originId].zhiHengTimes++
+    ACTION.discard(gameStatus,player,cards)
+    ACTION.draw(gameStatus, player, cards.length)
+    player.zhiHengTimes++
 }
 
 exports.handleWu001ZhiHengAction = handleWu001ZhiHengAction;

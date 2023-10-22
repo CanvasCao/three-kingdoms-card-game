@@ -1,3 +1,4 @@
+const {ACTION} = require("../action/action");
 const _clearDeadPlayerInAllResponse = (gameStatus, player) => {
     if (gameStatus.skillResponse?.playerId == player.playerId) {
         delete gameStatus.skillResponse
@@ -18,7 +19,7 @@ const setStatusWhenPlayerDie = (gameStatus, player) => {
     _clearDeadPlayerInAllResponse(gameStatus, player)
 
     if (player.canRebirth) {
-        player.drawCards(gameStatus, 3)
+        ACTION.draw(gameStatus, player, 3)
         player.currentBlood = 3;
         delete player.canRebirth;
     } else {

@@ -42,10 +42,6 @@ const emitNotifyPandingPlayPublicCard = (gameStatus, pandingResultCard, player, 
 }
 
 const emitNotifyThrowPlayPublicCard = (gameStatus, data) => {
-    // export type EmitThrowData = {
-    //     cards: Card[],
-    //     playerId: string,
-    // }
     const io = gameStatus.io;
     const roomId = gameStatus.roomId;
     const {cards, playerId} = data
@@ -56,8 +52,18 @@ const emitNotifyThrowPlayPublicCard = (gameStatus, data) => {
     });
 }
 
+const emitNotifyRemoveCard = (gameStatus, originPlayer, targetPlayer, card) => {
+    const io = gameStatus.io;
+    const roomId = gameStatus.roomId;
+    io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PUBLIC_CARD, {
+        cards: [card],
+        fromId: targetPlayer.playerId,
+        type: ADD_TO_PUBLIC_CARD_TYPE.CHAI
+    });
+}
+
 // TO PLAYER EMIT
-const emitNotifyDrawCards = (gameStatus, cards, player) => {
+const emitNotifyDrawCards = (gameStatus, player, cards) => {
     const io = gameStatus.io;
     const roomId = gameStatus.roomId;
     io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PLAYER_CARD, {
@@ -68,58 +74,15 @@ const emitNotifyDrawCards = (gameStatus, cards, player) => {
     });
 }
 
- const emitNotifyCardBoardAction = (gameStatus, boardActionData) => {
-    // export type EmitCardBoardData = {
-    //     originId: string,
-    //     targetId: string,
-    //     card: Card,
-    //     action: PlayerBoardAction,
-    // }
+const emitNotifyMoveCards = (gameStatus, fromId, toId, cards, isPublic) => {
     const io = gameStatus.io;
     const roomId = gameStatus.roomId;
-    const {originId, targetId, card, action} = boardActionData
-    if (action == PLAYER_BOARD_ACTION.REMOVE) {
-        io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PUBLIC_CARD, {
-            cards: [boardActionData.card],
-            fromId: boardActionData.targetId,
-            type: ADD_TO_PUBLIC_CARD_TYPE.CHAI
-        });
-    } else {
-        const isPublic = !gameStatus.players[targetId].cards.find((c) => c.cardId == card.cardId)
 
-        io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PLAYER_CARD, {
-            cards: [card],
-            fromId: targetId,
-            toId: originId,
-            isPublic
-        });
-    }
-}
-
-const emitNotifyJieDaoWeaponOwnerChange = (gameStatus, weaponCard) => {
-    const io = gameStatus.io;
-    const action = gameStatus.action;
-    const roomId = gameStatus.roomId;
     io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PLAYER_CARD, {
-        cards: [weaponCard],
-        fromId: action.targetIds[0],
-        toId: action.originId,
-        isPublic: true,
-    });
-}
-
-// export type data = {
-//         cards: Card[],
-//         playerId: string,
-//     }
-const emitNotifyGetCardsFromTable = (gameStatus, data) => {
-    const io = gameStatus.io;
-    const roomId = gameStatus.roomId;
-    io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PLAYER_CARD, {
-        cards: data.cards,
-        fromId: CARD_LOCATION.TABLE,
-        toId: data.playerId,
-        isPublic: true,
+        cards,
+        fromId,
+        toId,
+        isPublic
     });
 }
 
@@ -211,14 +174,11 @@ const emitRefreshRoomPlayers = (io, roomId) => {
 exports.emitNotifyPlayPublicCard = emitNotifyPlayPublicCard;
 exports.emitNotifyPandingPlayPublicCard = emitNotifyPandingPlayPublicCard;
 exports.emitNotifyThrowPlayPublicCard = emitNotifyThrowPlayPublicCard;
-
-// TO PUBLIC OR TO PLAYER
-exports.emitNotifyCardBoardAction = emitNotifyCardBoardAction;
+exports.emitNotifyRemoveCard = emitNotifyRemoveCard;
 
 // TO PLAYER
 exports.emitNotifyDrawCards = emitNotifyDrawCards;
-exports.emitNotifyJieDaoWeaponOwnerChange = emitNotifyJieDaoWeaponOwnerChange;
-exports.emitNotifyGetCardsFromTable = emitNotifyGetCardsFromTable;
+exports.emitNotifyMoveCards = emitNotifyMoveCards;
 
 // ADD LINES
 exports.emitNotifyAddLines = emitNotifyAddLines;

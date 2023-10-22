@@ -1,3 +1,4 @@
+const {ACTION} = require("../../action/action");
 const {CARD_CONFIG} = require("../../config/cardConfig");
 const {findOnGoingEventSkill} = require("../../event/utils");
 const {ALL_EVENTS_KEY_CONFIG} = require("../../config/eventConfig");
@@ -9,7 +10,7 @@ const handleWei005LuoYiResponse = (gameStatus, response) => {
     onGoingGameStageEventSkill.done = true;
     const currentPlayer = getCurrentPlayer(gameStatus)
     if (chooseToReleaseSkill) {
-        currentPlayer.drawCards(gameStatus, 1);
+        ACTION.draw(gameStatus,currentPlayer,1)
         currentPlayer.extraDamageMap = {
             [CARD_CONFIG.SHA.key]: 1,
             [CARD_CONFIG.LEI_SHA.key]: 1,
@@ -18,7 +19,7 @@ const handleWei005LuoYiResponse = (gameStatus, response) => {
         }
         delete gameStatus.skillResponse
     } else {
-        currentPlayer.drawCards(gameStatus)
+        ACTION.draw(gameStatus,currentPlayer)
     }
 }
 

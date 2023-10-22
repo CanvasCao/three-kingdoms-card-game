@@ -18,7 +18,7 @@ const {
 const {SKILL_CONFIG} = require("../config/skillsConfig");
 const {setEventSkillResponse, findAllEventSkillsByTimingNameAndActionCard} = require("./utils");
 const {emitNotifyPandingPlayPublicCard, emitRefreshStatus} = require("../utils/emitUtils");
-const {throwCards, getCards, getActualCardColor} = require("../utils/cardUtils");
+const {moveCardsToDiscardPile, getCards, getActualCardColor} = require("../utils/cardUtils");
 const {last} = require("lodash");
 
 const generatePandingEventThenSetNextPandingEventSkill = (gameStatus, {originId, pandingNameKey}) => {
@@ -170,7 +170,7 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
 const handlePandingEventEnd = (gameStatus) => {
     const pandingEvent = gameStatus.pandingEvent;
     if (pandingEvent.pandingResultCardNeedThrow) {
-        throwCards(gameStatus, pandingEvent.pandingResultCard);
+        moveCardsToDiscardPile(gameStatus, pandingEvent.pandingResultCard);
     }
     delete gameStatus.pandingEvent;
 }
@@ -193,7 +193,7 @@ const executeNextOnePandingCard = (gameStatus) => {
     if (nextNeedPandingSign.isEffect === false) {
         if (isPandingLebusishu) {
             currentPlayer.removePandingSign(nextNeedPandingSign);
-            throwCards(gameStatus, pandingActualCard);
+            moveCardsToDiscardPile(gameStatus, pandingActualCard);
         } else if (isPandingShandian) {
             moveShandianToNextPlayer(gameStatus, nextNeedPandingSign)
         }

@@ -3,7 +3,7 @@ const {CARD_COLOR, CARD_HUASE} = require("../config/cardConfig");
 const {Card} = require("../model/Card");
 const {getInitCards} = require("../initCards")
 
-const throwCards = (gameStatus, cards) => {
+const moveCardsToDiscardPile = (gameStatus, cards) => {
     if (!cards) {
         return
     }
@@ -62,7 +62,7 @@ const getActualCardColor = (actualCard) => {
     }
 }
 
-exports.throwCards = throwCards;
+exports.moveCardsToDiscardPile = moveCardsToDiscardPile;
 exports.getCards = getCards;
 exports.everyoneGetInitialCards = everyoneGetInitialCards;
 exports.getActualCardColor = getActualCardColor;

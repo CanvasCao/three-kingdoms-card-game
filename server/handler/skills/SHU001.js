@@ -1,8 +1,12 @@
+const {ACTION} = require("../../action/action");
+
 const handleShu001RenDeAction = (gameStatus) => {
     const {cards, actualCard, originId, skillKey, targetIds = []} = gameStatus.action;
-    gameStatus.players[targetIds[0]].addCards(cards);
+    const originPlayer = gameStatus.players[originId];
+    const targetPlayer = gameStatus.players[targetIds[0]];
 
-    const originPlayer = gameStatus.players[originId]
+    ACTION.give(gameStatus, originPlayer, targetPlayer, cards)
+
     let prevGivenCardNumber = originPlayer.givenCardNumber;
     const givenCardNumber = prevGivenCardNumber + cards.length;
     if (prevGivenCardNumber < 2 && givenCardNumber >= 2) {

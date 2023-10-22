@@ -1,22 +1,18 @@
+const {ACTION} = require("../action/action");
 const {clearNextCardBoardResponse} = require("../utils/responseUtils");
 const {ALL_EVENTS_KEY_CONFIG} = require("../config/eventConfig");
 const {findOnGoingEventSkill} = require("../event/utils");
 const {CARD_BOARD_ACTION_TYPE} = require("../config/cardBoardConfig");
-const {throwCards} = require("../utils/cardUtils")
 const cardBoardHandler = {
-    // export type EmitCardBoardData = {
-    //     originId: string,
-    //     targetId: string,
-    //     card: Card,
-    //     action: PlayerBoardAction,
-    // }
     handleCardBoard(gameStatus, data) {
         const {card, originId, targetId, action} = data;
-        gameStatus.players[targetId].removeCards(card);
+        const originPlayer = gameStatus.players[originId]
+        const targetPlayer = gameStatus.players[targetId]
+
         if (action == CARD_BOARD_ACTION_TYPE.REMOVE) {
-            throwCards(gameStatus, card);
+            ACTION.remove(gameStatus, originPlayer, targetPlayer, card)
         } else if (action == CARD_BOARD_ACTION_TYPE.MOVE) {
-            gameStatus.players[originId].addCards(card);
+            ACTION.move(gameStatus, originPlayer, targetPlayer, card)
         }
 
         // 反馈 麒麟弓 寒冰剑

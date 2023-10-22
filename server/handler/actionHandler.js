@@ -1,27 +1,30 @@
 const {handleDrawCardsNumberWhenPlayImmediateScroll} = require("./skills/common");
 const strikeEvent = require("../event/strikeEvent");
 const {
-    EQUIPMENT_TYPE,
     SCROLL_CARDS_CONFIG,
 } = require("../config/cardConfig")
 const {
     getCurrentPlayer,
     getAllAlivePlayersStartFromFirstLocation
 } = require("../utils/playerUtils");
-const {
-    getCards,
-    throwCards
-} = require("../utils/cardUtils");
+const {getCards} = require("../utils/cardUtils");
+const {ACTION} = require("../action/action")
 
 const actionHandler = {
     setStatusByShaAction: (gameStatus) => {
         const {cards, actualCard, originId, skillKey, targetIds = []} = gameStatus.action;
+
+        ACTION.use(gameStatus, gameStatus.action)
+
         strikeEvent.generateUseStrikeEventsThenSetNextStrikeEventSkill(
             gameStatus, {originId, targetIds, cards, actualCard}
         );
     },
     setStatusByTaoAction: (gameStatus) => {
         const {cards, actualCard, originId, skillKey, targetIds = []} = gameStatus.action;
+
+        ACTION.use(gameStatus, gameStatus.action)
+
         const originPlayer = gameStatus.players[originId]
         originPlayer.addBlood();
     },
@@ -33,6 +36,8 @@ const actionHandler = {
         // 黄月英急智
         const originPlayer = gameStatus.players[originId]
         handleDrawCardsNumberWhenPlayImmediateScroll(gameStatus, originPlayer)
+
+        ACTION.use(gameStatus, gameStatus.action)
 
         // targetIds 只有顺和拆 originId targetIds的值和action一样
         if (actualCard.key == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.key ||
@@ -163,51 +168,15 @@ const actionHandler = {
     // DELAY
     setStatusByDelayScrollAction: (gameStatus) => {
         const {cards, actualCard, originId, skillKey, targetIds = []} = gameStatus.action;
-
-        const targetPlayer = gameStatus.players[targetIds[0]]
-        const originPlayer = gameStatus.players[originId]
-        const actualCardKey = actualCard?.key
-        if (actualCardKey === SCROLL_CARDS_CONFIG.SHAN_DIAN.key) {
-            originPlayer.pandingSigns.push({
-                card: cards[0],
-                actualCard,
-            });
-        } else if (actualCardKey === SCROLL_CARDS_CONFIG.LE_BU_SI_SHU.key) {
-            targetPlayer.pandingSigns.push({
-                card: cards[0],
-                actualCard,
-            });
-        }
+        ACTION.use(gameStatus, gameStatus.action)
     },
 
     // Equipment
     setStatusByEquipmentAction: (gameStatus) => {
         const {cards, actualCard, originId, skillKey, targetIds = []} = gameStatus.action;
-
         const originPlayer = gameStatus.players[originId]
         const equipmentCard = cards[0]
-        const equipmentType = equipmentCard.equipmentType;
-        if (equipmentType == EQUIPMENT_TYPE.PLUS_HORSE) {
-            if (originPlayer.plusHorseCard) {
-                throwCards(gameStatus, originPlayer.plusHorseCard);
-            }
-            originPlayer.plusHorseCard = equipmentCard;
-        } else if (equipmentType == EQUIPMENT_TYPE.MINUS_HORSE) {
-            if (originPlayer.minusHorseCard) {
-                throwCards(gameStatus, originPlayer.minusHorseCard);
-            }
-            originPlayer.minusHorseCard = equipmentCard;
-        } else if (equipmentType == EQUIPMENT_TYPE.WEAPON) {
-            if (originPlayer.weaponCard) {
-                throwCards(gameStatus, originPlayer.weaponCard);
-            }
-            originPlayer.weaponCard = equipmentCard;
-        } else if (equipmentType == EQUIPMENT_TYPE.SHIELD) {
-            if (originPlayer.shieldCard) {
-                throwCards(gameStatus, originPlayer.shieldCard);
-            }
-            originPlayer.shieldCard = equipmentCard;
-        }
+        ACTION.equip(gameStatus, originPlayer, equipmentCard)
     },
 }
 

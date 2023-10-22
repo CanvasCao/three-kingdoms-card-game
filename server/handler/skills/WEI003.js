@@ -4,7 +4,7 @@ const {generateDamageEventThenSetNextDamageEventSkill} = require("../../event/da
 const {findOnGoingEventSkill} = require("../../event/utils");
 const {findOnGoingEvent} = require("../../event/utils");
 const {ALL_EVENTS_KEY_CONFIG} = require("../../config/eventConfig");
-const {throwCards} = require("../../utils/cardUtils");
+const {ACTION} = require("../../action/action")
 
 const handleWei003GangLieResponse = (gameStatus, response) => {
     const chooseToReleaseSkill = response.chooseToResponse;
@@ -40,8 +40,7 @@ const handleWei003GangLieResponse = (gameStatus, response) => {
             pandingNameKey: onGoingDamageEventSkill.skillKey
         })
     } else {
-        originPlayer.removeCards(response.cards);
-        throwCards(gameStatus, response.cards);
+        ACTION.discard(gameStatus,originPlayer,response.cards)
 
         onGoingDamageEventSkill.releaseCards = response.cards
         onGoingDamageEventSkill.done = true;

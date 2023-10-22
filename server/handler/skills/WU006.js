@@ -2,7 +2,7 @@ const {findOnGoingEventSkill} = require("../../event/utils");
 const {findOnGoingEvent} = require("../../event/utils");
 const {ALL_EVENTS_KEY_CONFIG} = require("../../config/eventConfig");
 const {emitNotifyAddLines} = require("../../utils/emitUtils");
-const {throwCards} = require("../../utils/cardUtils");
+const {ACTION} = require("../../action/action")
 
 const handleWu006LiuLiResponse = (gameStatus, response) => {
     const chooseToReleaseSkill = response.chooseToResponse;
@@ -19,9 +19,7 @@ const handleWu006LiuLiResponse = (gameStatus, response) => {
     if (onGoingUseStrikeEventSkill.chooseToReleaseSkill === undefined) {
         onGoingUseStrikeEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
     } else {
-        originPlayer.removeCards(response.cards);
-        throwCards(gameStatus, response.cards);
-
+        ACTION.discard(gameStatus, originPlayer, response.cards)
         emitNotifyAddLines(gameStatus, {
             fromId: onGoingUseStrikeEvent.targetId,
             toIds: response.skillTargetIds

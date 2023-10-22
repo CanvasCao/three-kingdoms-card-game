@@ -33,15 +33,7 @@ const {
 const {
     emitRefreshStatus,
     emitInit,
-    emitNotifyPlayPublicCard,
-    emitNotifyCardBoardAction,
-    emitNotifyAddLines,
-    emitNotifyThrowPlayPublicCard,
-    emitNotifyGetCardsFromTable,
 } = require("../utils/emitUtils");
-const {
-    throwCards
-} = require("../utils/cardUtils");
 const {actionHandler} = require("../handler/actionHandler");
 const {responseCardHandler} = require("../handler/responseHandler");
 const {throwHandler} = require("../handler/throwHandler");
@@ -137,24 +129,7 @@ class GameEngine {
         const {originId, targetIds, actualCard, cards, skillKey} = action;
         this.gameStatus.action = action;
 
-        // 日志
-        this.gameStatus.log.addLog({
-            roundNumber: this.gameStatus.stage.getRoundNumber(),
-            whoseRoundId: getCurrentPlayer(this.gameStatus).playerId,
-            playerId: originId, addType: USE_OR_PLAY_CONFIG.USE,
-            card: actualCard
-        })
-
-        // 从手牌移除
-        this.gameStatus.players[originId].removeCards(cards);
-
-        emitNotifyPlayPublicCard(this.gameStatus, action);
-        emitNotifyAddLines(this.gameStatus, {
-            fromId: originId,
-            toIds: targetIds,
-            actualCard
-        });
-
+        // 使用技能
         if (!actualCard?.key) {
             switch (skillKey) {
                 case SKILL_CONFIG.SHU001_REN_DE.key:
@@ -165,18 +140,25 @@ class GameEngine {
                     break;
                 case SKILL_CONFIG.WU001_ZHI_HENG.key:
                     handleWu001ZhiHengAction(this.gameStatus);
-                    throwCards(this.gameStatus, cards);
                     break;
             }
-        } else {
+        }
+        // 出牌
+        else {
+            // 出牌日志
+            this.gameStatus.log.addLog({
+                roundNumber: this.gameStatus.stage.getRoundNumber(),
+                whoseRoundId: getCurrentPlayer(this.gameStatus).playerId,
+                playerId: originId, addType: USE_OR_PLAY_CONFIG.USE,
+                card: actualCard
+            })
+
             const cardType = CARD_CONFIG[actualCard?.key].type;
             // BASIC
             if (ALL_SHA_CARD_KEYS.includes(actualCard?.key)) {
                 actionHandler.setStatusByShaAction(this.gameStatus);
-                throwCards(this.gameStatus, cards);
             } else if (actualCard?.key == BASIC_CARDS_CONFIG.TAO.key) {
                 actionHandler.setStatusByTaoAction(this.gameStatus);
-                throwCards(this.gameStatus, cards);
             }
             // Equipment
             else if (CARD_TYPE.EQUIPMENT == cardType) {
@@ -188,7 +170,6 @@ class GameEngine {
                     actionHandler.setStatusByDelayScrollAction(this.gameStatus);
                 } else {
                     actionHandler.setStatusByScrollAction(this.gameStatus);
-                    throwCards(this.gameStatus, cards);
                 }
             }
         }
@@ -201,7 +182,6 @@ class GameEngine {
     handleResponse(response) {
         const {actualCard, originId} = response
         const responseType = getResponseType(this.gameStatus);
-        emitNotifyPlayPublicCard(this.gameStatus, response);
 
         // 日志
         this.gameStatus.log.addLog({
@@ -252,8 +232,6 @@ class GameEngine {
     }
 
     handleThrowCards(data) {
-        emitNotifyThrowPlayPublicCard(this.gameStatus, data);
-
         throwHandler.handleThrowCards(this.gameStatus, data)
         emitRefreshStatus(this.gameStatus);
 
@@ -262,8 +240,6 @@ class GameEngine {
     }
 
     handleCardBoardAction(data) {
-        emitNotifyCardBoardAction(this.gameStatus, data)
-
         cardBoardHandler.handleCardBoard(this.gameStatus, data)
 
         // 第一个目标求闪/桃之后 继续找马超下一个铁骑的技能
@@ -279,8 +255,6 @@ class GameEngine {
     }
 
     handleWuguBoardAction(data) {
-        emitNotifyGetCardsFromTable(this.gameStatus, {...data, cards: [data.card]});
-
         wuguBoardHandler.handleWuGuBoard(this.gameStatus, data)
 
         // 下一个五谷丰登

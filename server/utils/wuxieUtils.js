@@ -1,3 +1,4 @@
+const {ACTION} = require("../action/action");
 const {generateResponseCardEventThenSetNextResponseCardEventSkill} = require("../event/responseCardEvent");
 const {STAGE_NAME} = require("../config/gameAndStageConfig");
 const {getNextNeedExecutePandingSign} = require("./pandingUtils");
@@ -65,8 +66,7 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
         const curScrollResponse = scrollResponses[0]
         if (isScrollEffected) {// 生效
             if (curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.key) {
-                const player = getCurrentPlayer(gameStatus)
-                player.drawCards(gameStatus);
+                ACTION.draw(gameStatus, getCurrentPlayer(gameStatus))
                 clearNextScrollResponse(gameStatus);
             } else if (curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.key) {
                 gameStatus.players[curScrollResponse.originId].addBlood();
