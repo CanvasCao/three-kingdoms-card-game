@@ -1,3 +1,4 @@
+const {SCROLL_CARDS_CONFIG} = require("./cardConfig");
 const {SKILL_CONFIG} = require("./skillsConfig");
 
 const HERO_STATIC_CONFIG = {
@@ -65,13 +66,17 @@ const HERO_STATIC_CONFIG = {
         maxBlood: 4,
         gender: 1
     },
-    WU004:{
+    WU004: {
         maxBlood: 4,
         gender: 1
     },
     WU006: {
         maxBlood: 3,
         gender: 0
+    },
+    WU007: {
+        maxBlood: 3,
+        gender: 1
     },
 
     // QUN
@@ -97,11 +102,13 @@ const HERO_SKILL_DYNAMIC_CONFIG = {
     },
     SHU007_JI_ZHI: {
         drawCardsNumberWhenPlayImmediateScroll: 1,
-
     },
     SHU007_QI_CAI: {
         bingLiangRange: 100,
         shunRange: 100,
+    },
+    WU007_QIAN_XUN: {
+        cantBeTargetKeys: [SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.key, SCROLL_CARDS_CONFIG.LE_BU_SI_SHU.key]
     },
     QUN002_WU_SHUANG: {
         responseStrikeNumber: 2,
@@ -118,7 +125,7 @@ const HERO_SKILLS_CONFIG = {
     WEI003: [SKILL_CONFIG.WEI003_GANG_LIE],
     WEI004: [SKILL_CONFIG.WEI004_TU_XI],
     WEI005: [SKILL_CONFIG.WEI005_LUO_YI],
-    WEI007: [SKILL_CONFIG.WEI007_QING_GUO,SKILL_CONFIG.WEI007_LUO_SHEN],
+    WEI007: [SKILL_CONFIG.WEI007_QING_GUO, SKILL_CONFIG.WEI007_LUO_SHEN],
 
     SHU001: [SKILL_CONFIG.SHU001_REN_DE],
     SHU002: [SKILL_CONFIG.SHU002_WU_SHENG],
@@ -132,6 +139,8 @@ const HERO_SKILLS_CONFIG = {
     WU003: [SKILL_CONFIG.WU003_KE_JI],
     WU004: [SKILL_CONFIG.WU004_KU_ROU],
     WU006: [SKILL_CONFIG.WU006_GUO_SE, SKILL_CONFIG.WU006_LIU_LI],
+    WU007: [SKILL_CONFIG.WU007_QIAN_XUN, SKILL_CONFIG.WU007_LIAN_YING],
+
     QUN002: [SKILL_CONFIG.QUN002_WU_SHUANG],
     SP001: [SKILL_CONFIG.SP001_CHONG_SHENG],
 }
