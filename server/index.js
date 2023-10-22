@@ -125,6 +125,7 @@ io.on('connection', (socket) => {
         if (rooms.getRoomPlayers(roomId).length <= 0) {
             if (process.env.NODE_ENV == 'production') {
                 rooms.setRoomEngine(roomId, null)
+                rooms.setRoomStatus(roomId, GAME_STATUS.IDLE)
             } else {
                 // keepalive for FE debug
             }

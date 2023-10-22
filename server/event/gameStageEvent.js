@@ -65,6 +65,8 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
     const originId = currentPlayer.playerId
 
     if (eventTimingTracker.length == 0) {
+        stage.setStageName(STAGE_NAME.START);
+
         const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_WHEN_PREPARE
         const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, originId})
         eventTimingTracker.push({eventTimingName, eventTimingSkills})
