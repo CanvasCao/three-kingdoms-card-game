@@ -1,3 +1,5 @@
+const {CARD_LOCATION} = require("../config/cardConfig");
+const {emitNotifyPublicCards} = require("../utils/emitUtils");
 const {clearSkillResponse} = require("../utils/responseUtils");
 const {STAGE_NAME} = require("../config/gameAndStageConfig");
 const {clearCardResponse} = require("../utils/responseUtils");
@@ -17,7 +19,7 @@ const {
 } = require("../config/cardConfig");
 const {SKILL_CONFIG} = require("../config/skillsConfig");
 const {setEventSkillResponse, findAllEventSkillsByTimingNameAndActionCard} = require("./utils");
-const {emitNotifyPandingPlayPublicCard, emitRefreshStatus} = require("../utils/emitUtils");
+const {emitRefreshStatus} = require("../utils/emitUtils");
 const {moveCardsToDiscardPile, getCards, getActualCardColor} = require("../utils/cardUtils");
 const {last} = require("lodash");
 
@@ -31,8 +33,14 @@ const generatePandingEventThenSetNextPandingEventSkill = (gameStatus, {originId,
         pandingResultCard,
         pandingResultCardNeedThrow: true,
     }
-    emitRefreshStatus(gameStatus); //为了显示判定Board
-    emitNotifyPandingPlayPublicCard(gameStatus, pandingResultCard, gameStatus.players[originId], pandingNameKey);
+    emitRefreshStatus(gameStatus); // 为了显示判定Board
+
+    emitNotifyPublicCards(gameStatus, {
+        cards: [pandingResultCard],
+        fromId: CARD_LOCATION.PAIDUI,
+        pandingPlayerId: gameStatus.players[originId],
+        pandingNameKey,
+    })
     setNextPandingEventSkill(gameStatus);
 }
 

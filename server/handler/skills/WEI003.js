@@ -40,7 +40,7 @@ const handleWei003GangLieResponse = (gameStatus, response) => {
             pandingNameKey: onGoingDamageEventSkill.skillKey
         })
     } else {
-        ACTION.discard(gameStatus,originPlayer,response.cards)
+        ACTION.discard(gameStatus, originPlayer, response.cards,SKILL_CONFIG.WEI003_GANG_LIE.key)
 
         onGoingDamageEventSkill.releaseCards = response.cards
         onGoingDamageEventSkill.done = true;

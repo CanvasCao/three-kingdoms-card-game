@@ -48,7 +48,7 @@ const handleWei002GuiCaiResponse = (gameStatus, response) => {
     if (onGoingPandingEventSkill.chooseToReleaseSkill === undefined) {
         onGoingPandingEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
     } else { // 发动+改判
-        ACTION.gaiPan(gameStatus, originPlayer, response.cards, onGoingPandingEvent.pandingResultCard)
+        ACTION.gaiPan(gameStatus, originPlayer, response.cards, onGoingPandingEvent.pandingResultCard,SKILL_CONFIG.WEI002_GUI_CAI.key)
 
         onGoingPandingEvent.pandingResultCard = response.cards[0]
         onGoingPandingEventSkill.releaseCards = response.cards

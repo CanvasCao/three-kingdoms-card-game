@@ -1,5 +1,4 @@
 const {Rooms} = require("../model/Rooms");
-const {PLAYER_BOARD_ACTION} = require("../config/boardConfig");
 const {teamMembers} = require("./roomUtils");
 const {EMIT_TYPE} = require("../config/emitConfig");
 const {GAME_STATUS} = require("../config/gameAndStageConfig");
@@ -8,7 +7,7 @@ const {ADD_TO_PUBLIC_CARD_TYPE} = require("../config/emitConfig");
 const {omit} = require("lodash")
 
 // TO PUBLIC EMIT
-const emitNotifyPlayPublicCard = (gameStatus, behaviour) => {
+const emitNotifyPlayPublicCards = (gameStatus, behaviour) => {
     // behaviour is action/response
     if (!behaviour) {
         throw new Error("need behaviour")
@@ -21,7 +20,7 @@ const emitNotifyPlayPublicCard = (gameStatus, behaviour) => {
         io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PUBLIC_CARD, {
             fromId: behaviour.originId,
             originId: behaviour.originId,
-            targetId: behaviour.targetId,
+            targetIds: behaviour.targetIds,
             cards: behaviour.cards,
             type: ADD_TO_PUBLIC_CARD_TYPE.PLAY,
             skillKey: behaviour.skillKey,
@@ -29,36 +28,17 @@ const emitNotifyPlayPublicCard = (gameStatus, behaviour) => {
     }
 }
 
-const emitNotifyPandingPlayPublicCard = (gameStatus, pandingResultCard, player, pandingNameKey) => {
+const emitNotifyPublicCards = (gameStatus, {fromId, cards, pandingPlayerId, pandingNameKey, type, skillKey}) => {
     const io = gameStatus.io;
     const roomId = gameStatus.roomId;
-    io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PUBLIC_CARD, {
-        cards: [pandingResultCard],
-        fromId: CARD_LOCATION.PAIDUI,
-        pandingPlayerId: player.playerId,
-        pandingNameKey,
-        type: ADD_TO_PUBLIC_CARD_TYPE.PANDING
-    });
-}
 
-const emitNotifyThrowPlayPublicCard = (gameStatus, data) => {
-    const io = gameStatus.io;
-    const roomId = gameStatus.roomId;
-    const {cards, playerId} = data
     io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PUBLIC_CARD, {
         cards,
-        fromId: playerId,
-        type: ADD_TO_PUBLIC_CARD_TYPE.THROW
-    });
-}
-
-const emitNotifyRemoveCard = (gameStatus, originPlayer, targetPlayer, card) => {
-    const io = gameStatus.io;
-    const roomId = gameStatus.roomId;
-    io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PUBLIC_CARD, {
-        cards: [card],
-        fromId: targetPlayer.playerId,
-        type: ADD_TO_PUBLIC_CARD_TYPE.CHAI
+        fromId,
+        pandingPlayerId,
+        pandingNameKey,
+        type,
+        skillKey
     });
 }
 
@@ -171,10 +151,8 @@ const emitRefreshRoomPlayers = (io, roomId) => {
 }
 
 // TO PUBLIC
-exports.emitNotifyPlayPublicCard = emitNotifyPlayPublicCard;
-exports.emitNotifyPandingPlayPublicCard = emitNotifyPandingPlayPublicCard;
-exports.emitNotifyThrowPlayPublicCard = emitNotifyThrowPlayPublicCard;
-exports.emitNotifyRemoveCard = emitNotifyRemoveCard;
+exports.emitNotifyPlayPublicCards = emitNotifyPlayPublicCards;
+exports.emitNotifyPublicCards = emitNotifyPublicCards;
 
 // TO PLAYER
 exports.emitNotifyDrawCards = emitNotifyDrawCards;

@@ -1,10 +1,11 @@
-const {emitNotifyThrowPlayPublicCard} = require("../utils/emitUtils");
+const {ADD_TO_PUBLIC_CARD_TYPE} = require("../config/emitConfig");
+const {emitNotifyPublicCards} = require("../utils/emitUtils");
 const {SCROLL_CARDS_CONFIG} = require("../config/cardConfig");
 const {EQUIPMENT_TYPE} = require("../config/cardConfig");
 const {emitNotifyAddLines} = require("../utils/emitUtils");
-const {emitNotifyPlayPublicCard} = require("../utils/emitUtils");
+const {emitNotifyPlayPublicCards} = require("../utils/emitUtils");
 const {getCards} = require("../utils/cardUtils");
-const {emitNotifyDrawCards, emitNotifyRemoveCard, emitNotifyMoveCards} = require("../utils/emitUtils");
+const {emitNotifyDrawCards, emitNotifyMoveCards} = require("../utils/emitUtils");
 const {moveCardsToDiscardPile} = require("../utils/cardUtils")
 
 const ACTION = {
@@ -32,7 +33,7 @@ const ACTION = {
             }
         }
 
-        emitNotifyPlayPublicCard(gameStatus, action);
+        emitNotifyPlayPublicCards(gameStatus, action);
         emitNotifyAddLines(gameStatus, {
             fromId: originId,
             toIds: targetIds,
@@ -40,7 +41,7 @@ const ACTION = {
         });
     },
     equip(gameStatus, player, card) {
-        emitNotifyPlayPublicCard(gameStatus, gameStatus.action);
+        emitNotifyPlayPublicCards(gameStatus, gameStatus.action);
         player.removeCards(card)
 
         const equipmentType = card.equipmentType;
@@ -74,12 +75,12 @@ const ACTION = {
         const {cards, actualCard, originId, skillKey} = response
         gameStatus.players[originId].removeCards(cards);
         moveCardsToDiscardPile(gameStatus, response.cards);
-        emitNotifyPlayPublicCard(gameStatus, response);
+        emitNotifyPlayPublicCards(gameStatus, response);
     },
     remove(gameStatus, originPlayer, targetPlayer, card) {
         targetPlayer.removeCards(card);
         moveCardsToDiscardPile(gameStatus, card);
-        emitNotifyRemoveCard(gameStatus, originPlayer, targetPlayer, card)
+        emitNotifyPublicCards(gameStatus, {fromId: targetPlayer.playerId, cards: [card], type: ADD_TO_PUBLIC_CARD_TYPE.CHAI})
     },
     move(gameStatus, originPlayer, targetPlayer, card) {
         targetPlayer.removeCards(card);
@@ -102,20 +103,22 @@ const ACTION = {
         player.addCards(cards);
         emitNotifyDrawCards(gameStatus, player, cards)
     },
-    discard(gameStatus, player, cards) {
+    discard(gameStatus, player, cards, skillKey) {
         player.removeCards(cards);
         moveCardsToDiscardPile(gameStatus, cards);
+        emitNotifyPublicCards(gameStatus, {fromId: player.playerId, cards, skillKey})
     },
     get() {
     },
-    gaiPan(gameStatus, originPlayer, cards, pandingResultCard) {
-        originPlayer.removeCards(cards);
+    gaiPan(gameStatus, player, cards, pandingResultCard, skillKey) {
+        player.removeCards(cards);
         moveCardsToDiscardPile(gameStatus, pandingResultCard);
+        emitNotifyPublicCards(gameStatus, {fromId: player.playerId, cards, type: ADD_TO_PUBLIC_CARD_TYPE.THROW, skillKey})
     },
     throw(gameStatus, player, cards) {
         player.removeCards(cards);
         moveCardsToDiscardPile(gameStatus, cards);
-        emitNotifyThrowPlayPublicCard(gameStatus, {cards, playerId: player.playerId});
+        emitNotifyPublicCards(gameStatus, {fromId: player.playerId, cards, type: ADD_TO_PUBLIC_CARD_TYPE.THROW})
     }
 }
 

@@ -1,6 +1,5 @@
 const ADD_TO_PUBLIC_CARD_TYPE = {
     PLAY: "PLAY",
-    PANDING: "PANDING",
     THROW: "THROW",
     CHAI: "CHAI",
 }

@@ -1,7 +1,6 @@
-const {moveCardsToDiscardPile} = require("../utils/cardUtils");
-const {emitNotifyThrowPlayPublicCard} = require("../utils/emitUtils");
 const {Card} = require("./Card");
 const {differenceBy} = require("lodash/array");
+const {ACTION} = require("../action/action");
 
 class Player {
     constructor(player) {
@@ -155,15 +154,7 @@ class Player {
             ...this.pandingSigns.map((sign) => sign.actualCard),
         ].filter(x => !!x)
 
-        emitNotifyThrowPlayPublicCard(gameStatus, {cards: needThrowCards, playerId: this.playerId})
-        moveCardsToDiscardPile(gameStatus, needThrowCards);
-
-        this.cards = [];
-        this.pandingSigns = [];
-        this.weaponCard = null;
-        this.shieldCard = null;
-        this.plusHorseCard = null;
-        this.minusHorseCard = null;
+        ACTION.throw(gameStatus, gameStatus.players[this.playerId], needThrowCards)
         this.isTieSuo = false;
     }
 }

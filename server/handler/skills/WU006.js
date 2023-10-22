@@ -19,7 +19,7 @@ const handleWu006LiuLiResponse = (gameStatus, response) => {
     if (onGoingUseStrikeEventSkill.chooseToReleaseSkill === undefined) {
         onGoingUseStrikeEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
     } else {
-        ACTION.discard(gameStatus, originPlayer, response.cards)
+        ACTION.discard(gameStatus, originPlayer, response.cards, SKILL_CONFIG.WU006_LIU_LI.key)
         emitNotifyAddLines(gameStatus, {
             fromId: onGoingUseStrikeEvent.targetId,
             toIds: response.skillTargetIds

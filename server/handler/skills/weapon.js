@@ -28,7 +28,7 @@ const handleCiXiongShuangGuJianResponse = (gameStatus, response) => {
         onGoingUseStrikeEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
         gameStatus.skillResponse.playerId = onGoingUseStrikeEvent.targetId;// 修改技能使用人的目标
     } else {
-        ACTION.discard(gameStatus, originPlayer, response.cards)
+        ACTION.discard(gameStatus, originPlayer, response.cards, EQUIPMENT_CARDS_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key)
 
         onGoingUseStrikeEventSkill.releaseCards = response.cards
         onGoingUseStrikeEventSkill.done = true;
@@ -75,7 +75,7 @@ const handleGuanShiFuResponse = (gameStatus, response) => {
     if (onGoingUseStrikeEventSkill.chooseToReleaseSkill === undefined) {
         onGoingUseStrikeEventSkill.chooseToReleaseSkill = chooseToReleaseSkill
     } else {
-        ACTION.discard(gameStatus, originPlayer, response.cards)
+        ACTION.discard(gameStatus, originPlayer, response.cards, EQUIPMENT_CARDS_CONFIG.GUAN_SHI_FU.key)
 
         onGoingUseStrikeEventSkill.done = true;
         delete gameStatus.skillResponse;
