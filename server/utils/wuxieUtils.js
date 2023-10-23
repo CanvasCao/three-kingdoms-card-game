@@ -64,7 +64,7 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
     // 即时锦囊
     else if (scrollResponses.length > 0) {
         const curScrollResponse = scrollResponses[0]
-        if (isScrollEffected) {// 生效
+        if (isScrollEffected) { // 生效
             if (curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.key) {
                 ACTION.draw(gameStatus, getCurrentPlayer(gameStatus))
                 clearNextScrollResponse(gameStatus);
@@ -94,7 +94,7 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
                 curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.GUO_HE_CHAI_QIAO.key
             ) {
                 const targetPlayer = gameStatus.players[curScrollResponse.targetId]
-                if (targetPlayer.hasAnyCards()) {
+                if (targetPlayer.hasAnyCardsOrPandingCards()) {
                     gameStatus.cardBoardResponses = [{
                         originId: curScrollResponse.originId,
                         targetId: curScrollResponse.targetId,

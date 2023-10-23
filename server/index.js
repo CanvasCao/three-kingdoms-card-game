@@ -165,6 +165,10 @@ io.on('connection', (socket) => {
         rooms.getRoomEngine(roomId)?.handleHeroSelectBoardAction(data);
     });
 
+    socket.on(EMIT_TYPE.FANJIAN_BOARD_ACTION, (data) => {
+        rooms.getRoomEngine(roomId)?.handleFanJianBoardAction(data);
+    });
+
     socket.on(EMIT_TYPE.END_PLAY, () => {
         rooms.getRoomEngine(roomId)?.handleEndPlay();
     });

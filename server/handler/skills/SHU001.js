@@ -5,7 +5,7 @@ const handleShu001RenDeAction = (gameStatus) => {
     const originPlayer = gameStatus.players[originId];
     const targetPlayer = gameStatus.players[targetIds[0]];
 
-    ACTION.give(gameStatus, originPlayer, targetPlayer, cards)
+    ACTION.give(gameStatus, originPlayer, targetPlayer, cards, false)
 
     let prevGivenCardNumber = originPlayer.givenCardNumber;
     const givenCardNumber = prevGivenCardNumber + cards.length;

@@ -1,4 +1,6 @@
 const sampleSize = require("lodash/sampleSize");
+const {fanjianBoardHandler} = require("../handler/fanjianBoardHandler");
+const {handleWu005FanJianAction} = require("../handler/skills/WU005");
 const {USE_OR_PLAY_CONFIG} = require("./Log");
 const {Log} = require("./Log");
 const {Stage} = require("./Stage");
@@ -58,6 +60,7 @@ class GameEngine {
 
             // cardBoard
             cardBoardResponses: [],
+            fanjianBoardResponse: undefined,
 
             // 锦囊
             scrollResponses: [],
@@ -140,6 +143,9 @@ class GameEngine {
                     break;
                 case SKILL_CONFIG.WU001_ZHI_HENG.key:
                     handleWu001ZhiHengAction(this.gameStatus);
+                    break;
+                case SKILL_CONFIG.WU005_FAN_JIAN.key:
+                    handleWu005FanJianAction(this.gameStatus);
                     break;
             }
         }
@@ -259,6 +265,13 @@ class GameEngine {
 
         // 下一个五谷丰登
         trySettleNextScroll(this.gameStatus)
+        emitRefreshStatus(this.gameStatus);
+    }
+
+    handleFanJianBoardAction(data) {
+        fanjianBoardHandler.handleFanJianBoard(this.gameStatus, data)
+
+        tryFindNextSkillResponse(this.gameStatus)
         emitRefreshStatus(this.gameStatus);
     }
 

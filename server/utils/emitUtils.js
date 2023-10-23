@@ -58,8 +58,10 @@ const emitNotifyMoveCards = (gameStatus, fromId, toId, cards, isPublic) => {
     const io = gameStatus.io;
     const roomId = gameStatus.roomId;
 
+    const movingCards = Array.isArray(cards) ? cards : [cards]
+
     io.to(roomId).emit(EMIT_TYPE.NOTIFY_ADD_TO_PLAYER_CARD, {
-        cards,
+        cards: movingCards,
         fromId,
         toId,
         isPublic

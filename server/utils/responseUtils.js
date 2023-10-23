@@ -16,6 +16,10 @@ const clearNextCardBoardResponse = (gameStatus) => {
     gameStatus.cardBoardResponses.shift();
 }
 
+const clearFanJianBoardResponse = (gameStatus) => {
+    gameStatus.fanjianBoardResponse = undefined;
+}
+
 const clearNextScrollResponse = (gameStatus) => {
     gameStatus.scrollResponses.shift();
 }
@@ -33,6 +37,7 @@ const clearAllResponses = (gameStatus) => {
     gameStatus.skillResponse = undefined;
     gameStatus.taoResponses = [];
     gameStatus.cardBoardResponses = [];
+    gameStatus.fanjianBoardResponse = undefined;
     gameStatus.scrollResponses = [];
 }
 
@@ -45,6 +50,8 @@ const getResponseType = (gameStatus) => {
         return RESPONSE_TYPE_CONFIG.SKILL;
     } else if (gameStatus.cardBoardResponses.length > 0) {
         return RESPONSE_TYPE_CONFIG.CARD_BOARD;
+    } else if (gameStatus.fanjianBoardResponse) {
+        return RESPONSE_TYPE_CONFIG.FAN_JIAN_BOARD;
     } else if (gameStatus.wuxieSimultaneousResponse?.hasWuxiePlayerIds?.length > 0) {
         return RESPONSE_TYPE_CONFIG.WUXIE;
     } else if (gameStatus.scrollResponses.length > 0) {
@@ -58,6 +65,7 @@ const ifAnyPlayerNeedToResponse = (gameStatus) => {
         gameStatus.taoResponses.length > 0 ||
         gameStatus.scrollResponses.length > 0 ||
         gameStatus.cardBoardResponses.length > 0 ||
+        gameStatus.fanjianBoardResponse ||
         gameStatus.wuxieSimultaneousResponse.hasWuxiePlayerIds.length > 0
     ) {
         return true
@@ -67,6 +75,7 @@ const ifAnyPlayerNeedToResponse = (gameStatus) => {
 
 exports.clearNextTaoResponse = clearNextTaoResponse;
 exports.clearNextCardBoardResponse = clearNextCardBoardResponse;
+exports.clearFanJianBoardResponse = clearFanJianBoardResponse;
 exports.clearCardResponse = clearCardResponse;
 exports.clearSkillResponse = clearSkillResponse;
 exports.clearNextScrollResponse = clearNextScrollResponse;

@@ -4,9 +4,9 @@ const handleWu001ZhiHengAction = (gameStatus) => {
     const {cards, actualCard, originId, skillKey, targetIds = []} = gameStatus.action;
     const player = gameStatus.players[originId]
 
-    ACTION.discard(gameStatus,player,cards,SKILL_CONFIG.WU001_ZHI_HENG.key)
+    ACTION.discard(gameStatus, player, cards, SKILL_CONFIG.WU001_ZHI_HENG.key)
     ACTION.draw(gameStatus, player, cards.length)
-    player.zhiHengTimes++
+    player.addUseSkillTimes(SKILL_CONFIG.WU001_ZHI_HENG.key);
 }
 
 exports.handleWu001ZhiHengAction = handleWu001ZhiHengAction;

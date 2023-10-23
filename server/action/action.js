@@ -14,7 +14,6 @@ const ACTION = {
         const isDelayScroll = SCROLL_CARDS_CONFIG[actualCard?.key]?.isDelay
         this._removeCard(gameStatus, gameStatus.players[originId], cards)
 
-
         if (!isDelayScroll) {
             moveCardsToDiscardPile(gameStatus, cards);
         } else {
@@ -79,43 +78,45 @@ const ACTION = {
         moveCardsToDiscardPile(gameStatus, response.cards);
         emitNotifyPlayPublicCards(gameStatus, response);
     },
+
     remove(gameStatus, originPlayer, targetPlayer, card) {
         this._removeCard(gameStatus, targetPlayer, card)
         moveCardsToDiscardPile(gameStatus, card);
         emitNotifyPublicCards(gameStatus, {fromId: targetPlayer.playerId, cards: [card], type: ADD_TO_PUBLIC_CARD_TYPE.CHAI})
     },
     move(gameStatus, originPlayer, targetPlayer, card) {
-        this._removeCard(gameStatus, targetPlayer, card)
         originPlayer.addCards(card);
+        this._removeCard(gameStatus, targetPlayer, card)
 
         const isPublic = !targetPlayer.cards.find((c) => c.cardId == card.cardId)
         emitNotifyMoveCards(gameStatus, targetPlayer.playerId, originPlayer.playerId, [card], isPublic)
     },
-    give(gameStatus, originPlayer, targetPlayer, cards) {
+
+    give(gameStatus, originPlayer, targetPlayer, cards, isPublic) {
         targetPlayer.addCards(cards);
         this._removeCard(gameStatus, originPlayer, cards)
 
-        emitNotifyMoveCards(gameStatus, originPlayer.playerId, targetPlayer.playerId, cards, false)
-        emitNotifyAddLines(gameStatus, {
-            fromId: originPlayer.playerId,
-            toIds: targetPlayer.playerId,
-        });
+        emitNotifyMoveCards(gameStatus, originPlayer.playerId, targetPlayer.playerId, cards, isPublic)
     },
+
     draw(gameStatus, player, number = 2) {
         const cards = getCards(gameStatus, number)
         player.addCards(cards);
         emitNotifyDrawCards(gameStatus, player, cards)
     },
+
     discard(gameStatus, player, cards, skillKey) {
         this._removeCard(gameStatus, player, cards)
         moveCardsToDiscardPile(gameStatus, cards);
         emitNotifyPublicCards(gameStatus, {fromId: player.playerId, cards, skillKey})
     },
+
     gaiPan(gameStatus, player, cards, pandingResultCard, skillKey) {
         this._removeCard(gameStatus, player, cards)
         moveCardsToDiscardPile(gameStatus, pandingResultCard);
-        emitNotifyPublicCards(gameStatus, {fromId: player.playerId, cards, type: ADD_TO_PUBLIC_CARD_TYPE.THROW, skillKey})
+        emitNotifyPublicCards(gameStatus, {fromId: player.playerId, cards, skillKey})
     },
+
     throw(gameStatus, player, cards) {
         this._removeCard(gameStatus, player, cards)
         moveCardsToDiscardPile(gameStatus, cards);
