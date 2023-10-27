@@ -1,3 +1,4 @@
+const {CARD_LOCATION} = require("../config/cardConfig");
 const {ADD_TO_PUBLIC_CARD_TYPE} = require("../config/emitConfig");
 const {emitNotifyPublicCards} = require("../utils/emitUtils");
 const {SCROLL_CARDS_CONFIG} = require("../config/cardConfig");
@@ -9,6 +10,7 @@ const {emitNotifyDrawCards, emitNotifyMoveCards} = require("../utils/emitUtils")
 const {moveCardsToDiscardPile} = require("../utils/cardUtils")
 
 const ACTION = {
+    // ----------- 卡牌使用 -----------
     use(gameStatus, action) {
         const {originId, targetIds, actualCard, cards, skillKey} = action;
         const isDelayScroll = SCROLL_CARDS_CONFIG[actualCard?.key]?.isDelay
@@ -79,11 +81,15 @@ const ACTION = {
         emitNotifyPlayPublicCards(gameStatus, response);
     },
 
+    // ----------- 卡牌移动 -----------
+    // 拆
     remove(gameStatus, originPlayer, targetPlayer, card) {
         this._removeCard(gameStatus, targetPlayer, card)
         moveCardsToDiscardPile(gameStatus, card);
         emitNotifyPublicCards(gameStatus, {fromId: targetPlayer.playerId, cards: [card], type: ADD_TO_PUBLIC_CARD_TYPE.CHAI})
     },
+
+    // 顺
     move(gameStatus, originPlayer, targetPlayer, card) {
         originPlayer.addCards(card);
         this._removeCard(gameStatus, targetPlayer, card)
@@ -92,6 +98,7 @@ const ACTION = {
         emitNotifyMoveCards(gameStatus, targetPlayer.playerId, originPlayer.playerId, [card], isPublic)
     },
 
+    // 仁德 反间
     give(gameStatus, originPlayer, targetPlayer, cards, isPublic) {
         targetPlayer.addCards(cards);
         this._removeCard(gameStatus, originPlayer, cards)
@@ -99,6 +106,17 @@ const ACTION = {
         emitNotifyMoveCards(gameStatus, originPlayer.playerId, targetPlayer.playerId, cards, isPublic)
     },
 
+    // 五谷 奸雄
+    getFromTable(gameStatus, player, cards) {
+        player.addCards(cards);
+        emitNotifyMoveCards(gameStatus,
+            CARD_LOCATION.TABLE,
+            player.playerId,
+            cards,
+            true)
+    },
+
+    // ----------- 其他 -----------
     draw(gameStatus, player, number = 2) {
         const cards = getCards(gameStatus, number)
         player.addCards(cards);

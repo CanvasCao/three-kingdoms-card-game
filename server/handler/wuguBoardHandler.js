@@ -1,19 +1,22 @@
-const {CARD_LOCATION} = require("../config/cardConfig");
-const {emitNotifyMoveCards} = require("../utils/emitUtils");
-const {clearNextScrollStorage} = require("../utils/scrollStorage")
+const {moveCardsToDiscardPile} = require("../utils/cardUtils");
+const {ACTION} = require('../action/action');
+const {clearNextScrollStorage} = require("../utils/scrollStorage");
+
 const wuguBoardHandler = {
     handleWuGuBoard(gameStatus, data) {
-        const wuguPlayer = gameStatus.players[data.playerId]
-        emitNotifyMoveCards(gameStatus,
-            CARD_LOCATION.TABLE,
-            wuguPlayer.playerId,
-            [data.card],
-            true)
+        const {playerId, card} = data
+        const wuguPlayer = gameStatus.players[playerId]
 
 
-        gameStatus.wugufengdengCards.find((c) => c.cardId == data.card.cardId).wugefengdengSelectedPlayerId = data.playerId
-        wuguPlayer.addCards(data.card);
+        ACTION.getFromTable(gameStatus, wuguPlayer, card)
+
+        gameStatus.wugufengdengCards.find((c) => c.cardId == card.cardId).wugefengdengSelectedPlayerId = playerId
         clearNextScrollStorage(gameStatus);
+
+        if (gameStatus.scrollStorages.length == 0) {
+            const cards = gameStatus.wugufengdengCards.filter(card => !card.wugefengdengSelectedPlayerId);
+            moveCardsToDiscardPile(gameStatus, cards);
+        }
     }
 }
 
