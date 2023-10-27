@@ -26,6 +26,12 @@ const SKILL_CONFIG = {
     WEI005_LUO_YI: {
         key: 'WEI005_LUO_YI',
     },
+    WEI006_YI_JI: {
+        key: 'WEI006_YI_JI',
+    },
+    WEI006_TIAN_DU: {
+        key: 'WEI006_TIAN_DU',
+    },
     WEI007_QING_GUO: {
         key: 'WEI007_QING_GUO',
     },
@@ -41,6 +47,12 @@ const SKILL_CONFIG = {
     },
     SHU003_PAO_XIAO: {
         key: 'SHU003_PAO_XIAO',
+    },
+    SHU004_GUAN_XING: {
+        key: 'SHU004_GUAN_XING',
+    },
+    SHU004_KONG_CHENG: {
+        key: 'SHU004_KONG_CHENG',
     },
     SHU005_LONG_DAN: {
         key: 'SHU005_LONG_DAN',
@@ -88,9 +100,28 @@ const SKILL_CONFIG = {
     WU007_LIAN_YING: {
         key: 'WU007_LIAN_YING',
     },
+    WU008_XIAO_JI: {
+        key: 'WU008_XIAO_JI',
+    },
+    WU008_JIE_YIN: {
+        key: 'WU008_JIE_YIN',
+    },
 
+
+    QUN001_QING_NANG: {
+        key: 'QUN001_QING_NANG',
+    },
+    QUN001_JI_JIU: {
+        key: 'QUN001_JI_JIU',
+    },
     QUN002_WU_SHUANG: {
         key: 'QUN002_WU_SHUANG',
+    },
+    QUN003_LI_JIAN: {
+        key: 'QUN003_LI_JIAN',
+    },
+    QUN003_BI_YUE: {
+        key: 'QUN003_BI_YUE',
     },
 
     SP001_CHONG_SHENG: {

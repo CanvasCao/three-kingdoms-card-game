@@ -23,6 +23,10 @@ const HERO_STATIC_CONFIG = {
         maxBlood: 4,
         gender: 1
     },
+    WEI006: {
+        maxBlood: 3,
+        gender: 1
+    },
     WEI007: {
         maxBlood: 3,
         gender: 0
@@ -39,6 +43,10 @@ const HERO_STATIC_CONFIG = {
     },
     SHU003: {
         maxBlood: 4,
+        gender: 1
+    },
+    SHU004: {
+        maxBlood: 3,
         gender: 1
     },
     SHU005: {
@@ -83,11 +91,23 @@ const HERO_STATIC_CONFIG = {
         maxBlood: 3,
         gender: 1
     },
+    WU008: {
+        maxBlood: 3,
+        gender: 0
+    },
 
     // QUN
+    QUN001: {
+        maxBlood: 3,
+        gender: 1
+    },
     QUN002: {
         maxBlood: 4,
         gender: 1
+    },
+    QUN003: {
+        maxBlood: 3,
+        gender: 0
     },
 
     // SP
@@ -120,10 +140,24 @@ const HERO_SKILL_DYNAMIC_CONFIG = {
         cantBeTargetKeys: [SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.key, SCROLL_CARDS_CONFIG.LE_BU_SI_SHU.key]
     },
     WU007_LIAN_YING: {
-        cardsRemoveHook: (player, gameStatus) => {
+        cardsRemoved: (player, gameStatus) => {
             if (player.cards.length == 0) {
                 ACTION.draw(gameStatus, player, 1)
             }
+        }
+    },
+    WU008_XIAO_JI: {
+        cardsWillRemove: (player, cards, gameStatus) => {
+            const {weaponCard, shieldCard, plusHorseCard, minusHorseCard} = player
+            const removeCards = Array.isArray(cards) ? cards : [cards]
+            removeCards.forEach(card => {
+                if ([weaponCard?.cardId,
+                    shieldCard?.cardId,
+                    plusHorseCard?.cardId,
+                    minusHorseCard?.cardId].includes(card.cardId)) {
+                    ACTION.draw(gameStatus, player)
+                }
+            })
         }
     },
 
@@ -142,11 +176,13 @@ const HERO_SKILLS_CONFIG = {
     WEI003: [SKILL_CONFIG.WEI003_GANG_LIE],
     WEI004: [SKILL_CONFIG.WEI004_TU_XI],
     WEI005: [SKILL_CONFIG.WEI005_LUO_YI],
+    WEI006: [SKILL_CONFIG.WEI006_YI_JI, SKILL_CONFIG.WEI006_TIAN_DU],
     WEI007: [SKILL_CONFIG.WEI007_QING_GUO, SKILL_CONFIG.WEI007_LUO_SHEN],
 
     SHU001: [SKILL_CONFIG.SHU001_REN_DE],
     SHU002: [SKILL_CONFIG.SHU002_WU_SHENG],
     SHU003: [SKILL_CONFIG.SHU003_PAO_XIAO],
+    SHU004: [SKILL_CONFIG.SHU004_GUAN_XING, SKILL_CONFIG.SHU004_KONG_CHENG],
     SHU005: [SKILL_CONFIG.SHU005_LONG_DAN],
     SHU006: [SKILL_CONFIG.SHU006_MA_SHU, SKILL_CONFIG.SHU006_TIE_JI],
     SHU007: [SKILL_CONFIG.SHU007_JI_ZHI, SKILL_CONFIG.SHU007_QI_CAI],
@@ -158,6 +194,7 @@ const HERO_SKILLS_CONFIG = {
     WU005: [SKILL_CONFIG.WU005_YING_ZI, SKILL_CONFIG.WU005_FAN_JIAN],
     WU006: [SKILL_CONFIG.WU006_GUO_SE, SKILL_CONFIG.WU006_LIU_LI],
     WU007: [SKILL_CONFIG.WU007_QIAN_XUN, SKILL_CONFIG.WU007_LIAN_YING],
+    WU008: [SKILL_CONFIG.WU008_XIAO_JI, SKILL_CONFIG.WU008_JIE_YIN],
 
     QUN002: [SKILL_CONFIG.QUN002_WU_SHUANG],
     SP001: [SKILL_CONFIG.SP001_CHONG_SHENG],

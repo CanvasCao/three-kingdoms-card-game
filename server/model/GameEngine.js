@@ -1,4 +1,5 @@
 const sampleSize = require("lodash/sampleSize");
+const {handleWu008JieYinAction} = require("../handler/skills/WU008");
 const {fanjianBoardHandler} = require("../handler/fanjianBoardHandler");
 const {handleWu005FanJianAction} = require("../handler/skills/WU005");
 const {USE_OR_PLAY_CONFIG} = require("./Log");
@@ -105,15 +106,15 @@ class GameEngine {
 
             // 选将
             const allSelectHeroIds = [
-                "WEI001", "WEI002", "WEI003", "WEI004", 'WEI005', "WEI007",
+                "WEI001", "WEI002", "WEI003", "WEI004", "WEI005", "WEI007",
                 "SHU001", "SHU002", "SHU003", "SHU005", "SHU006", "SHU007",
-                "WU001", "WU002", "WU003", "WU004", "WU006", "WU007",
+                "WU001", "WU002", "WU003", "WU004", "WU005", "WU006", "WU007",
                 "QUN002"];
 
             const canSelectHeroNumber = process.env.NODE_ENV == 'production' ? 3 : allSelectHeroIds.length
             const canSelectHeroIds = [
                 ...sampleSize(allSelectHeroIds, canSelectHeroNumber),
-                "WU005"
+                "WU008",
             ]
             newPlayer.canSelectHeros = canSelectHeroIds.map(heroId => getHeroConfig(heroId))
 
@@ -148,6 +149,9 @@ class GameEngine {
                     break;
                 case SKILL_CONFIG.WU005_FAN_JIAN.key:
                     handleWu005FanJianAction(this.gameStatus);
+                    break;
+                case SKILL_CONFIG.WU008_JIE_YIN.key:
+                    handleWu008JieYinAction(this.gameStatus);
                     break;
             }
         }

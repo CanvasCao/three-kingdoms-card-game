@@ -1,8 +1,8 @@
+const {EQUIPMENT_MAP} = require("../config/equipmentConfig");
 const {CARD_LOCATION} = require("../config/cardConfig");
 const {ADD_TO_PUBLIC_CARD_TYPE} = require("../config/emitConfig");
 const {emitNotifyPublicCards} = require("../utils/emitUtils");
 const {SCROLL_CARDS_CONFIG} = require("../config/cardConfig");
-const {EQUIPMENT_TYPE} = require("../config/cardConfig");
 const {emitNotifyAddLines} = require("../utils/emitUtils");
 const {emitNotifyPlayPublicCards} = require("../utils/emitUtils");
 const {getCards} = require("../utils/cardUtils");
@@ -46,32 +46,13 @@ const ACTION = {
         emitNotifyPlayPublicCards(gameStatus, gameStatus.action);
         this._removeCard(gameStatus, player, card)
 
-        const equipmentType = card.equipmentType;
-        if (equipmentType == EQUIPMENT_TYPE.PLUS_HORSE) {
-            if (player.plusHorseCard) {
-                player.removeCards(player.plusHorseCard)
-                moveCardsToDiscardPile(gameStatus, player.plusHorseCard);
-            }
-            player.plusHorseCard = card;
-        } else if (equipmentType == EQUIPMENT_TYPE.MINUS_HORSE) {
-            if (player.minusHorseCard) {
-                player.removeCards(player.minusHorseCard)
-                moveCardsToDiscardPile(gameStatus, player.minusHorseCard);
-            }
-            player.minusHorseCard = card;
-        } else if (equipmentType == EQUIPMENT_TYPE.WEAPON) {
-            if (player.weaponCard) {
-                player.removeCards(player.weaponCard)
-                moveCardsToDiscardPile(gameStatus, player.weaponCard);
-            }
-            player.weaponCard = card;
-        } else if (equipmentType == EQUIPMENT_TYPE.SHIELD) {
-            if (player.shieldCard) {
-                player.removeCards(player.shieldCard)
-                moveCardsToDiscardPile(gameStatus, player.shieldCard);
-            }
-            player.shieldCard = card;
+        const playerEquipCardName = EQUIPMENT_MAP[card.equipmentType];
+        const currentEquipCard = player[playerEquipCardName];
+        if (currentEquipCard) {
+            this._removeCard(gameStatus, player, currentEquipCard)
+            moveCardsToDiscardPile(gameStatus, currentEquipCard);
         }
+        player[playerEquipCardName] = card;
     },
     play(gameStatus, response) {
         const {cards, actualCard, originId, skillKey} = response
@@ -142,10 +123,18 @@ const ACTION = {
     },
 
     _removeCard(gameStatus, player, cards) {
+        if(!cards){
+            return
+        }
+
+        if (player.cardsWillRemove) {
+            player.cardsWillRemove(player, cards, gameStatus)
+        }
+
         player.removeCards(cards)
 
-        if (player.cardsRemoveHook) {
-            player.cardsRemoveHook(player, gameStatus) // 陆逊
+        if (player.cardsRemoved) {
+            player.cardsRemoved(player, gameStatus) // 陆逊
         }
     }
 }
