@@ -84,11 +84,11 @@ const responseCardHandler = {
         }
 
         if (ALL_SHA_CARD_KEYS.includes(actionCardKey)) {
+            const onGoingUseStrikeEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS);
             if (response.chooseToResponse) {
-                const onGoingUseStrikeEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS);
                 onGoingUseStrikeEvent.dodgeStatus = true; // 【贯石斧】、【青龙偃月刀】 猛进
             } else {
-                delete gameStatus.useStrikeEvents;
+                onGoingUseStrikeEvent.done = true;
             }
         }
 
