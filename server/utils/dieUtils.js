@@ -9,8 +9,8 @@ const _clearDeadPlayerInAllResponse = (gameStatus, player) => {
     }
 
     // AOE
-    gameStatus.scrollResponses = gameStatus.scrollResponses.filter((res) => {
-        return res.originId !== player.playerId
+    gameStatus.scrollStorages = gameStatus.scrollStorages.filter((scrollStorage) => {
+        return scrollStorage.originId !== player.playerId
     })
 }
 

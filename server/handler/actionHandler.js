@@ -42,7 +42,7 @@ const actionHandler = {
         // targetIds 只有顺和拆 originId targetIds的值和action一样
         if (actualCard.key == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.key ||
             actualCard.key == SCROLL_CARDS_CONFIG.GUO_HE_CHAI_QIAO.key) {
-            gameStatus.scrollResponses = targetIds.map((targetId) => {
+            gameStatus.scrollStorages = targetIds.map((targetId) => {
                 return {
                     originId,
                     targetId: targetId,
@@ -59,32 +59,32 @@ const actionHandler = {
                     targetIds:[A,B],
                     isEffect:false,
                 }
-             scrollResponses=[{
+             scrollStorages=[{
                     originId: A,
                     targetId: B,
                     isEffect:false,
                 }]
 
              1.失效
-             scrollResponses=[]
+             scrollStorages=[]
 
              2.生效
-             scrollResponses=[{
+             scrollStorages=[{
                     originId: A,
                     targetId: B,
                     isEffect:true,
                 }]
 
              2.1 出杀
-             scrollResponses=[]
+             scrollStorages=[]
              generateUseStrikeEventsThenSetNextStrikeEventSkill
 
              2.2 不出杀
-             scrollResponses=[]
+             scrollStorages=[]
              A remove weapon
              CurrentPlayer add weapon
              **/
-            gameStatus.scrollResponses = [{
+            gameStatus.scrollStorages = [{
                 originId: targetIds[0],
                 targetId: targetIds[1],
                 cardTakeEffectOnPlayerId: targetIds[0],
@@ -93,7 +93,7 @@ const actionHandler = {
                 isEffect: undefined,
             }]
         } else if (actualCard.key == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.key) {
-            gameStatus.scrollResponses = [{
+            gameStatus.scrollStorages = [{
                 originId: originId,
                 targetId: targetIds[0],
                 cardTakeEffectOnPlayerId: originId,
@@ -103,7 +103,7 @@ const actionHandler = {
             }]
         } else if (actualCard.key == SCROLL_CARDS_CONFIG.JUE_DOU.key) {
             // 决斗originId targetId的值相反
-            gameStatus.scrollResponses = [{
+            gameStatus.scrollStorages = [{
                 originId: targetIds[0],
                 targetId: originId,
                 cardTakeEffectOnPlayerId: targetIds[0],
@@ -113,7 +113,7 @@ const actionHandler = {
             }]
         } else if (actualCard.key == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.key) {
             const players = getAllAlivePlayersStartFromFirstLocation(gameStatus, getCurrentPlayer(gameStatus).location)
-            gameStatus.scrollResponses = players.filter((p) => p.currentBlood < p.maxBlood).map((player) => {
+            gameStatus.scrollStorages = players.filter((p) => p.currentBlood < p.maxBlood).map((player) => {
                 return {
                     originId: player.playerId,
                     cardTakeEffectOnPlayerId: player.playerId,
@@ -128,7 +128,7 @@ const actionHandler = {
             const firstLocation = currentPlayer.location;
             const players = getAllAlivePlayersStartFromFirstLocation(gameStatus, firstLocation)
 
-            const scrollResponses = players.filter(p => p.playerId !== currentPlayer.playerId).map((player) => {
+            const scrollStorages = players.filter(p => p.playerId !== currentPlayer.playerId).map((player) => {
                 return {
                     originId: player.playerId,
                     targetId: originId,
@@ -138,13 +138,13 @@ const actionHandler = {
                     isEffect: undefined,
                 }
             })
-            gameStatus.scrollResponses = scrollResponses
+            gameStatus.scrollStorages = scrollStorages
         } else if (actualCard.key == SCROLL_CARDS_CONFIG.WU_GU_FENG_DENG.key) {
             const currentPlayer = getCurrentPlayer(gameStatus);
             const firstLocation = currentPlayer.location;
             const players = getAllAlivePlayersStartFromFirstLocation(gameStatus, firstLocation)
 
-            const scrollResponses = players.map((player) => {
+            const scrollStorages = players.map((player) => {
                 return {
                     originId: player.playerId,
                     cards,
@@ -153,7 +153,7 @@ const actionHandler = {
                     isEffect: undefined,
                 }
             })
-            gameStatus.scrollResponses = scrollResponses
+            gameStatus.scrollStorages = scrollStorages
 
             // 有wugufengdengCards展示WuGuFengDengBoard
             let cardNumber;

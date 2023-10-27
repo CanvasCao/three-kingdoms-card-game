@@ -63,7 +63,6 @@ class GameEngine {
             fanjianBoardResponse: undefined,
 
             // 锦囊
-            scrollResponses: [],
             wuxieSimultaneousResponse: {
                 hasWuxiePlayerIds: [],
                 wuxieChain: []// 等待全员无懈可击
@@ -71,6 +70,9 @@ class GameEngine {
 
             // 其他
             wugufengdengCards: [],
+
+            // Storages
+            scrollStorages: [],
             tieSuoTempStorage: [],
 
             // event
@@ -210,12 +212,6 @@ class GameEngine {
                 break;
             case RESPONSE_TYPE_CONFIG.WUXIE:
                 responseCardHandler.setStatusByWuxieResponse(this.gameStatus, response);
-                break;
-            case RESPONSE_TYPE_CONFIG.SCROLL:
-                const curScrollResponse = this.gameStatus.scrollResponses[0];
-                if (curScrollResponse.actualCard.key === SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.key) {
-                    responseCardHandler.setStatusByJieDaoResponse(this.gameStatus, response);
-                }
                 break;
         }
 

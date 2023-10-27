@@ -136,6 +136,7 @@ const handleResponseCardEventEnd = (gameStatus) => {
         delete gameStatus.responseCardEvents;
 
         // 响应决斗 之后出牌 需要互换目标
+        // 为了赵云 涯角 决斗 重新生成ResponseCardEvent
         if (actionCardKey == CARD_CONFIG.JUE_DOU.key) {
             generateResponseCardEventThenSetNextResponseCardEventSkill(gameStatus, {
                 originId: responseCardEvent.targetId,

@@ -13,7 +13,6 @@ const tryFindNextSkillResponse = (gameStatus) => {
         gameStatus.cardBoardResponses?.length > 0 ||
         gameStatus.fanjianBoardResponse ||
         gameStatus.wuxieSimultaneousResponse?.hasWuxiePlayerIds?.length > 0
-        // gameStatus.scrollResponses.length > 0 || // 结算万箭齐发和南蛮入侵过程中 会放技能
     ) {
         return;
     }
@@ -66,17 +65,16 @@ const trySettleNextScroll = (gameStatus) => {
         gameStatus.cardBoardResponses.length > 0 ||
         gameStatus.fanjianBoardResponse ||
         gameStatus.wuxieSimultaneousResponse.hasWuxiePlayerIds.length > 0
-        // gameStatus.scrollResponses.length > 0 ||
     ) {
         return;
     }
     // 下一个人的锦囊需要继续求无懈可击
-    if (gameStatus.scrollResponses.length > 0 && gameStatus.scrollResponses[0].isEffect === undefined) {
+    if (gameStatus.scrollStorages.length > 0 && gameStatus.scrollStorages[0].isEffect === undefined) {
         const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
         if (hasWuxiePlayers.length > 0) {
             generateWuxieSimultaneousResponseByScroll(gameStatus)
         } else {
-            setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, gameStatus.scrollResponses[0].actualCard.key);
+            setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, gameStatus.scrollStorages[0].actualCard.key);
         }
     }
 };

@@ -4,14 +4,10 @@ const {STAGE_NAME} = require("../config/gameAndStageConfig");
 const {getNextNeedExecutePandingSign} = require("./pandingUtils");
 const {SCROLL_CARDS_CONFIG} = require("../config/cardConfig");
 const {getAllHasWuxiePlayers, getCurrentPlayer} = require("./playerUtils");
-const {clearNextScrollResponse, clearWuxieSimultaneousResponse} = require("./responseUtils");
+const {clearWuxieSimultaneousResponse} = require("./responseUtils");
+const {clearNextScrollStorage} = require("./scrollStorage");
 
-const generateWuxieSimultaneousResponseByScroll = (gameStatus) => {
-    if (!gameStatus.scrollResponses?.[0]) {
-        throw Error("没有scrollResponse 不能生成wuxieSimultaneousResponse")
-    }
-
-    const action = gameStatus.action;
+const _generateWuxieSimultaneousResponse = (gameStatus, cards, actualCard) => {
     const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus);
     if (hasWuxiePlayers.length <= 0) {
         throw Error("没有人有无懈可击 不需要生成wuxieSimultaneousResponse")
@@ -20,33 +16,32 @@ const generateWuxieSimultaneousResponseByScroll = (gameStatus) => {
     gameStatus.wuxieSimultaneousResponse = {
         hasWuxiePlayerIds: hasWuxiePlayers.map((u) => u.playerId),
         wuxieChain: [{
-            cards: action.cards,
-            actualCard: action.actualCard
+            cards,
+            actualCard
         }]
     }
+}
+
+const generateWuxieSimultaneousResponseByScroll = (gameStatus) => {
+    if (!gameStatus.scrollStorages?.[0]) {
+        throw Error("没有scrollStorage 不能生成wuxieSimultaneousResponse")
+    }
+
+    const {cards, actualCard} = gameStatus.action;
+    _generateWuxieSimultaneousResponse(gameStatus, cards, actualCard)
 }
 
 const generateWuxieSimultaneousResponseByPandingCard = (gameStatus) => {
     const nextPandingSign = getNextNeedExecutePandingSign(gameStatus);
-    const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus);
-    if (hasWuxiePlayers.length <= 0) {
-        throw Error("没有人有无懈可击 不需要生成wuxieSimultaneousResponse")
-    }
-    gameStatus.wuxieSimultaneousResponse = {
-        hasWuxiePlayerIds: hasWuxiePlayers.map((player) => player.playerId),
-        wuxieChain: [{
-            cards: [nextPandingSign.card],
-            actualCard: nextPandingSign.actualCard
-        }]
-    }
+    _generateWuxieSimultaneousResponse(gameStatus, [nextPandingSign.card], nextPandingSign.actualCard)
 }
 
 
 // 延时锦囊生效之后 set pandingSigns isEffect true/false 给executeNextOnePanding执行
-// 即时锦囊生效 set scrollResponses isEffect true 或 clear scrollResponses
+// 即时锦囊生效 set scrollStorages isEffect true 或 clear scrollStorages
 const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (gameStatus, from) => {
     // console.log("from", from)
-    const {stage, wuxieSimultaneousResponse, scrollResponses, players} = gameStatus
+    const {stage, wuxieSimultaneousResponse, scrollStorages, players} = gameStatus
 
     if (wuxieSimultaneousResponse.hasWuxiePlayerIds.length != 0) {
         throw new Error("还有人思考无懈可击 无法开始结算锦囊");
@@ -62,51 +57,53 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
     }
 
     // 即时锦囊
-    else if (scrollResponses.length > 0) {
-        const curScrollResponse = scrollResponses[0]
+    else if (scrollStorages.length > 0) {
+        const curScrollStorage = scrollStorages[0]
+        const {actualCard, originId, targetId, cards} = curScrollStorage
         if (isScrollEffected) { // 生效
-            if (curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.key) {
+            if (actualCard.key == SCROLL_CARDS_CONFIG.WU_ZHONG_SHENG_YOU.key) {
                 ACTION.draw(gameStatus, getCurrentPlayer(gameStatus))
-                clearNextScrollResponse(gameStatus);
-            } else if (curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.key) {
-                gameStatus.players[curScrollResponse.originId].addBlood();
-                clearNextScrollResponse(gameStatus);
+                clearNextScrollStorage(gameStatus);
+            } else if (actualCard.key == SCROLL_CARDS_CONFIG.TAO_YUAN_JIE_YI.key) {
+                gameStatus.players[originId].addBlood();
+                clearNextScrollStorage(gameStatus);
 
                 // 不写递归的算法
                 if (getAllHasWuxiePlayers(gameStatus).length == 0) {
-                    scrollResponses.forEach(res => {
-                        players[res.originId].addBlood();
+                    scrollStorages.forEach(storage => {
+                        players[storage.originId].addBlood();
+                        clearNextScrollStorage(gameStatus);
                     })
-                    gameStatus.scrollResponses = [];
                 }
-            } else if (curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.key ||
-                curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.key ||
-                curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.JUE_DOU.key
+            } else if (actualCard.key == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.key ||
+                actualCard.key == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.key ||
+                actualCard.key == SCROLL_CARDS_CONFIG.JUE_DOU.key ||
+                actualCard.key == SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.key
             ) {
                 generateResponseCardEventThenSetNextResponseCardEventSkill(gameStatus, {
-                    originId: curScrollResponse.originId,
-                    targetId: curScrollResponse.targetId,
-                    actionCards: curScrollResponse.cards,
-                    actionActualCard: curScrollResponse.actualCard,
+                    originId: originId,
+                    targetId: targetId,
+                    actionCards: cards,
+                    actionActualCard: actualCard,
                 })
-                clearNextScrollResponse(gameStatus);
-            } else if (curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.key ||
-                curScrollResponse.actualCard.key == SCROLL_CARDS_CONFIG.GUO_HE_CHAI_QIAO.key
+                clearNextScrollStorage(gameStatus);
+            } else if (actualCard.key == SCROLL_CARDS_CONFIG.SHUN_SHOU_QIAN_YANG.key ||
+                actualCard.key == SCROLL_CARDS_CONFIG.GUO_HE_CHAI_QIAO.key
             ) {
-                const targetPlayer = gameStatus.players[curScrollResponse.targetId]
+                const targetPlayer = gameStatus.players[targetId]
                 if (targetPlayer.hasAnyCardsOrPandingCards()) {
                     gameStatus.cardBoardResponses = [{
-                        originId: curScrollResponse.originId,
-                        targetId: curScrollResponse.targetId,
-                        cardBoardContentKey: curScrollResponse.actualCard.key
+                        originId: originId,
+                        targetId: targetId,
+                        cardBoardContentKey: actualCard.key
                     }]
                 }
-                clearNextScrollResponse(gameStatus);
-            } else {
-                curScrollResponse.isEffect = true;
+                clearNextScrollStorage(gameStatus);
+            } else  { // 五谷丰登
+                curScrollStorage.isEffect = true;
             }
         } else { // 失效
-            clearNextScrollResponse(gameStatus);
+            clearNextScrollStorage(gameStatus);
         }
     }
     clearWuxieSimultaneousResponse(gameStatus); // 生效后清空WuxieResponse

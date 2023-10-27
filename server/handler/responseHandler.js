@@ -1,4 +1,5 @@
 const strikeEvent = require("../event/strikeEvent");
+const {SCROLL_CARDS_CONFIG} = require("../config/cardConfig");
 const {ACTION} = require("../action/action");
 const {handleWei007LuoShenResponse} = require("./skills/WEI007");
 const {handleWu003KeJiResponse} = require("./skills/WU003");
@@ -30,7 +31,6 @@ const {
 const {
     clearCardResponse,
     clearNextTaoResponse,
-    clearNextScrollResponse,
 } = require("../utils/responseUtils");
 const {getAllHasWuxiePlayers, getCurrentPlayer} = require("../utils/playerUtils")
 const {ALL_EVENTS_KEY_CONFIG} = require("../config/eventConfig")
@@ -62,25 +62,58 @@ const responseCardHandler = {
 
         if (response.chooseToResponse) {
             onGoingResponseCardEvent.responseStatus = true // 雷击
+        } else {
+            delete gameStatus.responseCardEvents; // 吕布无双的情况下删除所有的responseCardEvents
+        }
 
-            if (ALL_SHA_CARD_KEYS.includes(actionCardKey)) {
+        if ([...ALL_SHA_CARD_KEYS,
+            SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.key,
+            SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.key,
+            SCROLL_CARDS_CONFIG.JUE_DOU.key].includes(actionCardKey)) {
+
+            if (response.chooseToResponse) {
+            } else {
+                generateDamageEventThenSetNextDamageEventSkill(gameStatus, {
+                    damageCards: cardResponse.actionCards,
+                    damageActualCard: cardResponse.actionActualCard, // 渠道
+                    damageAttribute: cardResponse.actionActualCard?.attribute,// 属性
+                    originId: cardResponse.targetId,// 来源
+                    targetId: cardResponse.originId
+                })
+            }
+        }
+
+        if (ALL_SHA_CARD_KEYS.includes(actionCardKey)) {
+            if (response.chooseToResponse) {
                 const onGoingUseStrikeEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS);
                 onGoingUseStrikeEvent.dodgeStatus = true; // 【贯石斧】、【青龙偃月刀】 猛进
-            }
-        } else {
-            generateDamageEventThenSetNextDamageEventSkill(gameStatus, {
-                damageCards: cardResponse.actionCards,
-                damageActualCard: cardResponse.actionActualCard, // 渠道
-                damageAttribute: cardResponse.actionActualCard?.attribute,// 属性
-                originId: cardResponse.targetId,// 来源
-                targetId: cardResponse.originId
-            })
-
-            if (ALL_SHA_CARD_KEYS.includes(actionCardKey)) {
+            } else {
                 delete gameStatus.useStrikeEvents;
             }
-            delete gameStatus.responseCardEvents;// 吕布无双的情况下删除所有的responseCardEvents
         }
+
+        if (SCROLL_CARDS_CONFIG.JIE_DAO_SHA_REN.key === actionCardKey) {
+            const APlayer = gameStatus.players[cardResponse.originId]
+            const BPlayer = gameStatus.players[cardResponse.targetId]
+            const currentPlayer = getCurrentPlayer(gameStatus);
+
+            // 出杀 A=>B A出杀 B响应闪
+            if (response.chooseToResponse) {
+                strikeEvent.generateUseStrikeEventsThenSetNextStrikeEventSkill(gameStatus,
+                    {
+                        originId: APlayer.playerId,
+                        targetIds: [BPlayer.playerId],
+                        cards: response.cards || [],
+                        actualCard: response.actualCard
+                    });
+            }
+            // 不出杀 A=>B A不出 A把刀给当前用户
+            else {
+                const weaponCard = cloneDeep(APlayer.weaponCard);
+                ACTION.give(gameStatus, APlayer, currentPlayer, weaponCard, true)
+            }
+        }
+
         clearCardResponse(gameStatus);
     },
 
@@ -203,34 +236,6 @@ const responseCardHandler = {
                 setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect(gameStatus, "setStatusByWuxieResponse 没出无懈可击")
             }
         }
-    },
-
-    setStatusByJieDaoResponse: (gameStatus, response) => {
-        if (response.chooseToResponse) { // 出杀 A=>B A出杀 B响应闪
-            const curScrollResponse = gameStatus.scrollResponses[0];
-            const APlayer = gameStatus.players[curScrollResponse.originId]
-            const BPlayer = gameStatus.players[curScrollResponse.targetId]
-
-            ACTION.play(gameStatus, response)
-
-            strikeEvent.generateUseStrikeEventsThenSetNextStrikeEventSkill(gameStatus,
-                {
-                    originId: APlayer.playerId,
-                    targetIds: [BPlayer.playerId],
-                    cards: response.cards || [],
-                    actualCard: response.actualCard
-                });
-        } else {
-            // 不出杀 A=>B A不出 A把刀给当前用户
-            const curScrollResponse = gameStatus.scrollResponses[0];
-            const APlayer = gameStatus.players[curScrollResponse.originId]
-            const currentPlayer = getCurrentPlayer(gameStatus);
-
-            const weaponCard = cloneDeep(APlayer.weaponCard);
-            ACTION.move(gameStatus, currentPlayer, APlayer, weaponCard)
-        }
-
-        clearNextScrollResponse(gameStatus);
     },
 }
 
