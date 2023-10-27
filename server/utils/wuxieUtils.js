@@ -57,7 +57,7 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
     }
 
     // 即时锦囊
-    else if (scrollStorages.length > 0) {
+    else if (scrollStorages?.length > 0) {
         const curScrollStorage = scrollStorages[0]
         const {actualCard, originId, targetId, cards} = curScrollStorage
         if (isScrollEffected) { // 生效

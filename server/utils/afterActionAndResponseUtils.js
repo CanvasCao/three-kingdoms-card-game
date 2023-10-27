@@ -1,3 +1,4 @@
+const {ifAnyPlayerNeedToResponse} = require("./responseUtils");
 const {setNextResponseCardEventSkill} = require("../event/responseCardEvent");
 const {setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect} = require("./wuxieUtils");
 const {generateWuxieSimultaneousResponseByScroll} = require("./wuxieUtils");
@@ -7,13 +8,7 @@ const {setNextStrikeEventSkill} = require("../event/strikeEvent");
 const {setNextPandingEventSkill} = require("../event/pandingEvent");
 
 const tryFindNextSkillResponse = (gameStatus) => {
-    if (gameStatus.cardResponse ||
-        gameStatus.skillResponse ||
-        gameStatus.taoResponses?.length > 0 ||
-        gameStatus.cardBoardResponses?.length > 0 ||
-        gameStatus.fanjianBoardResponse ||
-        gameStatus.wuxieSimultaneousResponse?.hasWuxiePlayerIds?.length > 0
-    ) {
+    if (ifAnyPlayerNeedToResponse(gameStatus)) {
         return;
     }
 
@@ -59,15 +54,10 @@ const tryFindNextSkillResponse = (gameStatus) => {
 
 // event的优先级 高于结算锦囊
 const trySettleNextScroll = (gameStatus) => {
-    if (gameStatus.cardResponse ||
-        gameStatus.skillResponse ||
-        gameStatus.taoResponses.length > 0 ||
-        gameStatus.cardBoardResponses.length > 0 ||
-        gameStatus.fanjianBoardResponse ||
-        gameStatus.wuxieSimultaneousResponse.hasWuxiePlayerIds.length > 0
-    ) {
+    if (ifAnyPlayerNeedToResponse(gameStatus)) {
         return;
     }
+
     // 下一个人的锦囊需要继续求无懈可击
     if (gameStatus.scrollStorages.length > 0 && gameStatus.scrollStorages[0].isEffect === undefined) {
         const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
