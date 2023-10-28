@@ -112,7 +112,7 @@ class GameEngine {
             });
 
             let canSelectHeroIds = process.env.NODE_ENV == 'production' ? heroIdsGroup[i].slice(0, 3) : shuffle(heroIds).slice(0, 7)
-            canSelectHeroIds = [...canSelectHeroIds, "QUN003"]
+            canSelectHeroIds = [...canSelectHeroIds, "WEI006"]
             newPlayer.canSelectHeros = canSelectHeroIds.map(heroId => getHeroConfig(heroId))
             this.gameStatus.players[newPlayer.playerId] = newPlayer;
         })

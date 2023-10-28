@@ -1,3 +1,4 @@
+const {PANDING_EVENT_TIMING} = require("../config/eventConfig");
 const {CARD_LOCATION} = require("../config/cardConfig");
 const {emitNotifyPublicCards} = require("../utils/emitUtils");
 const {clearSkillResponse} = require("../utils/responseUtils");
@@ -7,7 +8,7 @@ const {ALL_EVENTS_KEY_CONFIG} = require("../config/eventConfig");
 const {findOnGoingEvent, findOnGoingEventSkill} = require("./utils");
 const {generateDamageEventThenSetNextDamageEventSkill} = require("./damageEvent");
 const {findNextUnDoneSkillInLastEventTimingsWithSkills} = require("./utils");
-const {PANDING_EVENT_TIMINGS} = require("../config/eventConfig");
+const {ACTION} = require("../action/action");
 const {isNil} = require("lodash/lang");
 const {moveShandianToNextPlayer, getNextNeedExecutePandingSign} = require("../utils/pandingUtils");
 const {getCurrentPlayer} = require("../utils/playerUtils");
@@ -32,6 +33,7 @@ const generatePandingEventThenSetNextPandingEventSkill = (gameStatus, {originId,
         pandingNameKey,
         pandingResultCard,
         pandingResultCardNeedThrow: true,
+        takeEffect: undefined,
     }
     emitRefreshStatus(gameStatus); // 为了显示判定Board
 
@@ -52,9 +54,8 @@ const setNextPandingEventSkill = (gameStatus) => {
 
     const {originId, eventTimingTracker} = pandingEvent;
 
-    let timingIndex = 0;
     if (eventTimingTracker.length == 0) {
-        const eventTimingName = PANDING_EVENT_TIMINGS[timingIndex] // BEFORE_PANDING_TAKE_EFFECT
+        const eventTimingName = PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT
         const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, originId})
         pandingEvent.eventTimingTracker.push({eventTimingName, eventTimingSkills})
 
@@ -64,24 +65,7 @@ const setNextPandingEventSkill = (gameStatus) => {
         }
     }
 
-    if (last(eventTimingTracker).eventTimingName == PANDING_EVENT_TIMINGS[timingIndex]) {
-        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingTracker)
-        if (unDoneSkill) {
-            setEventSkillResponse(gameStatus, unDoneSkill)
-            return;
-        } else {
-            const eventTimingName = PANDING_EVENT_TIMINGS[timingIndex + 1] // AFTER_PANDING_TAKE_EFFECT
-            const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, originId})
-            pandingEvent.eventTimingTracker.push({eventTimingName, eventTimingSkills})
-
-            if (eventTimingSkills.length > 0) {
-                setEventSkillResponse(gameStatus, eventTimingSkills[0])
-                return;
-            }
-        }
-    }
-
-    if (last(eventTimingTracker).eventTimingName == PANDING_EVENT_TIMINGS[timingIndex + 1]) {
+    if (last(eventTimingTracker).eventTimingName == PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT) {
         const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingTracker)
         if (unDoneSkill) {
             setEventSkillResponse(gameStatus, unDoneSkill)
@@ -96,22 +80,23 @@ const setNextPandingEventSkill = (gameStatus) => {
 const setStatusBasedOnPandingResult = (gameStatus) => {
     const pandingEvent = gameStatus.pandingEvent;
     pandingEvent.takeEffect = false
-    const pandingResultCard = pandingEvent.pandingResultCard;
+    const {pandingResultCard, pandingNameKey, originId} = pandingEvent;
     const currentPlayer = getCurrentPlayer(gameStatus);
+    const pandingPlayer = gameStatus.players[originId]
 
-    if (pandingEvent.pandingNameKey == SKILL_CONFIG.SHU006_TIE_JI.key) {
+    if (pandingNameKey == SKILL_CONFIG.SHU006_TIE_JI.key) {
         const useStrikeEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.USE_STRIKE_EVENTS);
         if (getActualCardColor(pandingResultCard) == CARD_COLOR.RED) {
             pandingEvent.takeEffect = true
             useStrikeEvent.cantShan = true;
         }
-    } else if (pandingEvent.pandingNameKey == CARD_CONFIG.LE_BU_SI_SHU.key ||
-        pandingEvent.pandingNameKey == CARD_CONFIG.SHAN_DIAN.key) {
+    } else if (pandingNameKey == CARD_CONFIG.LE_BU_SI_SHU.key ||
+        pandingNameKey == CARD_CONFIG.SHAN_DIAN.key) {
         const nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus);
         const pandingActualCard = nextNeedPandingSign.actualCard;
         const pandingCard = nextNeedPandingSign.card;
 
-        if (pandingEvent.pandingNameKey == CARD_CONFIG.LE_BU_SI_SHU.key) {
+        if (pandingNameKey == CARD_CONFIG.LE_BU_SI_SHU.key) {
             currentPlayer.removePandingSign(nextNeedPandingSign);
             if (pandingResultCard.huase !== CARD_HUASE.HONGTAO) {
                 pandingEvent.takeEffect = true
@@ -134,7 +119,7 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
                 moveShandianToNextPlayer(gameStatus, nextNeedPandingSign)
             }
         }
-    } else if (pandingEvent.pandingNameKey === CARD_CONFIG.BA_GUA_ZHEN.key) {
+    } else if (pandingNameKey === CARD_CONFIG.BA_GUA_ZHEN.key) {
         if (getActualCardColor(pandingResultCard) == CARD_COLOR.RED) {
             pandingEvent.takeEffect = true
             const responseCardEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.RESPONSE_CARD_EVENTS);
@@ -146,7 +131,7 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
             }
             clearCardResponse(gameStatus)
         }
-    } else if (pandingEvent.pandingNameKey === SKILL_CONFIG.WEI003_GANG_LIE.key) {
+    } else if (pandingNameKey === SKILL_CONFIG.WEI003_GANG_LIE.key) {
         const onGoingDamageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENTS);
         const onGoingDamageEventSkill = findOnGoingEventSkill(gameStatus, ALL_EVENTS_KEY_CONFIG.DAMAGE_EVENTS);
 
@@ -160,16 +145,22 @@ const setStatusBasedOnPandingResult = (gameStatus) => {
             clearSkillResponse(gameStatus)
             onGoingDamageEventSkill.done = true;
         }
-    } else if (pandingEvent.pandingNameKey === SKILL_CONFIG.WEI007_LUO_SHEN.key) {
+    } else if (pandingNameKey === SKILL_CONFIG.WEI007_LUO_SHEN.key) {
         const onGoingGameStageEvent = findOnGoingEvent(gameStatus, ALL_EVENTS_KEY_CONFIG.GAME_STAGE_EVENT);
         if ([CARD_HUASE.HEITAO, CARD_HUASE.CAOHUA].includes(pandingResultCard.huase)) {
             pandingEvent.takeEffect = true;
             pandingEvent.pandingResultCardNeedThrow = false;
 
-            onGoingGameStageEvent.eventTimingTracker.pop() // 删除最后一个元素
-            gameStatus.players[pandingEvent.originId].addCards(pandingEvent.pandingResultCard)
+            onGoingGameStageEvent.eventTimingTracker.pop() // 删除最后一个元素 为了继续判定
+            ACTION.getFromTable(gameStatus, pandingPlayer, pandingResultCard)
         }
         clearSkillResponse(gameStatus)
+    }
+
+    // WEI006_TIAN_DU
+    if (pandingPlayer.skills.map(skill => skill.key).includes(SKILL_CONFIG.WEI006_TIAN_DU.key)) {
+        pandingEvent.pandingResultCardNeedThrow = false;
+        ACTION.getFromTable(gameStatus, pandingPlayer, pandingResultCard)
     }
 
     emitRefreshStatus(gameStatus); //为了显示判定Board

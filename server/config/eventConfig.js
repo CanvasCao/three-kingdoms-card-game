@@ -82,7 +82,7 @@ const PANDING_EVENT_TIMING = {
 const PANDING_EVENT_TIMINGS = [
     // PANDING_EVENT_TIMING.WHEN_PANDING, // 【咒缚】
     PANDING_EVENT_TIMING.BEFORE_PANDING_TAKE_EFFECT, // 【鬼才】、【鬼道】
-    PANDING_EVENT_TIMING.AFTER_PANDING_TAKE_EFFECT, // 【天妒】、【洛神】
+    // PANDING_EVENT_TIMING.AFTER_PANDING_TAKE_EFFECT, // 【天妒】、【洛神】
 ]
 
 // https://gltjk.com/sanguosha/rules/flow/damage.html
