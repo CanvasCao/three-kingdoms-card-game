@@ -27,6 +27,7 @@ const generateDamageEventThenSetNextDamageEventSkill = (gameStatus, {
         originId,// 来源
         targetId,// 受到伤害的角色
         damageNumber,// 伤害值
+        amendDamageNumber: damageNumber,// 调整以后的伤害值
         // isTieSuo, // 是否为连环伤害
         eventTimingTracker: [],
         done: false,
@@ -45,7 +46,7 @@ const setNextDamageEventSkill = (gameStatus) => {
         return;
     }
 
-    const {originId, targetId, damageActualCard, damageSkill, eventTimingTracker} = damageEvent;
+    const {originId, targetId, damageActualCard, damageSkill, eventTimingTracker, damageNumber} = damageEvent;
     const damageActualCardKey = damageActualCard?.key
     const originPlayer = gameStatus.players[originId]
     const targetPlayer = gameStatus.players[targetId]
@@ -82,8 +83,8 @@ const setNextDamageEventSkill = (gameStatus) => {
             } else {
                 // WHEN_TAKE_DAMAGE结束 扣减体力
                 const extraDamageNumber = originPlayer ? (originPlayer.extraDamageMap[damageActualCardKey] || 0) : 0
-                const damageNumber = damageEvent.damageNumber + extraDamageNumber
-                targetPlayer.reduceBlood(damageNumber)
+                damageEvent.amendDamageNumber = damageEvent.damageNumber + extraDamageNumber
+                targetPlayer.reduceBlood(damageEvent.amendDamageNumber)
                 // 求桃
                 if (targetPlayer.currentBlood <= 0) {
                     generateQiuTaoResponses(gameStatus, targetPlayer)
@@ -105,7 +106,12 @@ const setNextDamageEventSkill = (gameStatus) => {
             }
 
             const eventTimingName = DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE // 【奸雄】、【反馈】、【刚烈】、【遗计】
-            const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {eventTimingName, targetId, originId})
+            const eventTimingSkills = findAllEventSkillsByTimingNameAndActionCard(gameStatus, {
+                eventTimingName,
+                targetId,
+                originId,
+                damageNumber: damageEvent.amendDamageNumber
+            })
             damageEvent.eventTimingTracker.push({eventTimingName, eventTimingSkills})
 
             if (eventTimingSkills.length > 0) {

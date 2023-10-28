@@ -111,8 +111,8 @@ class GameEngine {
                 location: i,
             });
 
-            let canSelectHeroIds = process.env.NODE_ENV == 'production' ? heroIdsGroup[i].slice(0, 3) : shuffle(heroIds).slice(0, 7)
-            canSelectHeroIds = [...canSelectHeroIds, "WEI006"]
+            let canSelectHeroIds = process.env.NODE_ENV == 'production' ? heroIdsGroup[i].slice(0, 3) : shuffle(heroIds).slice(0, 6)
+            canSelectHeroIds = [...canSelectHeroIds, "WEI006", "WEI005"]
             newPlayer.canSelectHeros = canSelectHeroIds.map(heroId => getHeroConfig(heroId))
             this.gameStatus.players[newPlayer.playerId] = newPlayer;
         })

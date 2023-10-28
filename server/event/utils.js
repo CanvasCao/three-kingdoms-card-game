@@ -1,3 +1,4 @@
+const {cloneDeep} = require("lodash/lang");
 const {GAME_STAGE_TIMING} = require("../config/eventConfig");
 const {ALL_SHA_CARD_KEYS} = require("../config/cardConfig");
 const {PLAY_EVENT_TIMING} = require("../config/eventConfig");
@@ -90,7 +91,13 @@ const findOnGoingEventSkill = (gameStatus, eventKey) => {
 }
 
 // AllEventSkills
-const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingName, actionCardKey, originId, targetId}) => {
+const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {
+    eventTimingName,
+    actionCardKey,
+    originId,
+    targetId,
+    damageNumber
+}) => {
     const originPlayer = gameStatus.players[originId];
     const targetPlayer = gameStatus.players?.[targetId];
 
@@ -201,7 +208,18 @@ const findAllEventSkillsByTimingNameAndActionCard = (gameStatus, {eventTimingNam
                     }
                 })
                 .map((skill) => configTimingSkillToResponseSkill(skill, targetId))
-            eventTimingSkills = eventTimingSkills.concat(eventSkillsForPlayer)
+
+            // 根据受伤点数生成的技能
+            eventSkillsForPlayer.forEach(eventSkill => {
+                const {skillKey} = eventSkill
+                if (TIMING_SKILLS_CONFIG[skillKey].triggerByDamageNumber) {
+                    for (let i = 1; i <= damageNumber; i++) {
+                        eventTimingSkills = eventTimingSkills.concat(cloneDeep(eventSkill));
+                    }
+                } else {
+                    eventTimingSkills = eventTimingSkills.concat(eventSkill)
+                }
+            })
             break;
 
         // 使用牌

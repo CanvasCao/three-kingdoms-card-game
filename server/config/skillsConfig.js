@@ -160,6 +160,11 @@ const TIMING_SKILLS_CONFIG = {
         key: "WEI005_LUO_YI",
         triggerTiming: GAME_STAGE_TIMING.GAME_STAGE_IS_DRAWING,
     },
+    WEI006_YI_JI: {
+        key: "WEI006_YI_JI",
+        triggerTiming: DAMAGE_EVENT_TIMING.AFTER_CAUSE_DAMAGE,
+        triggerByDamageNumber: true,
+    },
     WEI007_LUO_SHEN: {
         key: "WEI007_LUO_SHEN",
         triggerTiming: GAME_STAGE_TIMING.GAME_STAGE_WHEN_PREPARE,
