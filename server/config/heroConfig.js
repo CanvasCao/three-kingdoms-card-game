@@ -111,10 +111,10 @@ const HERO_STATIC_CONFIG = {
     },
 
     // SP
-    SP001: {
-        maxBlood: 3,
-        gender: 0
-    },
+    // SP001: {
+    //     maxBlood: 3,
+    //     gender: 0
+    // },
 }
 
 // 武将技能切换和失效的时候 删除
@@ -165,6 +165,12 @@ const HERO_SKILL_DYNAMIC_CONFIG = {
         responseStrikeNumber: 2,
         responseDuelNumber: 2,
     },
+    QUN003_BI_YUE: {
+        gameStageWhenEndStart: (player, gameStatus) => {
+            ACTION.draw(gameStatus, player, 1)
+        }
+    },
+
     SP001_CHONG_SHENG: {
         canRebirth: true,
     }
@@ -196,7 +202,9 @@ const HERO_SKILLS_CONFIG = {
     WU007: [SKILL_CONFIG.WU007_QIAN_XUN, SKILL_CONFIG.WU007_LIAN_YING],
     WU008: [SKILL_CONFIG.WU008_XIAO_JI, SKILL_CONFIG.WU008_JIE_YIN],
 
+    QUN001: [SKILL_CONFIG.QUN001_QING_NANG, SKILL_CONFIG.QUN001_JI_JIU],
     QUN002: [SKILL_CONFIG.QUN002_WU_SHUANG],
+    QUN003: [SKILL_CONFIG.QUN003_LI_JIAN, SKILL_CONFIG.QUN003_BI_YUE],
     SP001: [SKILL_CONFIG.SP001_CHONG_SHENG],
 }
 
@@ -233,4 +241,5 @@ const getHeroConfig = (heroId) => {
     }
 }
 
+exports.HERO_STATIC_CONFIG = HERO_STATIC_CONFIG;
 exports.getHeroConfig = getHeroConfig;

@@ -1,4 +1,8 @@
-const sampleSize = require("lodash/sampleSize");
+const {handleQun003LiJianAction} = require("../handler/skills/QUN003");
+const {handleQun001QingNangAction} = require("../handler/skills/QUN001");
+const {chunk} = require("lodash/array");
+const {shuffle} = require("lodash/collection");
+const {HERO_STATIC_CONFIG} = require("../config/heroConfig");
 const {handleWu008JieYinAction} = require("../handler/skills/WU008");
 const {fanjianBoardHandler} = require("../handler/fanjianBoardHandler");
 const {handleWu005FanJianAction} = require("../handler/skills/WU005");
@@ -95,6 +99,9 @@ class GameEngine {
     }
 
     setPlayers(roomPlayers) {
+        const heroIds = Object.keys(HERO_STATIC_CONFIG);
+        const heroIdsGroup = chunk(shuffle(heroIds), roomPlayers.length);
+
         const reorderedRoomPlayers = reorderRoomPlayers(roomPlayers);
         reorderedRoomPlayers.forEach((roomPlayer, i) => {
             const newPlayer = new Player({
@@ -104,20 +111,9 @@ class GameEngine {
                 location: i,
             });
 
-            // 选将
-            const allSelectHeroIds = [
-                "WEI001", "WEI002", "WEI003", "WEI004", "WEI005", "WEI007",
-                "SHU001", "SHU002", "SHU003", "SHU005", "SHU006", "SHU007",
-                "WU001", "WU002", "WU003", "WU004", "WU005", "WU006", "WU007",
-                "QUN002"];
-
-            const canSelectHeroNumber = process.env.NODE_ENV == 'production' ? 3 : allSelectHeroIds.length
-            const canSelectHeroIds = [
-                ...sampleSize(allSelectHeroIds, canSelectHeroNumber),
-                "WU008",
-            ]
+            let canSelectHeroIds = process.env.NODE_ENV == 'production' ? heroIdsGroup[i].slice(0, 3) : shuffle(heroIds).slice(0, 7)
+            canSelectHeroIds = [...canSelectHeroIds, "QUN003"]
             newPlayer.canSelectHeros = canSelectHeroIds.map(heroId => getHeroConfig(heroId))
-
             this.gameStatus.players[newPlayer.playerId] = newPlayer;
         })
     }
@@ -152,6 +148,12 @@ class GameEngine {
                     break;
                 case SKILL_CONFIG.WU008_JIE_YIN.key:
                     handleWu008JieYinAction(this.gameStatus);
+                    break;
+                case SKILL_CONFIG.QUN001_QING_NANG.key:
+                    handleQun001QingNangAction(this.gameStatus);
+                    break;
+                case SKILL_CONFIG.QUN003_LI_JIAN.key:
+                    handleQun003LiJianAction(this.gameStatus);
                     break;
             }
         }

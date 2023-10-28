@@ -188,6 +188,21 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
     }
 
     if (last(eventTimingTracker)?.eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_IS_THROWING) {
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingTracker)
+        if (unDoneSkill) {
+            setEventSkillResponse(gameStatus, unDoneSkill)
+            return;
+        } else {
+            stage.setStageName(STAGE_NAME.END);
+            if (currentPlayer.gameStageWhenEndStart) { // 闭月
+                currentPlayer.gameStageWhenEndStart(currentPlayer, gameStatus);
+            }
+            const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_WHEN_END_START;
+            eventTimingTracker.push({eventTimingName, eventTimingSkills: []})
+        }
+    }
+
+    if (last(eventTimingTracker)?.eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_WHEN_END_START) {
         handleGameStageEventEnd(gameStatus);
     }
 }
