@@ -1,3 +1,4 @@
+const {BASIC_CARDS_CONFIG} = require("./cardConfig");
 const {SCROLL_CARDS_CONFIG} = require("./cardConfig");
 const {SKILL_CONFIG} = require("./skillsConfig");
 const {ACTION} = require("../action/action");
@@ -121,6 +122,13 @@ const HERO_STATIC_CONFIG = {
 const HERO_SKILL_DYNAMIC_CONFIG = {
     SHU003_PAO_XIAO: {
         shaLimitTimes: 100,
+    },
+    SHU004_KONG_CHENG: {
+        cantBeTargetWhenNoHandCardsKeys: [
+            BASIC_CARDS_CONFIG.HUO_SHA.key,
+            BASIC_CARDS_CONFIG.LEI_SHA.key,
+            BASIC_CARDS_CONFIG.SHA.key,
+            SCROLL_CARDS_CONFIG.JUE_DOU.key]
     },
     SHU006_MA_SHU: {
         minusHorseDistance: -1,
