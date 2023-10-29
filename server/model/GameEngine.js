@@ -102,7 +102,7 @@ class GameEngine {
 
     setPlayers(roomPlayers) {
         const heroIds = Object.keys(HERO_STATIC_CONFIG);
-        const heroIdsGroup = chunk(shuffle(heroIds), roomPlayers.length);
+        const heroIdsGroup = chunk(shuffle(heroIds), 3);
 
         const reorderedRoomPlayers = reorderRoomPlayers(roomPlayers);
         reorderedRoomPlayers.forEach((roomPlayer, i) => {
@@ -113,8 +113,9 @@ class GameEngine {
                 location: i,
             });
 
-            let canSelectHeroIds = process.env.NODE_ENV == 'production' ? heroIdsGroup[i].slice(0, 3) : shuffle(heroIds).slice(0, 7)
-            canSelectHeroIds = [...canSelectHeroIds, "SHU004"]
+            let canSelectHeroIds = process.env.NODE_ENV == 'production' ? heroIdsGroup[i] : shuffle(heroIds).slice(0, 7)
+            canSelectHeroIds = [...canSelectHeroIds]
+
             newPlayer.canSelectHeros = canSelectHeroIds.map(heroId => getHeroConfig(heroId))
             this.gameStatus.players[newPlayer.playerId] = newPlayer;
         })
