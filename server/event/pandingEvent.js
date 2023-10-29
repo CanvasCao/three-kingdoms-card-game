@@ -21,11 +21,11 @@ const {
 const {SKILL_CONFIG} = require("../config/skillsConfig");
 const {setEventSkillResponse, findAllEventSkillsByTimingNameAndActionCard} = require("./utils");
 const {emitRefreshStatus} = require("../utils/emitUtils");
-const {moveCardsToDiscardPile, getCards, getActualCardColor} = require("../utils/cardUtils");
+const {moveCardsToDiscardPile, getCardsFromDeck, getActualCardColor} = require("../utils/cardUtils");
 const {last} = require("lodash");
 
 const generatePandingEventThenSetNextPandingEventSkill = (gameStatus, {originId, pandingNameKey}) => {
-    const pandingResultCard = getCards(gameStatus, 1)
+    const pandingResultCard = getCardsFromDeck(gameStatus, 1)
     gameStatus.pandingEvent = {
         originId,
         eventTimingTracker: [],

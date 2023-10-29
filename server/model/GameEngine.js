@@ -1,3 +1,4 @@
+const {guanxingBoardHandler} = require("../handler/guanxingBoardHandler");
 const {handleQun003LiJianAction} = require("../handler/skills/QUN003");
 const {handleQun001QingNangAction} = require("../handler/skills/QUN001");
 const {chunk} = require("lodash/array");
@@ -65,7 +66,8 @@ class GameEngine {
 
             // cardBoard
             cardBoardResponses: [],
-            fanjianBoardResponse: undefined,
+            fanJianBoardResponse: undefined,
+            guanXingBoardResponse: undefined,
 
             // 锦囊
             wuxieSimultaneousResponse: {
@@ -111,7 +113,7 @@ class GameEngine {
                 location: i,
             });
 
-            let canSelectHeroIds = process.env.NODE_ENV == 'production' ? heroIdsGroup[i].slice(0, 3) : shuffle(heroIds).slice(0, 6)
+            let canSelectHeroIds = process.env.NODE_ENV == 'production' ? heroIdsGroup[i].slice(0, 3) : shuffle(heroIds).slice(0, 7)
             canSelectHeroIds = [...canSelectHeroIds, "SHU004"]
             newPlayer.canSelectHeros = canSelectHeroIds.map(heroId => getHeroConfig(heroId))
             this.gameStatus.players[newPlayer.playerId] = newPlayer;
@@ -274,6 +276,12 @@ class GameEngine {
         fanjianBoardHandler.handleFanJianBoard(this.gameStatus, data)
 
         tryFindNextSkillResponse(this.gameStatus)
+        emitRefreshStatus(this.gameStatus);
+    }
+
+    handleGuanXingBoardAction(data) {
+        guanxingBoardHandler.handleGuanXingBoard(this.gameStatus, data)
+        trySetNextGameStageEventSkill(this.gameStatus)
         emitRefreshStatus(this.gameStatus);
     }
 

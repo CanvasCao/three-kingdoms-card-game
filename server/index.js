@@ -169,6 +169,10 @@ io.on('connection', (socket) => {
         rooms.getRoomEngine(roomId)?.handleFanJianBoardAction(data);
     });
 
+    socket.on(EMIT_TYPE.GUAN_XING_ACTION, (data) => {
+        rooms.getRoomEngine(roomId)?.handleGuanXingBoardAction(data);
+    });
+
     socket.on(EMIT_TYPE.END_PLAY, () => {
         rooms.getRoomEngine(roomId)?.handleEndPlay();
     });

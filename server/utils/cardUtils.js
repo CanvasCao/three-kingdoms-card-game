@@ -12,7 +12,7 @@ const moveCardsToDiscardPile = (gameStatus, cards) => {
     gameStatus.throwedCards = gameStatus.throwedCards.concat(throwingCards);
 }
 
-const getCards = (gameStatus, number = 2) => {
+const getCardsFromDeck = (gameStatus, number = 2) => {
     if (gameStatus.deckCards.length < number) {
         if (process.env.NODE_ENV == 'production') {
             gameStatus.deckCards = shuffle([...gameStatus.throwedCards, ...gameStatus.deckCards])
@@ -36,7 +36,7 @@ const getCards = (gameStatus, number = 2) => {
 
 const everyoneGetInitialCards = (gameStatus) => {
     Object.keys(gameStatus.players).forEach((playerId) => {
-        gameStatus.players[playerId].cards = getCards(gameStatus, 4);
+        gameStatus.players[playerId].cards = getCardsFromDeck(gameStatus, 4);
     })
 }
 
@@ -63,6 +63,6 @@ const getActualCardColor = (actualCard) => {
 }
 
 exports.moveCardsToDiscardPile = moveCardsToDiscardPile;
-exports.getCards = getCards;
+exports.getCardsFromDeck = getCardsFromDeck;
 exports.everyoneGetInitialCards = everyoneGetInitialCards;
 exports.getActualCardColor = getActualCardColor;

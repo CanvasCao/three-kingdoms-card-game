@@ -30,7 +30,6 @@ const handleCiXiongShuangGuJianResponse = (gameStatus, response) => {
     } else {
         ACTION.discard(gameStatus, originPlayer, response.cards, EQUIPMENT_CARDS_CONFIG.CI_XIONG_SHUANG_GU_JIAN.key)
 
-        onGoingUseStrikeEventSkill.releaseCards = response.cards
         onGoingUseStrikeEventSkill.done = true;
 
         delete gameStatus.skillResponse

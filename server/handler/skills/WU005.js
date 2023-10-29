@@ -5,7 +5,7 @@ const handleWu005FanJianAction = (gameStatus) => {
     const {cards, actualCard, originId, skillKey, targetIds = []} = gameStatus.action;
     const player = gameStatus.players[originId]
 
-    gameStatus.fanjianBoardResponse = {
+    gameStatus.fanJianBoardResponse = {
         originId: targetIds[0],
     }
     player.addUseSkillTimes(SKILL_CONFIG.WU005_FAN_JIAN.key);

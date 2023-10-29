@@ -7,7 +7,7 @@ const {
     getCurrentPlayer,
     getAllAlivePlayersStartFromFirstLocation
 } = require("../utils/playerUtils");
-const {getCards} = require("../utils/cardUtils");
+const {getCardsFromDeck} = require("../utils/cardUtils");
 const {ACTION} = require("../action/action")
 
 const actionHandler = {
@@ -161,7 +161,7 @@ const actionHandler = {
             if (cardNumber <= 1) {
                 cardNumber = 2;
             }
-            gameStatus.wugufengdengCards = getCards(gameStatus, cardNumber)
+            gameStatus.wugufengdengCards = getCardsFromDeck(gameStatus, cardNumber)
         }
     },
 

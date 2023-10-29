@@ -17,7 +17,11 @@ const clearNextCardBoardResponse = (gameStatus) => {
 }
 
 const clearFanJianBoardResponse = (gameStatus) => {
-    gameStatus.fanjianBoardResponse = undefined;
+    gameStatus.fanJianBoardResponse = undefined;
+}
+
+const clearGuanXingBoardResponse = (gameStatus) => {
+    gameStatus.guanXingBoardResponse = undefined;
 }
 
 const clearWuxieSimultaneousResponse = (gameStatus) => {
@@ -33,7 +37,8 @@ const clearAllResponses = (gameStatus) => {
     gameStatus.skillResponse = undefined;
     gameStatus.taoResponses = [];
     gameStatus.cardBoardResponses = [];
-    gameStatus.fanjianBoardResponse = undefined;
+    gameStatus.fanJianBoardResponse = undefined;
+    gameStatus.guanXingBoardResponse = undefined;
 }
 
 const getResponseType = (gameStatus) => {
@@ -45,7 +50,9 @@ const getResponseType = (gameStatus) => {
         return RESPONSE_TYPE_CONFIG.SKILL;
     } else if (gameStatus.cardBoardResponses.length > 0) {
         return RESPONSE_TYPE_CONFIG.CARD_BOARD;
-    } else if (gameStatus.fanjianBoardResponse) {
+    } else if (gameStatus.fanJianBoardResponse) {
+        return RESPONSE_TYPE_CONFIG.FAN_JIAN_BOARD;
+    }  else if (gameStatus.guanXingBoardResponse) {
         return RESPONSE_TYPE_CONFIG.FAN_JIAN_BOARD;
     } else if (gameStatus.wuxieSimultaneousResponse?.hasWuxiePlayerIds?.length > 0) {
         return RESPONSE_TYPE_CONFIG.WUXIE;
@@ -57,7 +64,8 @@ const ifAnyPlayerNeedToResponse = (gameStatus) => {
         gameStatus.skillResponse ||
         gameStatus.taoResponses.length > 0 ||
         gameStatus.cardBoardResponses.length > 0 ||
-        gameStatus.fanjianBoardResponse ||
+        gameStatus.fanJianBoardResponse ||
+        gameStatus.guanXingBoardResponse ||
         gameStatus.wuxieSimultaneousResponse.hasWuxiePlayerIds.length > 0
     ) {
         return true
@@ -68,6 +76,7 @@ const ifAnyPlayerNeedToResponse = (gameStatus) => {
 exports.clearNextTaoResponse = clearNextTaoResponse;
 exports.clearNextCardBoardResponse = clearNextCardBoardResponse;
 exports.clearFanJianBoardResponse = clearFanJianBoardResponse;
+exports.clearGuanXingBoardResponse = clearGuanXingBoardResponse;
 exports.clearCardResponse = clearCardResponse;
 exports.clearSkillResponse = clearSkillResponse;
 exports.clearWuxieSimultaneousResponse = clearWuxieSimultaneousResponse;

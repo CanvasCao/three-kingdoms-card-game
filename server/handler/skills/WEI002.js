@@ -51,7 +51,6 @@ const handleWei002GuiCaiResponse = (gameStatus, response) => {
         ACTION.gaiPan(gameStatus, originPlayer, response.cards, onGoingPandingEvent.pandingResultCard,SKILL_CONFIG.WEI002_GUI_CAI.key)
 
         onGoingPandingEvent.pandingResultCard = response.cards[0]
-        onGoingPandingEventSkill.releaseCards = response.cards
         onGoingPandingEventSkill.done = true;
         delete gameStatus.skillResponse
         emitRefreshStatus(gameStatus); //为了显示判定Board

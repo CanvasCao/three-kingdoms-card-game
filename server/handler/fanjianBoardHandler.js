@@ -7,7 +7,7 @@ const {getCurrentPlayer} = require("../utils/playerUtils");
 const fanjianBoardHandler = {
     handleFanJianBoard(gameStatus, data) {
         const originPlayer = getCurrentPlayer(gameStatus)
-        const targetPlayer = gameStatus.players[gameStatus.fanjianBoardResponse.originId]
+        const targetPlayer = gameStatus.players[gameStatus.fanJianBoardResponse.originId]
 
         if (originPlayer.cards.length <= 0) {
             return

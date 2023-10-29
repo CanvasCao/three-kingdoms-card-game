@@ -5,7 +5,7 @@ const {emitNotifyPublicCards} = require("../utils/emitUtils");
 const {SCROLL_CARDS_CONFIG} = require("../config/cardConfig");
 const {emitNotifyAddLines} = require("../utils/emitUtils");
 const {emitNotifyPlayPublicCards} = require("../utils/emitUtils");
-const {getCards} = require("../utils/cardUtils");
+const {getCardsFromDeck} = require("../utils/cardUtils");
 const {emitNotifyDrawCards, emitNotifyMoveCards} = require("../utils/emitUtils");
 const {moveCardsToDiscardPile} = require("../utils/cardUtils")
 
@@ -99,7 +99,7 @@ const ACTION = {
 
     // ----------- 其他 -----------
     draw(gameStatus, player, number = 2) {
-        const cards = getCards(gameStatus, number)
+        const cards = getCardsFromDeck(gameStatus, number)
         player.addCards(cards);
         emitNotifyDrawCards(gameStatus, player, cards)
     },

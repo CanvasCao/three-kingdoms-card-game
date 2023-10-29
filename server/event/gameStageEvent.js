@@ -79,33 +79,39 @@ const trySetNextGameStageEventSkill = (gameStatus, from) => {
     }
 
     if (last(eventTimingTracker)?.eventTimingName == GAME_STAGE_TIMING.GAME_STAGE_WHEN_PREPARE) {
-        stage.setStageName(STAGE_NAME.JUDGE);
-        const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_JUDGING
-
-        let nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus)
-        if (nextNeedPandingSign) {
-            while (nextNeedPandingSign) {
-                if (isNil(nextNeedPandingSign.isEffect)) {
-                    const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
-                    if (hasWuxiePlayers.length > 0) {
-                        generateWuxieSimultaneousResponseByPandingCard(gameStatus)
-                        return;
-                    } else { // 没有无懈可击 延时锦囊直接生效
-                        nextNeedPandingSign.isEffect = true;
-                    }
-                }
-
-                executeNextOnePandingCard(gameStatus);
-                if (ifAnyPlayerNeedToResponse(gameStatus)) {
-                    return;
-                }
-                nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus)
-            }
-
-            // while 中间没有break 说明判定自动结束
-            eventTimingTracker.push({eventTimingName, eventTimingSkills: []})
+        const unDoneSkill = findNextUnDoneSkillInLastEventTimingsWithSkills(gameStatus, eventTimingTracker)
+        if (unDoneSkill) {
+            setEventSkillResponse(gameStatus, unDoneSkill)
+            return;
         } else {
-            eventTimingTracker.push({eventTimingName, eventTimingSkills: []})
+            stage.setStageName(STAGE_NAME.JUDGE);
+            const eventTimingName = GAME_STAGE_TIMING.GAME_STAGE_IS_JUDGING
+
+            let nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus)
+            if (nextNeedPandingSign) {
+                while (nextNeedPandingSign) {
+                    if (isNil(nextNeedPandingSign.isEffect)) {
+                        const hasWuxiePlayers = getAllHasWuxiePlayers(gameStatus)
+                        if (hasWuxiePlayers.length > 0) {
+                            generateWuxieSimultaneousResponseByPandingCard(gameStatus)
+                            return;
+                        } else { // 没有无懈可击 延时锦囊直接生效
+                            nextNeedPandingSign.isEffect = true;
+                        }
+                    }
+
+                    executeNextOnePandingCard(gameStatus);
+                    if (ifAnyPlayerNeedToResponse(gameStatus)) {
+                        return;
+                    }
+                    nextNeedPandingSign = getNextNeedExecutePandingSign(gameStatus)
+                }
+
+                // while 中间没有break 说明判定自动结束
+                eventTimingTracker.push({eventTimingName, eventTimingSkills: []})
+            } else {
+                eventTimingTracker.push({eventTimingName, eventTimingSkills: []})
+            }
         }
     }
 

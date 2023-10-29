@@ -170,7 +170,10 @@ const TIMING_SKILLS_CONFIG = {
         triggerTiming: GAME_STAGE_TIMING.GAME_STAGE_WHEN_PREPARE,
     },
 
-
+    SHU004_GUAN_XING: {
+        key: "SHU004_GUAN_XING",
+        triggerTiming: GAME_STAGE_TIMING.GAME_STAGE_WHEN_PREPARE,
+    },
     SHU006_TIE_JI: {
         key: "SHU006_TIE_JI",
         triggerTiming: USE_EVENT_TIMING.AFTER_SPECIFYING_TARGET,

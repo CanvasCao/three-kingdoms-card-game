@@ -32,8 +32,6 @@ const {v4: uuidv4} = require('uuid');
 //                         "skillKey": "铁骑",
 //                         "playerId": "a2511baa-80f8-4e6b-be63-317e902bfa9d",
 //                         "chooseToReleaseSkill": false
-//                          releaseTargetIds: [],
-//                          releaseCards: [],
 //                          done: false,
 //                     }
 //                 ]

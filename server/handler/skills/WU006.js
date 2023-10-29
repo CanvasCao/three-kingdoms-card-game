@@ -26,9 +26,6 @@ const handleWu006LiuLiResponse = (gameStatus, response) => {
         });
 
         onGoingUseStrikeEvent.targetId = response.skillTargetIds[0];
-
-        onGoingUseStrikeEventSkill.releaseTargetIds = response.skillTargetIds
-        onGoingUseStrikeEventSkill.releaseCards = response.cards // 最后结算弃牌的时候需要
         onGoingUseStrikeEventSkill.done = true;
 
         delete gameStatus.skillResponse
