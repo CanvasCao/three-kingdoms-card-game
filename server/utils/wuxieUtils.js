@@ -72,8 +72,9 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
                 if (getAllHasWuxiePlayers(gameStatus).length == 0) {
                     scrollStorages.forEach(storage => {
                         players[storage.originId].addBlood();
-                        clearNextScrollStorage(gameStatus);
                     })
+                    // 不能在forEach clearNextScrollStorage(gameStatus);
+                    gameStatus.scrollStorages = [];
                 }
             } else if (actualCard.key == SCROLL_CARDS_CONFIG.WAN_JIAN_QI_FA.key ||
                 actualCard.key == SCROLL_CARDS_CONFIG.NAN_MAN_RU_QIN.key ||
@@ -99,7 +100,7 @@ const setGameStatusAfterMakeSureNoBodyWantsPlayXuxieThenScrollTakeEffect = (game
                     }]
                 }
                 clearNextScrollStorage(gameStatus);
-            } else  { // 五谷丰登
+            } else { // 五谷丰登
                 curScrollStorage.isEffect = true;
             }
         } else { // 失效
